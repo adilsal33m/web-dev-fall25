@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Web-Based Application Development</title>
+
+	<meta name="description" content="To be added later">
+	<meta name="author" content="Muhammad Adil Saleem">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/solarized.min.css" id="theme">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"
+		integrity="sha512-Atu8sttM7mNNMon28+GHxLdz4Xo2APm1WVHwiLW9gW4bmHpHc/E2IbXrj98SmefTmbqbUTOztKl5PDPiu0LD/A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<!-- Header -->
+		<div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;"><img class="inline h-8"
+					src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration Karachi</p>
+		</div>
+		<!-- Footer -->
+		<div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+		</div>
+		<div class="slides">
+			<section
+				data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 2</h3>
+				<p class="text-2xl">28th Aug 2025</p>
+			</section>
+
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>Git Basics</li>
+					<li>Designing your application</li>
+					<li>Wireframes using Figma</li>
+				</ul>
+			</section>
+
+			<section>
+				<section>
+					<h2>Git Basics</h2>
+				</section>
+				<section>
+					<h2 class="text-2xl font-bold">1. Initialize Git</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div class="text-left">
+							<ul class="list-disc pl-5 space-y-2">
+								<li>Go to your project folder.</li>
+								<li>Run <code>git init</code> to start version control.</li>
+								<li>This creates a hidden <code>.git</code> folder.</li>
+							</ul>
+						</div>
+						<div>
+							<pre><code data-trim data-noescape class="bash">
+cd my-project
+git init
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">2. Stage and Commit</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<ul class="list-disc pl-5 space-y-2">
+								<li>Stage files: <code>git add</code></li>
+								<li>Commit with a message: <code>git commit -m</code></li>
+							</ul>
+						</div>
+						<div>
+							<pre><code data-trim class="bash">
+git add index.html
+git commit -m "Initial commit"
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">3. Add Remote</h2>
+					<div class="grid grid-cols-1 gap-4">
+						<div>
+							<p>Link your local repo to GitHub (or any remote):</p>
+						</div>
+						<div>
+							<pre><code class="bash">
+git remote add origin https://github.com/user/repo.git
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">4. Push</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<p>Send your commits to the remote branch:</p>
+						</div>
+						<div>
+							<pre><code class="bash">
+git push -u origin main
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">5. Branching</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<ul class="list-disc pl-5 space-y-2">
+								<li>Create a branch: <code>git branch feature-x</code></li>
+								<li>Switch to branch: <code>git checkout feature-x</code></li>
+								<li>Or combine: <code>git checkout -b feature-x</code></li>
+							</ul>
+						</div>
+						<div>
+							<pre><code class="bash">
+git checkout -b feature-login
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">6. Merge</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<p>Merge another branch into current branch:</p>
+						</div>
+						<div>
+							<pre><code class="bash">
+git checkout main
+git merge feature-login
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">7. Example Merge Conflict</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<p>Conflict occurs when both branches modify the same line:</p>
+						</div>
+						<div>
+							<pre><code class="diff">
+<<<<<<< HEAD
+console.log("Hello from main");
+=======
+console.log("Hello from feature");
+>>>>>>> feature-login
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">8. Resolve Merge Conflict</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<ul class="list-disc pl-5 space-y-2">
+								<li>Edit file and keep correct version.</li>
+								<li>Stage the fixed file.</li>
+								<li>Commit the merge resolution.</li>
+							</ul>
+						</div>
+						<div>
+							<pre><code class="bash">
+# After fixing code
+git add file.js
+git commit
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">9. Stash & Apply</h2>
+					<div class="grid grid-cols-2 gap-4">
+						<div>
+							<p>Temporarily save your changes:</p>
+							<ul class="list-disc pl-5 space-y-2">
+								<li><code>git stash</code> → save changes</li>
+								<li><code>git stash apply</code> → reapply changes</li>
+							</ul>
+						</div>
+						<div>
+							<pre><code class="bash">
+git stash
+git checkout main
+git pull
+git stash apply
+      </code></pre>
+						</div>
+					</div>
+				</section>
+
+			</section>
+			<section>
+				<section>
+					<h3>Using Git through command-line can be a bit cumbersome</h3>
+				</section>
+				<section>
+					<h3>As an alternative, you can use a source control client like Github Desktop or Sourcetree</h3>
+					<div class="grid grid-cols-2 gap-8">
+						<div class="flex justify-center">
+							<img class="h-64" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Github-desktop-logo-symbol.svg/2048px-Github-desktop-logo-symbol.svg.png" alt="">
+						</div>
+						<div class="flex justify-center">
+							<img class="h-64" src="https://cdn.worldvectorlogo.com/logos/sourcetree-1.svg" alt="">
+						</div>
+					</div>
+				</section>
+				<section>
+					<h3>You can also use Source Control available in IDE like Visual Studio Code</h3>
+					<div class="flex justify-center">
+						<img class="h-64 w-full object-cover" src="https://i.ytimg.com/vi/TUYt4oXLxQs/maxresdefault.jpg" alt="">
+					</div>	
+				</section>
+			</section>
+		</div>
+
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			pdfMaxPagesPerSlide: 1,
+			pdfSeparateFragments: false,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+
+	</script>
+
+</body>
+
+</html>
