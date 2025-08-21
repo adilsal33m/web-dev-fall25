@@ -21,6 +21,9 @@
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
 	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"
+		integrity="sha512-Atu8sttM7mNNMon28+GHxLdz4Xo2APm1WVHwiLW9gW4bmHpHc/E2IbXrj98SmefTmbqbUTOztKl5PDPiu0LD/A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -203,16 +206,184 @@
 					Understand the fundamental principles of web-based applications.
 				</section>
 				<section>
-					Gain practical experience with frontend and backend frameworks. 
+					Gain practical experience with frontend and backend frameworks.
 				</section>
 				<section>
-					Design and implement secure and scalable web applications. 
+					Design and implement secure and scalable web applications.
 				</section>
 				<section>
-					Work effectively in teams to deliver a complete deployed product. 
+					Work effectively in teams to deliver a complete deployed product.
 				</section>
 				<section>
-					Apply best practices in version control, testing, and deployment. 
+					Apply best practices in version control, testing, and deployment.
+				</section>
+			</section>
+
+			<section data-background="white">
+				<br>
+				<h3>Course Outline (tentative)</h3>
+				<section>
+					<h2>Week 1</h2>
+					<p><strong>Topics:</strong> Course Introduction, Project Assignment, Source Control using Git,
+						Wireframing</p>
+					<p><strong>Outcome:</strong> Students form teams, receive project ideas, and learn to use version
+						control. Draft project wireframes.</p>
+				</section>
+
+				<section>
+					<h2>Week 2</h2>
+					<p><strong>Topics:</strong> HTML, CSS, Responsive Design</p>
+					<p><strong>Outcome:</strong> Students can create landing page structure and implement responsive
+						layout.</p>
+				</section>
+
+				<section>
+					<h2>Week 3</h2>
+					<p><strong>Topics:</strong> CSS Frameworks, Javascript & DOM, Common UI Patterns</p>
+					<p><strong>Outcome:</strong> Students can create styled pages with basic interactivity added.</p>
+				</section>
+
+				<section>
+					<h2>Week 4</h2>
+					<p><strong>Topics:</strong> HTTP, Web Server, PHP, REST APIs</p>
+					<p><strong>Outcome:</strong> Students can build forms and fetch data from backend.</p>
+				</section>
+
+				<section>
+					<h2>Week 5</h2>
+					<p><strong>Topics:</strong> AJAX, jQuery and axios, Sessions & Cookies</p>
+					<p><strong>Outcome:</strong> Students can send AJAX forms and update the page without full reload.
+						Students can create session-aware elements.</p>
+				</section>
+
+				<section>
+					<h2>Week 6</h2>
+					<p><strong>Topics:</strong> SSR vs SPA, Vue, Components, State Management, Routing</p>
+					<p><strong>Outcome:</strong> Students gain awareness about two core ways to develop web
+						applications. Students can create component-based pages.</p>
+				</section>
+
+				<section>
+					<h2>Week 7</h2>
+					<p><strong>Topics:</strong> Laravel, Artisan, Database Design, Migration and Seeders</p>
+					<p><strong>Outcome:</strong> Students can now create database schemas for storing data.</p>
+				</section>
+
+				<section>
+					<h2>Week 8</h2>
+					<p><strong>Topics:</strong> ORM, Relations, Database Transactions, Collections</p>
+					<p><strong>Outcome:</strong> Students can use ORM to access data.</p>
+				</section>
+
+				<section>
+					<h2>Week 9</h2>
+					<p><strong>Topics:</strong> Middleware, Routing, Request Lifecycle, User Authentication</p>
+					<p><strong>Outcome:</strong> Students can implement user authentication with secure password
+						storage.</p>
+				</section>
+
+				<section>
+					<h2>Week 10</h2>
+					<p><strong>Topics:</strong> Role Based Access Control, Caching, Queues</p>
+					<p><strong>Outcome:</strong> Students can set up different roles and permissions. Students can cache
+						information and run background tasks.</p>
+				</section>
+
+				<section>
+					<h2>Week 11</h2>
+					<p><strong>Topics:</strong> API Design, Auth Token and JWT/Sanctum, Swagger/Postman, Testing</p>
+					<p><strong>Outcome:</strong> Students can create API endpoints. Students can test their code.</p>
+				</section>
+
+				<section>
+					<h2>Week 12</h2>
+					<p><strong>Topics:</strong> Notifications, Pagination, Accessibility, Reports</p>
+					<p><strong>Outcome:</strong> Students can add features to improve user experience.</p>
+				</section>
+
+				<section>
+					<h2>Week 13</h2>
+					<p><strong>Topics:</strong> Deployment, Containers, Logging, ML Backend (optional)</p>
+					<p><strong>Outcome:</strong> Students can deploy applications, use containers, and handle logging.
+					</p>
+				</section>
+
+				<section>
+					<h2>Week 14</h2>
+					<p><strong>Topics:</strong> Web Security (XSS, CSRF, SQLi, MITM), HTTPS, Progressive Web Apps
+						(optional)</p>
+					<p><strong>Outcome:</strong> Students can identify and mitigate security risks in their application.
+					</p>
+				</section>
+
+				<section>
+					<h2>Week 15</h2>
+					<p><strong>Topics:</strong> Presentations</p>
+					<p><strong>Outcome:</strong> Students present their final projects.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h3 class="r-fit-text">Project Assignment</h3>
+				</section>
+				<section>
+					<h2>Take 2 minutes to form a group of 2</h2>
+					<div x-data="{ timeLeft: 120, timer: null }"
+						class="flex flex-col items-center justify-center h-full">
+
+						<div class="text-6xl font-bold" :class="{ 'text-red-500': timeLeft <= 10 }">
+							<span x-text="Math.floor(timeLeft / 60).toString().padStart(2, '0')"></span>:<span
+								x-text="(timeLeft % 60).toString().padStart(2, '0')"></span>
+						</div>
+						<button
+							@click="timer = setInterval(() => { if (timeLeft > 0) { timeLeft--; } else { clearInterval(timer); } }, 1000)"
+							x-show="timer === null"
+							class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-4">
+							Start Timer
+						</button>
+
+
+						<p x-show="timeLeft === 0" class="text-2xl text-red-500">Time's Up! ⏰</p>
+					</div>
+				</section>
+				<section>
+					<h2>Group ID Randomizer</h2>
+					<div x-data="{ numbers: [] }" class="flex flex-col items-center justify-center h-full">
+
+						<button @click="
+      numbers = [];
+      const used = new Set();
+      while (numbers.length < 12) {
+        const randomNum = Math.floor(Math.random() * 12) + 1;
+        if (!used.has(randomNum)) {
+          numbers.push(randomNum);
+          used.add(randomNum);
+        }
+      }
+    " class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-8 text-lg">
+							Generate Sequence
+						</button>
+
+						<div class="flex flex-wrap justify-center gap-2">
+							<template x-for="(number, index) in numbers" :key="index">
+								<span class="p-4 rounded-md font-bold text-white text-4xl shadow-md bg-black hover:text-black hover:bg-white transition duration-300" x-text="number">
+								</span>
+							</template>
+						</div>
+
+					</div>
+				</section>
+				<section>
+					<p>Each group have now the option to pursue the project</p>
+					<div class="grid grid-cols-2 gap-8">
+						<div class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-white text-7xl shadow-md bg-black">
+							As a product
+						</div>
+						<div class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-black text-7xl shadow-md bg-white">
+							As a client-driven project
+						</div>
+					</div>
+					<p class="fragment text-2xl text-red-500">Still a work in progress idea, we'll see how it goes.</p>
 				</section>
 			</section>
 		</div>
@@ -232,6 +403,7 @@
 		Reveal.initialize({
 			width: 1200,
 			height: 700,
+			slideNumber: 'c/t',
 			controls: true,
 			progress: true,
 			center: true,
