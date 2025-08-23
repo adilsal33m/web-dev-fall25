@@ -16,7 +16,7 @@
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/solarized.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
 
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
@@ -37,8 +37,9 @@
 		<div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
 			<p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
 		</div>
-		<div class="slides" >
-			<section data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+		<div class="slides">
+			<section
+				data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
 				<h2>Web Based Application Development</h2>
 				<h3 class="pt-16">Lecture 1</h3>
 				<p class="text-2xl">26th Aug 2025</p>
@@ -366,25 +367,34 @@
 
 						<div class="flex flex-wrap justify-center gap-2">
 							<template x-for="(number, index) in numbers" :key="index">
-								<span class="p-4 rounded-md font-bold text-white text-4xl shadow-md bg-black hover:text-black hover:bg-white transition duration-300" x-text="number">
+								<span
+									class="p-4 rounded-md font-bold text-white text-4xl shadow-md bg-black hover:text-black hover:bg-white transition duration-300"
+									x-text="number">
 								</span>
 							</template>
 						</div>
 
 					</div>
 				</section>
-				<section>
-					<p>Each group have now the option to pursue the project</p>
-					<div class="grid grid-cols-2 gap-8">
-						<div class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-white text-7xl shadow-md bg-black">
-							As a product
-						</div>
-						<div class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-black text-7xl shadow-md bg-white">
-							As a client-driven project
-						</div>
+			</section>
+
+			<section>
+				<p>Each group have the option to pursue the project</p>
+				<div class="grid grid-cols-2 gap-8">
+					<div
+						class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-white text-7xl shadow-md bg-black">
+						As a product
 					</div>
-					<p class="fragment text-2xl text-red-500">Still a work in progress idea, we'll see how it goes.</p>
-				</section>
+					<div
+						class="flex flex-col justify-center p-4 h-96 rounded-md font-bold text-black text-7xl shadow-md bg-white">
+						As a client-driven project
+					</div>
+				</div>
+				<p class="fragment text-2xl text-red-500">Still a work in progress idea, we'll see how it goes.</p>
+			</section>
+			<section>
+				<p>Think about the application you are going to build.</p>
+				<p>We'll discuss it in the next class.</p>
 			</section>
 		</div>
 

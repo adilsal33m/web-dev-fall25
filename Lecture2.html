@@ -16,7 +16,7 @@
 
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/solarized.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
 
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
@@ -224,7 +224,9 @@ git stash apply
 					<h3>As an alternative, you can use a source control client like Github Desktop or Sourcetree</h3>
 					<div class="grid grid-cols-2 gap-8">
 						<div class="flex justify-center">
-							<img class="h-64" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Github-desktop-logo-symbol.svg/2048px-Github-desktop-logo-symbol.svg.png" alt="">
+							<img class="h-64"
+								src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Github-desktop-logo-symbol.svg/2048px-Github-desktop-logo-symbol.svg.png"
+								alt="">
 						</div>
 						<div class="flex justify-center">
 							<img class="h-64" src="https://cdn.worldvectorlogo.com/logos/sourcetree-1.svg" alt="">
@@ -234,8 +236,135 @@ git stash apply
 				<section>
 					<h3>You can also use Source Control available in IDE like Visual Studio Code</h3>
 					<div class="flex justify-center">
-						<img class="h-64 w-full object-cover" src="https://i.ytimg.com/vi/TUYt4oXLxQs/maxresdefault.jpg" alt="">
-					</div>	
+						<img class="h-64 w-full object-cover" src="https://i.ytimg.com/vi/TUYt4oXLxQs/maxresdefault.jpg"
+							alt="">
+					</div>
+				</section>
+			</section>
+
+			<section>
+				<br>
+				<section>
+					<h3>What do we need to start building our application?</h3>
+				</section>
+				<section>
+					<h2 class="text-2xl font-bold">1. Idea</h2>
+					<div>
+						<p>A clear problem your app will solve and why it matters.</p>
+						<p class="text-gray-500 fragment">You already have one now!</p>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">2. Requirements</h2>
+					<div>
+						<p>List of features the developer (you) needs to guide development.</p>
+						<p class="text-gray-500 fragment">Hopefully, you had a chance to think about it after our last
+							class.</p>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">3. Design</h2>
+					<div>
+						<p>Create wireframes or UI mockups to visualize the app flow.</p>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">4. Tech Stack</h2>
+					<div>
+						<p>Choose your tools: programming language, framework, and database.</p>
+					</div>
+				</section>
+
+				<section>
+					<h2 class="text-2xl font-bold">5. Development Setup</h2>
+					<div>
+						<p>Prepare your coding environment with essential tools.</p>
+					</div>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2 class="r-fit-text">Let's talk about designing your app!</h2>
+					<p class="fragment">And design, in general</p>
+				</section>
+				<section>
+					<h3>What is design?</h3>
+					<ul>
+						<li class="fragment">The definition of design vary across different domains</li>
+						<li class="fragment">In this case, <blockquote class="text-center"><b>design</b> is the process
+								of creating
+								purposeful, functional, and visually appealing solutions
+								to meet user needs.</blockquote>
+						</li>
+						<li class="fragment">
+							Design is (and should be) tech-stack agnostic
+						</li>
+					</ul>
+				</section>
+
+				<section>
+					<h3>Designing is primarily a designer's job because:</h3>
+					<br>
+					<ul class="list-disc pl-5 space-y-2">
+						<li class="fragment fade-in-then-semi-out">it requires expertise in UI/UX principles to ensure a
+							good user experience.</li>
+						<li class="fragment fade-in-then-semi-out">it requires proficiency in design tools like Figma,
+							Adobe XD, etc.</li>
+						<li class="fragment fade-in">it requires creativity and visual problem-solving.</li>
+					</ul>
+				</section>
+
+				<section>
+					<div class="text-left">
+						<p>A practical first step in the design process is creating <b>wireframes</b>.</p>
+						<blockquote class="fragment">
+							Wireframes are simple, low-fidelity sketches or blueprints of an application’s layout that
+							focus on structure and functionality rather than colors or visuals.
+						</blockquote>
+						<p class="fragment">Eventually, wireframes evolve into full designs with colors, interactions,
+							and detailed visuals, which developers then implement in code.</p>
+					</div>
+				</section>
+			</section>
+			<section>
+				<br>
+				<h3>Wireframes Capture:</h3>
+
+				<section>
+					<p>Layout and structure - placement of headers, content, buttons, and menus.</p>
+				</section>
+
+				<section>
+					<p>Navigation flow - how users move between screens or pages.</p>
+				</section>
+
+				<section>
+					<p>Content hierarchy - which elements are most important and their order.</p>
+				</section>
+
+				<section>
+					<p>Functional elements - forms, buttons, input fields, and interactive components.</p>
+				</section>
+
+				<section>
+					<p>Basic interactions - clicks, links, and transitions (without detailed animations).</p>
+				</section>
+
+				<section>
+					<p>Page or screen relationships - overall app or website architecture.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<p>Wireframes are relatively easy to build, especially with modern tools at our disposal.</p>
+				</section>
+				<section>
+					<p>Let's try to build some wireframes in Figma</p>
+					<p class="text-gray-500 fragment">You can watch or follow along</p>
 				</section>
 			</section>
 		</div>
