@@ -48,12 +48,98 @@
 			<section>
 				<h3>Agenda</h3>
 				<ul>
-					<li>Git Basics</li>
+					<li>Why use version control?</li>
 					<li>Designing your application</li>
 					<li>Wireframes using Figma</li>
 				</ul>
 			</section>
+			<section>
 
+				<section>
+					<h2>Why should we use version control?</h2>
+					<div class="w-full flex flex-row justify-center">
+						<img src="https://i.redd.it/7p6rgwk7dwd41.jpg" class="h-[500px] mx-auto" alt="">
+					</div>
+				</section>
+				<section>
+					<h2>Why should we use version control?</h2>
+					<ul>
+						<li class="fragment">Work together without overwriting each other</li>
+						<li class="fragment">Track every change with full history</li>
+						<li class="fragment">Experiment safely with branches</li>
+						<li class="fragment">Review, automate, and ship with confidence</li>
+					</ul>
+				</section>
+
+				<!-- Collaboration -->
+				<section>
+					<h3>1) Collaboration</h3>
+					<ul>
+						<li class="fragment">Parallel work via branches</li>
+						<li class="fragment">Merge changes instead of emailing files</li>
+						<li class="fragment">Resolve conflicts transparently</li>
+					</ul>
+				</section>
+
+				<!-- History & Rollback -->
+				<section>
+					<h3>2) History & Rollback</h3>
+					<ul>
+						<li class="fragment">Every commit = a snapshot with author & timestamp</li>
+						<li class="fragment">Revert bad changes quickly</li>
+						<li class="fragment">Blame/annotate to see who changed what, when, and why</li>
+					</ul>
+				</section>
+
+				<!-- Branching & Experimentation -->
+				<section>
+					<h3>3) Branching & Experimentation</h3>
+					<ul>
+						<li class="fragment">Try ideas without breaking main</li>
+						<li class="fragment">Feature branches for focused work</li>
+						<li class="fragment">Safe prototypes and spikes</li>
+					</ul>
+				</section>
+
+				<!-- Code Review & Quality -->
+				<section>
+					<h3>4) Code Review & Quality</h3>
+					<ul>
+						<li class="fragment">Pull requests enable discussion</li>
+						<li class="fragment">Automated checks (lint/tests) on each commit</li>
+					</ul>
+				</section>
+
+				<!-- Traceability & Compliance -->
+				<section>
+					<h3>5) Traceability & Compliance</h3>
+					<ul>
+						<li class="fragment">Link commits to issues and tasks</li>
+						<li class="fragment">Audit trails for regulated environments</li>
+						<li class="fragment">Release notes from commit history</li>
+					</ul>
+				</section>
+
+				<!-- Backup & DR -->
+				<section>
+					<h3>6) Backup & Disaster Recovery</h3>
+					<ul>
+						<li class="fragment">Cloned repos = distributed backups</li>
+						<li class="fragment">Recover lost work with history</li>
+						<li class="fragment">No more “final_v7_really_final.zip”</li>
+					</ul>
+				</section>
+
+				<!-- CI/CD & Automation -->
+				<section>
+					<h3>7) CI/CD & Automation</h3>
+					<ul>
+						<li class="fragment">Build, test, and deploy on every push</li>
+						<li class="fragment">Consistent, repeatable releases</li>
+						<li class="fragment">Faster feedback loops</li>
+					</ul>
+				</section>
+			</section>
 			<section>
 				<section>
 					<h2>Git Basics</h2>
@@ -217,6 +303,19 @@ git stash apply
 
 			</section>
 			<section>
+				<h3>Hands-on Task</h3>
+				<ol>
+					<li>Run <code>git init</code> in a new folder</li>
+					<li>Add <code>hello.txt</code>, commit</li>
+					<li>Create branch <code>feature</code>, edit <code>hello.txt</code>, commit</li>
+					<li>Switch back to <code>main</code>, edit same line, commit</li>
+					<li>Merge <code>feature</code> into <code>main</code> → conflict!</li>
+					<li>Edit file to fix, then <code>git add</code> &amp; <code>git commit</code></li>
+				</ol>
+				<p class="text-2xl text-gray-500">Feel free to use IDE (if available). Try running this command after you are done</p>
+				<p class="hljs javascript">git log --graph --oneline --all</p>
+			</section>
+			<section>
 				<section>
 					<h3>Using Git through command-line can be a bit cumbersome</h3>
 				</section>
@@ -364,7 +463,7 @@ git stash apply
 				</section>
 				<section>
 					<p>Let's try to build some wireframes in Figma</p>
-					<p class="text-gray-500 fragment">You can watch or follow along</p>
+					<p class="text-gray-500 fragment">Try to follow along.</p>
 				</section>
 			</section>
 		</div>
