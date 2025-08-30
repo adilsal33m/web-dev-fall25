@@ -267,7 +267,7 @@
 						<pre><code>&lt;q&gt;Knowledge is power.&lt;/q&gt;</code></pre>
 					</div>
 					<div class="fragment">
-						<blockquote>“The web is more a social creation than a technical one.” – Tim Berners-Lee
+						<blockquote>“The web is more a social creation than a technical one.” - Tim Berners-Lee
 						</blockquote>
 						<pre><code>&lt;blockquote&gt;The web is more a social creation...&lt;/blockquote&gt;</code></pre>
 					</div>
@@ -968,6 +968,60 @@
   &lt;input type="reset" value="Reset"&gt;
 &lt;/form&gt;</code></pre>
 					</div>
+				</section>
+			</section>
+			<section>
+				<!-- Intro -->
+				<section>
+					<h2>From &lt;div&gt; to Semantic Containers</h2>
+					<p class="fragment">In early HTML, developers used <code>&lt;div&gt;</code> everywhere as a general
+						container.</p>
+					<p class="fragment">HTML5 introduced <strong>semantic elements</strong> that give meaning to the
+						structure.</p>
+				</section>
+
+				<!-- Div Example -->
+				<section>
+					<h3>Using &lt;div&gt; Everywhere</h3>
+					<div class="fragment">
+						<div id="header">Header</div>
+						<div id="nav">Navigation Links</div>
+						<div id="content">Main Content</div>
+						<div id="footer">Footer</div>
+					</div>
+					<pre class="fragment"><code>&lt;div id="header"&gt;Header&lt;/div&gt;
+&lt;div id="nav"&gt;Navigation Links&lt;/div&gt;
+&lt;div id="content"&gt;Main Content&lt;/div&gt;
+&lt;div id="footer"&gt;Footer&lt;/div&gt;</code></pre>
+				</section>
+
+				<!-- Semantic Example -->
+				<section>
+					<h3>Semantic HTML5 Structure</h3>
+					<div class="fragment">
+						<header>Header</header>
+						<nav>Navigation Links</nav>
+						<div>
+							<article>Main Article Content</article>
+						</div>
+						<footer>Footer</footer>
+					</div>
+					<pre class="fragment"><code>&lt;header&gt;Header&lt;/header&gt;
+&lt;nav&gt;Navigation Links&lt;/nav&gt;
+&lt;section&gt;
+  &lt;article&gt;Main Article Content&lt;/article&gt;
+&lt;/section&gt;
+&lt;footer&gt;Footer&lt;/footer&gt;</code></pre>
+				</section>
+
+				<!-- Why Semantic? -->
+				<section>
+					<h3>Why Semantic Containers?</h3>
+					<p class="fragment"><strong>Accessibility</strong> - screen readers understand page structure.
+					</p>
+					<p class="fragment"><strong>SEO</strong> - search engines recognize important content.</p>
+					<p class="fragment"><strong>Readability</strong> - code is easier to maintain and understand.
+					</p>
 				</section>
 			</section>
 			<section>
