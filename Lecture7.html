@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Web-Based Application Development</title>
+
+	<meta name="description" content="To be added later">
+	<meta name="author" content="Muhammad Adil Saleem">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"
+		integrity="sha512-Atu8sttM7mNNMon28+GHxLdz4Xo2APm1WVHwiLW9gW4bmHpHc/E2IbXrj98SmefTmbqbUTOztKl5PDPiu0LD/A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<!-- Header -->
+		<div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;"><img class="inline h-8"
+					src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration Karachi</p>
+		</div>
+		<!-- Footer -->
+		<div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+		</div>
+		<div class="slides">
+			<section
+				data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 7</h3>
+				<p class="text-2xl">16th September 2025</p>
+			</section>
+
+			<!-- <section>
+				<h3>What we did in the last class</h3>
+				<ul>
+					<li>Why use version control?</li>
+					<li>Designing your application</li>
+					<li>Wireframes using Figma</li>
+				</ul>
+			</section> -->
+
+
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>Web Servers</li>
+				</ul>
+			</section>
+
+			<section>
+				<section>How does the web work? 🤔</section>
+				<section>
+					1. When you access the internet, you connect through an Internet Service Provider (ISP)
+					<p class="fragment text-gray-500">
+						To visit a website, you simply type its domain name or web address into your browser.
+					</p>
+				</section>
+				<section>
+					Your computer then connects to a network of servers called the Domain Name System (DNS).
+					These servers act like a phone book — they translate the domain name into the correct IP address.
+					<p class="fragment  text-gray-500">
+						An IP address is a unique numeric identifier (up to 12 digits, separated by periods).
+						Every device on the internet has its own IP address, much like a phone number for that computer.
+					</p>
+				</section>
+				<section>
+					<p>The unique number returned by the DNS server allows your browser to connect to the web server
+					hosting the requested site.</p>
+					<p class="fragment text-gray-500">A web server is a computer that stays online continuously and is designed to deliver web pages to
+					users.</p>
+				</section>
+
+				<section>
+					<p>Once connected, the web server sends the requested page back to your web browser.</p>
+				</section>
+			</section>
+		</div>
+
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			pdfMaxPagesPerSlide: 1,
+			pdfSeparateFragments: false,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+
+	</script>
+
+</body>
+
+</html>

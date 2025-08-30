@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+
+	<title>Web-Based Application Development</title>
+
+	<meta name="description" content="To be added later">
+	<meta name="author" content="Muhammad Adil Saleem">
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"
+		integrity="sha512-Atu8sttM7mNNMon28+GHxLdz4Xo2APm1WVHwiLW9gW4bmHpHc/E2IbXrj98SmefTmbqbUTOztKl5PDPiu0LD/A=="
+		crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<!-- Header -->
+		<div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;"><img class="inline h-8"
+					src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration Karachi</p>
+		</div>
+		<!-- Footer -->
+		<div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
+			<p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+		</div>
+		<div class="slides">
+			<section
+				data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 3</h3>
+				<p class="text-2xl">2nd September 2025</p>
+			</section>
+
+			<section>
+				<h3>What we did in the last class</h3>
+				<ul>
+					<li>Why use version control?</li>
+					<li>Designing your application</li>
+					<li>Wireframes using Figma</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>Content of today's lecture are based on:</h3>
+				<ul class="space-y-4">
+					<li class="list-none"><a class="text-5xl" href="https://web.dev/learn/html"
+							target="None"><q>https://web.dev/learn/html</q></a>
+					</li>
+					<li class="list-none">
+						<q class=" text-5xl lowercase">HTML & CSS: design and build websites by Jon Duckett</q>
+					</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>Wireframes using Figma (if needed)</li>
+					<li>HTML</li>
+				</ul>
+			</section>
+
+			<section>
+				<div class="flex gap-8">
+					<div class="flex flex-col">
+						<h3>Poll</h3>
+						<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://adilsaleem.pythonanywhere.com/answer_questionnaire/1"
+							alt="">
+					</div>
+					<div class="flex-1 h-screen">
+						<iframe class="w-full h-full py-8" src="http://adilsaleem.pythonanywhere.com/dashboard/1"
+							frameborder="0"></iframe>
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<section>
+					<h3>Let's start with HTML!</h3>
+					<p class="text-3xl text-gray-500 font-light tracking-wider uppercase">HTML = Hyper Text Markup
+						Language</p>
+				</section>
+				<section>
+					<p>But before that, do you know what's common between these pictures?</p>
+					<div class="h-96 grid grid-cols-3 gap-4">
+						<img class="h-full object-cover object-left"
+							src="https://i.dawn.com/primary/2019/08/5d4afd6f61230.jpg" alt="">
+						<img class="h-full object-contain"
+							src="https://newdocer.cache.wpscdn.com/photo/20191024/9b78c51a5e7442e0b7426a5e6e9b0514.jpg"
+							alt="">
+						<img class="h-full object-cover"
+							src="https://img.freepik.com/free-psd/supermarket-template-design_23-2151804182.jpg" alt="">
+					</div>
+
+				</section>
+				<section>
+					<p>The answer is <b>Structure</b></p>
+					<p class="fragment">HTML is used to provide structure to documents of the web or <b>webpages</b></p>
+				</section>
+				<section>
+					<h3>Let's look at a basic HTML document structure</h3>
+					<img class="!mx-auto shadow-xl rounded" src="images/html-structure.png" alt="">
+				</section>
+				<section>
+					<h3>Try it now</h3>
+					<p>If you are using Chrome, open any webpage, right click and press "View Page Source". </p>
+					<p>You'll see similar code that we saw earlier.</p>
+				</section>
+				<section>
+					<p>Did you notice the text with the angle brackets?</p>
+					<p class="fragment">These are called <b>tags</b></p>
+					<p class="fragment">Tags act like containers which let you know about the information enclosed
+						within it.</p>
+					<p class="fragment">Tags come in pairs (but not always) and are called <b>element</b></p>
+				</section>
+				<section>
+					<h3>A closer look at tags</h3>
+					<div class="grid grid-cols-2">
+						<img class="!mx-auto shadow-xl rounded" src="images/html-tag-opening.png" alt="">
+						<img class="!mx-auto shadow-xl rounded" src="images/html-tag-closing.png" alt="">
+					</div>
+				</section>
+				<section>
+					<p>Additionally, tags can have additional information called <b>attributes</b></p>
+					<img class="!mx-auto shadow-xl rounded" src="images/tag-attribute.png" alt="">
+					<p class="fragment">They appear in the opening tag of an element</p>
+					<p class="fragment">Attributes have a <b>name</b> and can be assigned a <b>value</b></p>
+				</section>
+				<section>
+					<p>Inside the html element, there are two elements</p>
+					<ul>
+						<li class="fragment"><b>&lt;body&gt;</b>, which shows whatever is placed inside it in the
+							browser</li>
+						<li class="fragment"><b>&lt;head&gt;</b>, which holds the information about the page</li>
+					</ul>
+					<p class="fragment"><b>&lt;title&gt;</b> tag is present in the head element which shows the title
+						you see on the browser tab for that page.</p>
+				</section>
+				<section>
+					<h3>Fun fact 😮</h3>
+					<p>In the past, browsers didn't have tabs. There would be a separate window for every opened
+						website.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<p class="fragment">Let's learn how to handle text in HTML!</p>
+					<p class="fragment">The idea behind handling text in HTML is NOT to stylize — it is to give semantic
+						meaning to text.</p>
+				</section>
+
+				<!-- Headings -->
+				<section>
+					<p class="fragment">HTML provides six levels of headings: <code>&lt;h1&gt;</code> through
+						<code>&lt;h6&gt;</code>.
+					</p>
+					<div class="fragment">
+						<h1>Heading 1</h1>
+						<pre><code>&lt;h1&gt;Heading 1&lt;/h1&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<h3>Heading 3</h3>
+						<pre><code>&lt;h3&gt;Heading 3&lt;/h3&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<h6>Heading 6</h6>
+						<pre><code>&lt;h6&gt;Heading 6&lt;/h6&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Paragraphs -->
+				<section>
+					<h2>Paragraphs</h2>
+					<div class="fragment">
+						<p>This is the first paragraph.</p>
+						<pre><code>&lt;p&gt;This is the first paragraph.&lt;/p&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p>This is another paragraph.</p>
+						<pre><code>&lt;p&gt;This is another paragraph.&lt;/p&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Bold & Italic -->
+				<section>
+					<h2>Bold & Italic</h2>
+					<div class="fragment">
+						<p><b>Bold text</b></p>
+						<pre><code>&lt;b&gt;Bold text&lt;/b&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><i>Italic text</i></p>
+						<pre><code>&lt;i&gt;Italic text&lt;/i&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><strong>Strong emphasis</strong></p>
+						<pre><code>&lt;strong&gt;Strong emphasis&lt;/strong&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><em>Emphasized text</em></p>
+						<pre><code>&lt;em&gt;Emphasized text&lt;/em&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Superscript & Subscript -->
+				<section>
+					<h2>Superscripts & Subscripts</h2>
+					<div class="fragment">
+						<p>x<sup>2</sup> + y<sup>2</sup></p>
+						<pre><code>x&lt;sup&gt;2&lt;/sup&gt; + y&lt;sup&gt;2&lt;/sup&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p>H<sub>2</sub>O</p>
+						<pre><code>H&lt;sub&gt;2&lt;/sub&gt;O</code></pre>
+					</div>
+				</section>
+
+				<!-- Whitespace, Line Breaks, Horizontal Rules -->
+				<section>
+					<h2>Whitespace, Line Breaks & Rules</h2>
+					<div class="fragment">
+						<p>Line one<br>Line two</p>
+						<pre><code>Line one&lt;br&gt;Line two</code></pre>
+					</div>
+					<div class="fragment">
+						<hr>
+						<pre><code>&lt;hr&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Semantic Markups -->
+				<section>
+					<h2>Semantic Markups</h2>
+					<div class="fragment">
+						<p><mark>Highlighted text</mark></p>
+						<pre><code>&lt;mark&gt;Highlighted text&lt;/mark&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><abbr title="HyperText Markup Language">HTML</abbr></p>
+						<pre><code>&lt;abbr title="HyperText Markup Language"&gt;HTML&lt;/abbr&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><cite>HTML5 Guide</cite></p>
+						<pre><code>&lt;cite&gt;HTML5 Guide&lt;/cite&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Quotations -->
+				<section>
+					<h2>Quotations</h2>
+					<div class="fragment">
+						<p><q>Knowledge is power.</q></p>
+						<pre><code>&lt;q&gt;Knowledge is power.&lt;/q&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<blockquote>“The web is more a social creation than a technical one.” – Tim Berners-Lee
+						</blockquote>
+						<pre><code>&lt;blockquote&gt;The web is more a social creation...&lt;/blockquote&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Insertions & Deletions -->
+				<section>
+					<h2>Insertions & Deletions</h2>
+					<div class="fragment">
+						<p>My favorite color is <del>blue</del> <ins>green</ins>.</p>
+						<pre><code>My favorite color is &lt;del&gt;blue&lt;/del&gt; &lt;ins&gt;green&lt;/ins&gt;.</code></pre>
+					</div>
+				</section>
+
+				<!-- HTML Entities -->
+				<section>
+					<h2>HTML Entities</h2>
+					<p>There are some reserved characters in HTML. You can use them like this:</p>
+					<div class="fragment">
+						<pre><code>&amp;lt; → &lt;</code></pre>
+					</div>
+					<div class="fragment">
+						<pre><code>&amp;gt; → &gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<pre><code>&amp;amp; → &amp;</code></pre>
+					</div>
+					<div class="fragment">
+						<pre><code>&amp;copy; → ©</code></pre>
+					</div>
+					<div class="fragment">
+						<pre><code>&amp;nbsp; → &nbsp;</code></pre>
+					</div>
+				</section>
+			</section>
+
+			<section>
+				<section>
+					<h2>Media in HTML</h2>
+					<p class="fragment">HTML allows you to include multimedia elements like images, videos, and audio in
+						web pages.</p>
+					<p class="fragment">These elements enhance user experience and make content more engaging.</p>
+				</section>
+
+				<!-- Images -->
+				<section>
+					<h2>Images</h2>
+					<div class="grid grid-cols-2">
+						<div class="fragment" data-fragment-index="1">
+							<p>Basic image:</p>
+							<img class="!mx-auto" src="https://placehold.co/200" alt="Placeholder Image">
+						</div>
+						<div class="fragment" data-fragment-index="2">
+							<p>Image with width and height:</p>
+							<img class="!mx-auto" src="https://placehold.co/200" alt="Placeholder Image" width="200"
+								height="100">
+						</div>
+					</div>
+					<pre class="fragment"
+						data-fragment-index="1"><code>&lt;img src="https://placehold.co/200" alt="Placeholder Image"&gt;</code></pre>
+					<pre class="fragment"
+						data-fragment-index="2"><code>&lt;img src="https://placehold.co/200" alt="Placeholder Image" width="200" height="100"&gt;</code></pre>
+
+				</section>
+
+				<!-- Videos -->
+				<section>
+					<h2>Videos</h2>
+					<div class="grid grid-cols-2">
+						<div class="fragment" data-fragment-index="1">
+							<p>Basic video with controls:</p>
+							<video class="!mx-auto" width="320" height="240" controls>
+								<source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+								Your browser does not support the video tag.
+							</video>
+						</div>
+						<div class="fragment" data-fragment-index="2">
+							<p>Autoplay video with autoplay:</p>
+							<video class="!mx-auto" width="320" height="240" autoplay muted loop>
+								<source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+							</video>
+
+						</div>
+					</div>
+					<pre class="fragment" data-fragment-index="1"><code>&lt;video width="320" height="240" controls&gt;
+  &lt;source src="mov_bbb.mp4" type="video/mp4"&gt;
+  Your browser does not support the video tag.
+&lt;/video&gt;</code></pre>
+					<pre class="fragment" data-fragment-index="2"><code>&lt;video width="320" height="240" autoplay muted loop&gt;
+  &lt;source src="mov_bbb.mp4" type="video/mp4"&gt;
+&lt;/video&gt;</code></pre>
+				</section>
+
+				<!-- Audio -->
+				<section>
+					<h2>Audio</h2>
+					<div class="fragment">
+						<p>Basic audio with controls:</p>
+						<audio class="mx-auto" controls>
+							<source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+							Your browser does not support the audio element.
+						</audio>
+						<pre><code>&lt;audio controls&gt;
+  &lt;source src="horse.mp3" type="audio/mpeg"&gt;
+  Your browser does not support the audio element.
+&lt;/audio&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p>Autoplay audio (muted if needed):</p>
+						<audio class="mx-auto" autoplay loop muted>
+							<source src="https://www.w3schools.com/html/horse.mp3" type="audio/mpeg">
+						</audio>
+						<pre><code>&lt;audio autoplay muted loop&gt;
+  &lt;source src="horse.mp3" type="audio/mpeg"&gt;
+&lt;/audio&gt;</code></pre>
+					</div>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Links in HTML</h2>
+					<p class="fragment">Links are created with the <code>&lt;a&gt;</code> tag (anchor tag).</p>
+					<p class="fragment">They allow users to navigate between pages, sections, or even trigger actions
+						like opening email.</p>
+				</section>
+
+				<!-- Basic Link -->
+				<section>
+					<h2>Basic Link</h2>
+					<div class="fragment">
+						<p><a href="https://www.example.com">Visit Example</a></p>
+						<pre><code>&lt;a href="https://www.example.com"&gt;Visit Example&lt;/a&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Open in New Tab -->
+				<section>
+					<h2>Open in New Tab</h2>
+					<div class="fragment">
+						<p><a href="https://www.example.com" target="_blank">Open Example in new tab</a></p>
+						<pre><code>&lt;a href="https://www.example.com" target="_blank"&gt;Open Example in new tab&lt;/a&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Email Link -->
+				<section>
+					<h2>Email Links</h2>
+					<div class="fragment">
+						<p><a href="mailto:someone@example.com">Send Email</a></p>
+						<pre><code>&lt;a href="mailto:someone@example.com"&gt;Send Email&lt;/a&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Page Anchors -->
+				<section>
+					<h2>Page Anchors</h2>
+					<div class="fragment">
+						<p><a href="#section2">Jump to Section 2</a></p>
+						<pre><code>&lt;a href="#section2"&gt;Jump to Section 2&lt;/a&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p id="section2"><strong>This is Section 2</strong></p>
+						<pre><code>&lt;p id="section2"&gt;This is Section 2&lt;/p&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Image Links -->
+				<section>
+					<h2>Image as a Link</h2>
+					<div class="fragment">
+						<p><a href="https://www.example.com"><img class="!mx-auto" src="https://placehold.co/200"
+									alt="Example"></a></p>
+						<pre><code>&lt;a href="https://www.example.com"&gt;
+  &lt;img src="https://placehold.co/200" alt="Example"&gt;
+&lt;/a&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Relative vs Absolute Links -->
+				<section>
+					<h2>Relative vs Absolute Links</h2>
+					<div class="fragment">
+						<p><strong>Relative Link:</strong> Works within the same site.</p>
+						<p><a href="about.html">About Us</a></p>
+						<pre><code>&lt;a href="about.html"&gt;About Us&lt;/a&gt;</code></pre>
+					</div>
+					<div class="fragment">
+						<p><strong>Absolute Link:</strong> Full URL including domain.</p>
+						<p><a href="https://www.example.com/about.html">About Us</a></p>
+						<pre><code>&lt;a href="https://www.example.com/about.html"&gt;About Us&lt;/a&gt;</code></pre>
+					</div>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Lists in HTML</h2>
+					<p class="fragment">Lists are used to group related items together in a structured way.</p>
+					<p class="fragment">HTML provides several types of lists: unordered, ordered, nested, and
+						description lists.</p>
+				</section>
+
+				<!-- Unordered List -->
+				<section>
+					<h2>Unordered List</h2>
+					<div class="fragment">
+						<ul>
+							<li>HTML</li>
+							<li>CSS</li>
+							<li>JavaScript</li>
+						</ul>
+						<pre><code>&lt;ul&gt;
+  &lt;li&gt;HTML&lt;/li&gt;
+  &lt;li&gt;CSS&lt;/li&gt;
+  &lt;li&gt;JavaScript&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Ordered List -->
+				<section>
+					<h2>Ordered List</h2>
+					<div class="fragment">
+						<ol>
+							<li>Install software</li>
+							<li>Write code</li>
+							<li>Test project</li>
+						</ol>
+						<pre><code>&lt;ol&gt;
+  &lt;li&gt;Install software&lt;/li&gt;
+  &lt;li&gt;Write code&lt;/li&gt;
+  &lt;li&gt;Test project&lt;/li&gt;
+&lt;/ol&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Nested List -->
+				<section>
+					<h2>Nested List</h2>
+					<div class="grid grid-cols-2">
+						<div>
+
+							<pre><code>&lt;ul&gt;
+  &lt;li&gt;Frontend
+    &lt;ul&gt;
+      &lt;li&gt;HTML&lt;/li&gt;
+      &lt;li&gt;CSS&lt;/li&gt;
+      &lt;li&gt;JS&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Backend
+    &lt;ul&gt;
+      &lt;li&gt;PHP&lt;/li&gt;
+      &lt;li&gt;Node.js&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+						</div>
+						<div class="fragment">
+							<ul>
+								<li>Frontend
+									<ul>
+										<li>HTML</li>
+										<li>CSS</li>
+										<li>JS</li>
+									</ul>
+								</li>
+								<li>Backend
+									<ul>
+										<li>PHP</li>
+										<li>Node.js</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<!-- Description List -->
+				<section>
+					<h2>Description List</h2>
+					<div class="fragment">
+						<dl>
+							<dt>HTML</dt>
+							<dd>HyperText Markup Language, used for creating web pages.</dd>
+							<dt>CSS</dt>
+							<dd>Cascading Style Sheets, used for styling web pages.</dd>
+							<dt>JavaScript</dt>
+							<dd>Programming language for adding interactivity.</dd>
+						</dl>
+						<pre><code>&lt;dl&gt;
+  &lt;dt&gt;HTML&lt;/dt&gt;
+  &lt;dd&gt;HyperText Markup Language, used for creating web pages.&lt;/dd&gt;
+  &lt;dt&gt;CSS&lt;/dt&gt;
+  &lt;dd&gt;Cascading Style Sheets, used for styling web pages.&lt;/dd&gt;
+  &lt;dt&gt;JavaScript&lt;/dt&gt;
+  &lt;dd&gt;Programming language for adding interactivity.&lt;/dd&gt;
+&lt;/dl&gt;</code></pre>
+					</div>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Tables in HTML</h2>
+					<p class="fragment">Tables are used to display tabular data in rows and columns.</p>
+					<p class="fragment">HTML tables are built with <code>&lt;table&gt;</code>, <code>&lt;tr&gt;</code>,
+						<code>&lt;td&gt;</code>, and <code>&lt;th&gt;</code> elements.
+					</p>
+				</section>
+
+				<!-- Basic Table -->
+				<section>
+					<h2>Basic Table</h2>
+					<div class="fragment">
+						<table border="1">
+							<tr>
+								<td>Row 1, Cell 1</td>
+								<td>Row 1, Cell 2</td>
+							</tr>
+							<tr>
+								<td>Row 2, Cell 1</td>
+								<td>Row 2, Cell 2</td>
+							</tr>
+						</table>
+						<pre><code>&lt;table border="1"&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Row 1, Cell 1&lt;/td&gt;
+    &lt;td&gt;Row 1, Cell 2&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Row 2, Cell 1&lt;/td&gt;
+    &lt;td&gt;Row 2, Cell 2&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Table with Headers -->
+				<section>
+					<h2>Table with Headers</h2>
+					<div class="fragment grid grid-cols-2">
+						<table border="1">
+							<tr>
+								<th>Name</th>
+								<th>Age</th>
+								<th>City</th>
+							</tr>
+							<tr>
+								<td>Alice</td>
+								<td>25</td>
+								<td>New York</td>
+							</tr>
+							<tr>
+								<td>Bob</td>
+								<td>30</td>
+								<td>London</td>
+							</tr>
+						</table>
+						<pre><code>&lt;table border="1"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Age&lt;/th&gt;
+    &lt;th&gt;City&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Alice&lt;/td&gt;
+    &lt;td&gt;25&lt;/td&gt;
+    &lt;td&gt;New York&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Bob&lt;/td&gt;
+    &lt;td&gt;30&lt;/td&gt;
+    &lt;td&gt;London&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Table with Rowspan and Colspan -->
+				<section>
+					<h2>Rowspan & Colspan</h2>
+					<div class="fragment  grid grid-cols-2">
+						<table border="1">
+							<tr>
+								<th>Name</th>
+								<th colspan="2">Marks</th>
+							</tr>
+							<tr>
+								<td>Alice</td>
+								<td>Math: 90</td>
+								<td>Science: 85</td>
+							</tr>
+							<tr>
+								<td>Bob</td>
+								<td colspan="2">Math: 80, Science: 75</td>
+							</tr>
+						</table>
+						<pre><code>&lt;table border="1"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th colspan="2"&gt;Marks&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Alice&lt;/td&gt;
+    &lt;td&gt;Math: 90&lt;/td&gt;
+    &lt;td&gt;Science: 85&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Bob&lt;/td&gt;
+    &lt;td colspan="2"&gt;Math: 80, Science: 75&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Styled Table -->
+				<section>
+					<h2>Styled Table</h2>
+					<div class="fragment  grid grid-cols-2">
+						<table border="1" style="border-collapse: collapse; width: 50%;">
+							<tr style="background-color: #f2f2f2;">
+								<th>Name</th>
+								<th>Age</th>
+								<th>City</th>
+							</tr>
+							<tr>
+								<td>Alice</td>
+								<td>25</td>
+								<td>New York</td>
+							</tr>
+							<tr>
+								<td>Bob</td>
+								<td>30</td>
+								<td>London</td>
+							</tr>
+						</table>
+						<pre><code>&lt;table border="1" style="border-collapse: collapse; width:50%;"&gt;
+  &lt;tr style="background-color:#f2f2f2;"&gt;
+    &lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Age&lt;/th&gt;
+    &lt;th&gt;City&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Alice&lt;/td&gt;
+    &lt;td&gt;25&lt;/td&gt;
+    &lt;td&gt;New York&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Bob&lt;/td&gt;
+    &lt;td&gt;30&lt;/td&gt;
+    &lt;td&gt;London&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+					</div>
+				</section>
+				<section>
+					<p>Although we can style some elements using HTML attributes, it is preferred to using CSS for
+						styling.</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>HTML Forms</h2>
+					<p class="fragment">Forms allow users to submit data to a server or interact with web pages.</p>
+					<p class="fragment">Forms use the <code>&lt;form&gt;</code> element and a variety of input controls.
+					</p>
+				</section>
+
+				<!-- Basic Input -->
+				<section>
+					<h2>Basic Input Fields</h2>
+					<div class="fragment">
+						<form>
+							<label for="name">Name:</label>
+							<input type="text" id="name" name="name"><br><br>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name" name="name"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Password and Email -->
+				<section>
+					<h2>Password & Email Inputs</h2>
+					<div class="fragment">
+						<form>
+							<label for="email">Email:</label>
+							<input type="email" id="email" name="email"><br><br>
+							<label for="pass">Password:</label>
+							<input type="password" id="pass" name="pass">
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;
+  &lt;label for="pass"&gt;Password:&lt;/label&gt;
+  &lt;input type="password" id="pass" name="pass"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Textarea -->
+				<section>
+					<h2>Textarea</h2>
+					<div class="fragment">
+						<form>
+							<label for="message">Message:</label><br>
+							<textarea id="message" name="message" rows="4" cols="40"></textarea>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="message"&gt;Message:&lt;/label&gt;&lt;br&gt;
+  &lt;textarea id="message" name="message" rows="4" cols="40"&gt;&lt;/textarea&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Checkboxes -->
+				<section>
+					<h2>Checkboxes</h2>
+					<div class="fragment">
+						<form>
+							<label><input type="checkbox" name="vehicle" value="Bike"> I have a bike</label><br>
+							<label><input type="checkbox" name="vehicle" value="Car"> I have a car</label>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label&gt;&lt;input type="checkbox" name="vehicle" value="Bike"&gt; I have a bike&lt;/label&gt;&lt;br&gt;
+  &lt;label&gt;&lt;input type="checkbox" name="vehicle" value="Car"&gt; I have a car&lt;/label&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Radio Buttons -->
+				<section>
+					<h2>Radio Buttons</h2>
+					<div class="fragment">
+						<form>
+							<label><input type="radio" name="gender" value="male"> Male</label><br>
+							<label><input type="radio" name="gender" value="female"> Female</label>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label&gt;&lt;input type="radio" name="gender" value="male"&gt; Male&lt;/label&gt;&lt;br&gt;
+  &lt;label&gt;&lt;input type="radio" name="gender" value="female"&gt; Female&lt;/label&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Dropdown / Select -->
+				<section>
+					<h2>Dropdown / Select</h2>
+					<div class="fragment">
+						<form>
+							<label for="cars">Choose a car:</label>
+							<select id="cars" name="cars">
+								<option value="volvo">Volvo</option>
+								<option value="saab">Saab</option>
+								<option value="bmw">BMW</option>
+							</select>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="cars"&gt;Choose a car:&lt;/label&gt;
+  &lt;select id="cars" name="cars"&gt;
+    &lt;option value="volvo"&gt;Volvo&lt;/option&gt;
+    &lt;option value="saab"&gt;Saab&lt;/option&gt;
+    &lt;option value="bmw"&gt;BMW&lt;/option&gt;
+  &lt;/select&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Buttons -->
+				<section>
+					<h2>Buttons</h2>
+					<div class="fragment">
+						<form>
+							<input type="submit" value="Submit">
+							<input type="reset" value="Reset">
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;input type="submit" value="Submit"&gt;
+  &lt;input type="reset" value="Reset"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<section>
+					<h2>Numeric Inputs</h2>
+					<div class="fragment">
+						<form>
+							<label for="age">Enter your age:</label>
+							<input type="number" id="age" name="age" min="1" max="120" step="1">
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="age"&gt;Enter your age:&lt;/label&gt;
+  &lt;input type="number" id="age" name="age" min="1" max="120" step="1"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- File Upload -->
+				<section>
+					<h2>File Upload</h2>
+					<div class="fragment">
+						<form>
+							<label for="resume">Upload your resume:</label>
+							<input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="resume"&gt;Upload your resume:&lt;/label&gt;
+  &lt;input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Fieldset & Legend -->
+				<section>
+					<h2>Fieldset & Legend</h2>
+					<div class="fragment">
+						<form>
+							<fieldset>
+								<legend>Personal Info</legend>
+								<label for="fname">First Name:</label>
+								<input type="text" id="fname" name="fname"><br><br>
+								<label for="lname">Last Name:</label>
+								<input type="text" id="lname" name="lname">
+							</fieldset>
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;fieldset&gt;
+    &lt;legend&gt;Personal Info&lt;/legend&gt;
+    &lt;label for="fname"&gt;First Name:&lt;/label&gt;
+    &lt;input type="text" id="fname" name="fname"&gt;&lt;br&gt;&lt;br&gt;
+    &lt;label for="lname"&gt;Last Name:&lt;/label&gt;
+    &lt;input type="text" id="lname" name="lname"&gt;
+  &lt;/fieldset&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Form Validation -->
+				<section>
+					<h2>Form Validation</h2>
+					<div class="fragment grid grid-cols-2">
+						<form>
+							<label for="email">Email (required):</label>
+							<input type="email" id="email" name="email" required><br><br>
+
+							<label for="password">Password (min 6 characters):</label>
+							<input type="password" id="password" name="password" minlength="6" required><br><br>
+
+							<label for="age2">Age (between 18 and 99):</label>
+							<input type="number" id="age2" name="age2" min="18" max="99" required><br><br>
+
+							<input type="submit" value="Submit">
+						</form>
+						<pre><code>&lt;form&gt;
+  &lt;label for="email"&gt;Email (required):&lt;/label&gt;
+  &lt;input type="email" id="email" name="email" required&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;label for="password"&gt;Password (min 6 characters):&lt;/label&gt;
+  &lt;input type="password" id="password" name="password" minlength="6" required&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;label for="age2"&gt;Age (between 18 and 99):&lt;/label&gt;
+  &lt;input type="number" id="age2" name="age2" min="18" max="99" required&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;input type="submit" value="Submit"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+
+				<!-- Complete Form Example -->
+				<section>
+					<h2>Complete Form Example</h2>
+					<div class="fragment grid grid-cols-2 text-4xl">
+						<form action="/submit" method="post">
+							<label for="name">Name:</label>
+							<input type="text" id="name" name="name"><br><br>
+
+							<label for="email">Email:</label>
+							<input type="email" id="email" name="email"><br><br>
+
+							<label for="message">Message:</label><br>
+							<textarea id="message" name="message" rows="4" cols="40"></textarea><br><br>
+
+							<input type="submit" value="Submit">
+							<input type="reset" value="Reset">
+						</form>
+						<pre><code>&lt;form action="/submit" method="post"&gt;
+  &lt;label for="name"&gt;Name:&lt;/label&gt;
+  &lt;input type="text" id="name" name="name"&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;label for="email"&gt;Email:&lt;/label&gt;
+  &lt;input type="email" id="email" name="email"&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;label for="message"&gt;Message:&lt;/label&gt;&lt;br&gt;
+  &lt;textarea id="message" name="message" rows="4" cols="40"&gt;&lt;/textarea&gt;&lt;br&gt;&lt;br&gt;
+
+  &lt;input type="submit" value="Submit"&gt;
+  &lt;input type="reset" value="Reset"&gt;
+&lt;/form&gt;</code></pre>
+					</div>
+				</section>
+			</section>
+			<section>
+				We have not explored all the HTML elements. You can find more details regarding them online.
+			</section>
+		</div>
+
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+
+		// Also available as an ES module, see:
+		// https://revealjs.com/initialization/
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			pdfMaxPagesPerSlide: 1,
+			pdfSeparateFragments: false,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+
+	</script>
+
+</body>
+
+</html>
