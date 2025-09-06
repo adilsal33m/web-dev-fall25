@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Web-Based Application Development — CSS Basics</title>
+  <meta name="description" content="CSS Lecture Slides">
+  <meta name="author" content="Muhammad Adil Saleem">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Reveal.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+  <!-- Syntax highlight -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+  <!-- Tailwind (utility for a few helpers just like the HTML deck) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <!-- Header -->
+    <div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
+      <div class="flex justify-between items-center px-4">
+        <p style="text-align: center; font-size: 0.5em;">
+          <img class="inline h-8" src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration
+          Karachi
+        </p>
+        <a class="text-xs text-gray-400 uppercase" href="https://jsfiddle.net" data-preview-link>Open span Editor</a>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
+      <p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+    </div>
+
+    <div class="slides">
+
+      <!-- Title -->
+      <section
+        data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+        <h3>Web Based Application Development</h3>
+        <h3 class="pt-16">Lecture 5</h3>
+        <p class="text-2xl">9th September 2025</p>
+      </section>
+
+      <section>
+        <h3>What we did last time</h3>
+        <ul>
+          <li class="fragment">CSS</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Agenda</h3>
+        <ul>
+          <li>CSS Frameworks</li>
+          <li>Introduction to <em>npm</em></li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Useful Link</h3>
+        <a href="https://caniuse.com" class="font-bold !text-emerald-500 hover:!text-emerald-600 transition">Can I
+          Use?</a>
+        <p>Can I Use is useful for finding out browser support of different functionalities. </p>
+      </section>
+
+      <section>
+        <!-- Slide 1: Challenges with Vanilla CSS -->
+        <section>
+          <h3>Challenges with Vanilla CSS</h3>
+          <ul>
+            <li class="fragment">Global namespace &amp; selector collisions (specificity wars)</li>
+            <li class="fragment">Large maintenance burden as project scales</li>
+            <li class="fragment">Inconsistent design decisions across teams</li>
+            <li class="fragment">Difficulty composing small utility rules; repeated declarations</li>
+          </ul>
+        </section>
+
+        <!-- Slide 2a: CSS Frameworks to the rescue -->
+        <section>
+          <h3>CSS Frameworks to the rescue</h3>
+          <p class="mt-4">Frameworks provide a consistent, tested set of styles and utilities that speed up development,
+            reduce duplication, and enforce design patterns.</p>
+        </section>
+
+        <!-- Slide 2b: How frameworks solve issues -->
+        <section>
+          <h3>How frameworks solve Vanilla CSS problems</h3>
+          <ul>
+            <li class="fragment">Namespacing and predictable classes reduce collisions</li>
+            <li class="fragment">Reusable components and utilities reduce repetition</li>
+            <li class="fragment">Opinionated defaults provide consistency</li>
+            <li class="fragment">Integrated tooling improves workflow (build, purge, watch)</li>
+          </ul>
+        </section>
+
+        <!-- Slide 2c: Popular frameworks -->
+        <section>
+          <h3>Some popular CSS Frameworks</h3>
+          <div class="mt-4 grid grid-cols-2 gap-4">
+            <div class="fragment">
+              <h3>Component-first</h3>
+              <ul class="ml-4 list-disc mt-2">
+                <li>Bootstrap</li>
+                <li>Bulma</li>
+              </ul>
+            </div>
+            <div class="fragment">
+              <h3>Utility-first</h3>
+              <ul class="ml-4 list-disc mt-2">
+                <li>Tailwind CSS</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+
+        <!-- Slide 3a: What is Tailwind -->
+        <section>
+          <h3>What is Tailwind CSS?</h3>
+          <p class="mt-4">Tailwind is a utility-first CSS framework — it offers tiny, single-purpose utility classes
+            (e.g.
+            <span decoaration-solid>p-4</span>, <span decoaration-solid>text-center</span>)
+            that you compose to build UI directly in your markup.
+          </p>
+          <ul>
+            <li class="fragment">Not a component library — it's a toolbox</li>
+            <li class="fragment">Highly configurable via a JavaScript config (tailwind.config.js)</li>
+            <li class="fragment">Pairs well with build tooling to purge unused CSS</li>
+          </ul>
+        </section>
+
+        <!-- Slide 3b & 3c: Tailwind CDN install and caveat -->
+        <section>
+
+          <div>
+            <h3 class="text-xl font-semibold">Easiest way to try: CDN</h3>
+            <p class="mt-2">You can include Tailwind via a CDN for quick prototypes and slides. This skips the build
+              step and gives you access to utility classes right away.</p>
+          </div>
+          <div class="p-6 bg-slate-500 text-white rounded">Hello Tailwind</div>
+          <div>
+            <pre><code>&lt;!-- Tailwind CDN (for demos) --&gt;
+&lt;link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.2/dist/tailwind.min.css" rel="stylesheet"&gt;
+
+&lt;!-- then use utilities in your markup --&gt;
+&lt;div class="p-6 bg-slate-500 text-white rounded"&gt;Hello Tailwind&lt;/div&gt;
+</code></pre>
+          </div>
+        </section>
+
+        <section>
+          <h3 class="text-xl font-semibold">CDN — Not intended for production</h3>
+          <p class="mt-2">Use the npm + build setup for production so you can:</p>
+          <ul class="ml-6 list-disc mt-2">
+            <li>Purge unused classes (small CSS footprint)</li>
+            <li>Extend/override tokens in tailwind.config.js</li>
+            <li>Enable JIT mode and advanced plugins</li>
+          </ul>
+        </section>
+      </section>
+
+      <section>
+        <!-- Slide group: Core utility examples (4a - 4k) -->
+        <section>
+          <h3>Tailwind — Core utilities (overview)</h3>
+          <p class="mt-4">We'll show short examples for colors, spacing, layout, typography, and interactivity.</p>
+        </section>
+
+        <!-- 4a Colors -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Colors</h3>
+              <p class="mt-2">Tailwind exposes a palette with shades. Use classes like <span
+                  decoaration-solid>bg-blue-500</span>, <span decoaration-solid>text-slate-700</span>, or custom colors
+                from your config.</p>
+              <ul class="ml-6 mt-2 list-disc">
+                <li>Background: <span decoaration-solid>bg-{color}-{shade}</span></li>
+                <li>Text: <span decoaration-solid>text-{color}-{shade}</span></li>
+                <li>Border: <span decoaration-solid>border-{color}-{shade}</span></li>
+              </ul>
+            </div>
+            <div>
+              <div>
+                <div class="p-4 bg-gradient-to-r from-blue-400 to-indigo-600 text-white rounded">
+                  Blue to Indigo banner
+                </div>
+
+                <p class="text-red-500 mt-4">Paragraph with red text</p>
+              </div>
+              <div class="spanbox">
+                <pre><code>&lt;div class="p-4 bg-gradient-to-r from-blue-400 to-indigo-600 text-white rounded"&gt;
+  Blue to Indigo banner
+&lt;/div&gt;
+
+&lt;p class="text-red-500 mt-4"&gt;Paragraph with slate text&lt;/p&gt;
+</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4b Margin & padding -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Margin &amp; Padding</h3>
+              <p class="mt-2">Spacing utilities follow a scale (e.g. <span decoaration-solid>0, 0.5, 1, 1.5, 2, 3, 4, 5,
+                  6
+                  ...</span> usually mapped to <span decoaration-solid>0, 0.125rem, 0.25rem, 0.375rem, 0.5rem, 0.75rem,
+                  1rem</span> etc.).</p>
+            </div>
+            <div>
+
+              <div class="p-6 mb-16 bg-red-200">Card with spacing</div>
+              <div>Inline <span class="px-16 py-2 bg-red-200">padded</span> area</div>
+              <div class="spanbox">
+                <pre><code>&lt;div class="p-6 mb-16 bg-red-200"&gt;Card with spacing&lt;/div&gt;
+
+&lt;div class="px-16 py-2 bg-red-200"&gt;Inline padded area&lt;/div&gt;
+</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4c Width & Height -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Width &amp; Height</h3>
+              <p class="mt-2">Use helpers like <span decoaration-solid>w-1/2</span>, <span
+                  decoaration-solid>w-full</span>, <span decoaration-solid>h-64</span> or
+                arbitrary values like <span decoaration-solid>w-[320px]</span>.</p>
+            </div>
+            <div>
+              <div>
+                <div class="w-1/3 h-48 bg-slate-100 rounded">Box</div>
+                <img class="w-full h-auto" src="https://placehold.co/600x200" alt="placeholder" />
+              </div>
+              <div class="spanbox">
+                <pre><code>&lt;div class="w-1/3 h-48 bg-slate-100 rounded"&gt;Box&lt;/div&gt;
+
+&lt;img class="w-full h-auto" src="https://placehold.co/600x200" alt="placeholder"/&gt;
+</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4d Borders & shadows -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Borders &amp; Shadows</h3>
+              <p class="mt-2">Controls for border width, color, radius and shadows are provided with concise classes
+                like
+                <span decoaration-solid>border</span>, <span decoaration-solid>rounded-lg</span>, <span
+                  decoaration-solid>shadow-md</span>.
+              </p>
+            </div>
+            <div>
+              <div class="spanbox">
+                <pre><code>&lt;div class="border border-gray-200 rounded-lg shadow p-4"&gt;Card&lt;/div&gt;
+
+&lt;div class="rounded-full border-2 border-indigo-500 p-2 inline-block"&gt;Avatar placeholder&lt;/div&gt;
+</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4e Text size & weights -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Text sizes &amp; font weights</h3>
+              <p class="mt-2">Use <span decoaration-solid>text-sm</span>, <span decoaration-solid>text-xl</span>, and
+                weights like <span decoaration-solid>font-semibold</span>, <span decoaration-solid>font-bold</span>.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>&lt;h3&gt;Heading&lt;/h3&gt;
+&lt;p class="text-sm text-slate-500"&gt;Small helper text&lt;/p&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4f Position -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Position</h3>
+              <p class="mt-2">Helpers: <span decoaration-solid>relative</span>, <span decoaration-solid>absolute</span>,
+                <span decoaration-solid>inset-0</span>,
+                <span decoaration-solid>top-1/2</span>.
+              </p>
+            </div>
+            <div class="spanbox">
+              <pre><code>&lt;div class="relative h-40 bg-slate-50"&gt;
+  &lt;div class="absolute inset-0 flex items-center justify-center"&gt;Centered overlay&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4g Visibility & z-index -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Visibility &amp; Z-index</h3>
+              <p class="mt-2">Classes: <span decoaration-solid>hidden</span>, <span decoaration-solid>block</span>,
+                <span decoaration-solid>z-10</span>, <span decoaration-solid>z-50</span>.
+              </p>
+            </div>
+            <div class="spanbox">
+              <pre><code>&lt;div class="relative"&gt;
+  &lt;div class="z-10 relative"&gt;Foreground&lt;/div&gt;
+  &lt;div class="absolute inset-0 z-0 opacity-30"&gt;Background layer&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4h Flex -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Flex layout</h3>
+              <p class="mt-2">Utilities for flexbox: <span decoaration-solid>flex</span>, <span
+                  decoaration-solid>items-center</span>, <span decoaration-solid>justify-between</span>, <span
+                  decoaration-solid>gap-4</span>.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>&lt;div class="flex items-center justify-between p-4 bg-white rounded"&gt;
+  &lt;div&gt;Left&lt;/div&gt;
+  &lt;div&gt;Right&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4i Grid -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Grid layout</h3>
+              <p class="mt-2">Grid utilities: <span decoaration-solid>grid</span>, <span
+                  decoaration-solid>grid-cols-3</span>, <span decoaration-solid>col-span-2</span>.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>&lt;div class="grid grid-cols-3 gap-4"&gt;
+  &lt;div class="col-span-2 p-4 bg-white rounded"&gt;Main&lt;/div&gt;
+  &lt;div class="p-4 bg-white rounded"&gt;Aside&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4j Transitions & animation -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Transition &amp; Animation</h3>
+              <p class="mt-2">Use <span decoaration-solid>transition</span>, <span
+                  decoaration-solid>duration-200</span>,
+                <span decoaration-solid>ease-in-out</span>. For animations, leverage @keyframes via custom CSS
+                or plugins.
+              </p>
+            </div>
+            <div>
+              <button
+                class="transition transform hover:bg-red-400 hover:-translate-y-1 duration-200 px-4 py-2 rounded bg-indigo-600 text-white">Hover
+                me</button>
+
+              <div class="spanbox">
+                <pre><code>&lt;button class="transition transform hover:bg-red-400 hover:-translate-y-1 duration-200 px-4 py-2 rounded bg-indigo-600 text-white"&gt;Hover me&lt;/button&gt;
+</code></pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4k Transform -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Transform</h3>
+              <p class="mt-2">Helpers: <span decoaration-solid>scale-95</span>, <span decoaration-solid>rotate-3</span>,
+                <span decoaration-solid>translate-x-2</span>. Often used with <span decoaration-solid>transform</span>
+                and
+                transitions.
+              </p>
+            </div>
+            <div>
+              <div class="transform hover:scale-105 duration-200">Interactive tile</div>
+              <div class="spanbox">
+                <pre><code>&lt;div class="transform hover:scale-110 duration-700"&gt;Interactive tile&lt;/div&gt;
+</code></pre>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <!-- Slide 5a: Introduction to npm -->
+        <section>
+          <h3>Introduction to npm</h3>
+          <p class="mt-4">npm (Node Package Manager) lets you install, version and run packages and build tools —
+            required
+            for production Tailwind workflows (postcss, autoprefixer, tailwindcss).</p>
+        </section>
+
+        <!-- Slide 5b: Install Tailwind using npm -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Install Tailwind via npm (typical setup)</h3>
+              <ol class="ml-6 list-decimal mt-2">
+                <li>Initialize project: <span decoaration-solid>npm init -y</span></li>
+                <li>Install: <span decoaration-solid>npm install -D tailwindcss postcss autoprefixer</span>
+                </li>
+                <li>Generate config: <span decoaration-solid>npx tailwindcss init -p</span></li>
+                <li>Configure <span decoaration-solid>content</span> paths and build script to produce your
+                  CSS.</li>
+              </ol>
+            </div>
+            <div class="spanbox">
+              <pre><code>// package.json scripts snippet
+"scripts": {
+  "build:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
+  "watch:css": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+}
+
+/* input.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+</code></pre>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <!-- Slide 6: Extending Tailwind -->
+        <section>
+          <h3>Extending Tailwind</h3>
+          <p class="mt-4">Use <span decoaration-solid>tailwind.config.js</span> to add custom tokens,
+            fonts, sizes and enable plugins.</p>
+        </section>
+
+        <!-- 6b Define new colors -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Define new colors</h3>
+              <p class="mt-2">Add colors under the <span decoaration-solid>theme.extend.colors</span> key
+                and then use them like <span decoaration-solid>bg-mybrand-500</span>.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>// tailwind.config.js
+module.exports = {
+  content: ['./src/**/*.{html,js}'],
+  theme: {
+    extend: {
+      colors: {
+        mybrand: {
+          50: '#f5f7ff',
+          500: '#3b82f6',
+          700: '#1e40af',
+        }
+      }
+    }
+  }
+}
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6c Adding fonts -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Adding new fonts</h3>
+              <p class="mt-2">Extend <span decoaration-solid>theme.extend.fontFamily</span> and reference
+                via <span decoaration-solid>font-sans</span> or your custom name.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      fontFamily: {
+        inter: ['Inter', 'ui-sans-serif', 'system-ui']
+      }
+    }
+  }
+}
+
+/* then in CSS */
+&lt;body class="font-inter"&gt;...&lt;/body&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6d Redefining sizes -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Redefining sizes</h3>
+              <p class="mt-2">Extend spacing, fontSize or container sizes in config to support project-specific design
+                tokens.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      spacing: {
+        '72': '18rem',
+        '84': '21rem'
+      },
+      fontSize: {
+        'xxs': '0.625rem'
+      }
+    }
+  }
+}
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6e Watching changes -->
+        <section>
+          <div class="grid grid-cols-2">
+            <div>
+              <h3 class="text-xl font-semibold">Watching changes</h3>
+              <p class="mt-2">Use the <span decoaration-solid>--watch</span> flag during development so
+                Tailwind recompiles CSS on file changes.</p>
+            </div>
+            <div class="spanbox">
+              <pre><code>// Run during development
+npm run watch:css
+
+// or directly
+npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+      <!-- Slide 7: CSS preprocessors overview -->
+      <section>
+        <h3>Overview: CSS Preprocessors</h3>
+        <p class="mt-4">Preprocessors like Sass provide variables, nesting, mixins and functions to
+          make CSS authoring easier.</p>
+        <p class="fragment">Sass (most popular): variables, nesting, partials</p>
+        <a href="https://sass-lang.com/playground" target="_blank">Sass Playground</a>
+      </section>
+    </div>
+  </div>
+
+  <!-- Reveal scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      pdfMaxPagesPerSlide: 1,
+      pdfSeparateFragments: false,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+</body>
+
+</html>
