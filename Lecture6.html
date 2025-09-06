@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Web-Based Application Development — CSS Basics</title>
+  <meta name="description" content="CSS Lecture Slides">
+  <meta name="author" content="Muhammad Adil Saleem">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.min.js"
+    integrity="sha512-Atu8sttM7mNNMon28+GHxLdz4Xo2APm1WVHwiLW9gW4bmHpHc/E2IbXrj98SmefTmbqbUTOztKl5PDPiu0LD/A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
+      <div class="flex justify-between items-center px-4">
+        <p style="text-align: center; font-size: 0.5em;">
+          <img class="inline h-8" src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration
+          Karachi
+        </p>
+        <a class="text-xs text-gray-400 uppercase" href="https://jsfiddle.net" data-preview-link>Open Code Editor</a>
+      </div>
+    </div>
+    <div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
+      <p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+    </div>
+
+    <div class="slides">
+
+      <section
+        data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
+        <h3>Web Based Application Development</h3>
+        <h3 class="pt-16">Lecture 6</h3>
+        <p class="text-2xl">11th September 2025</p>
+      </section>
+
+      <section>
+        <h3>Agenda</h3>
+        <ul>
+          <li>Document Object Model</li>
+          <li>Using JS in Browser</li>
+          <li>Common UI Components</li>
+        </ul>
+      </section>
+
+      <section>
+        <section>
+          <h2>Document Object Model (DOM)</h2>
+          <div class="grid grid-cols-2 gap-8">
+            <div class="col-span-1 text-2xl  flex-col justify-center">
+              <p class="fragment fade-in-then-semi-out">The DOM is a programming interface for HTML and XML documents.
+              </p>
+              <p class="fragment fade-in-then-semi-out">It represents the page so that programs can change the document
+                structure, style, and content.</p>
+              <p class="fragment fade-in-then-semi-out">Think of it as a tree-like structure where each node is an
+                object representing a part of the document.</p>
+            </div>
+            <div class="col-span-1 h-96">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/DOM-model.svg/800px-DOM-model.svg.png"
+                alt="Diagram of the Document Object Model tree structure">
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section>
+          <h2>Using JavaScript in the Browser</h2>
+          <div class="grid grid-cols-2 gap-4 items-center">
+            <div class="col-span-1">
+              <p class="fragment fade-in-then-semi-out">JavaScript is a versatile language primarily used for creating
+                interactive web pages.</p>
+              <p class="fragment fade-in-then-semi-out">When a web page loads, the browser creates a Document Object
+                Model of the page, which JavaScript can then interact with.</p>
+            </div>
+            <div class="col-span-1">
+              <img class="h-96 !mx-auto" src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"
+                alt="JavaScript Logo">
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Manipulating the DOM</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">You can select HTML elements using methods like:</p>
+              <ul>
+                <li>document.getElementById()</li>
+                <li>document.querySelector()</li>
+                <li>document.querySelectorAll()</li>
+              </ul>
+              <p class="fragment">Once selected, you can modify their properties, such as changing text content, styles,
+                or adding/removing classes.</p>
+            </div>
+            <div class="col-span-1">
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+// Get an element by its ID
+const myDiv = document.getElementById('my-div');
+
+// Change its text content
+myDiv.textContent = 'New text content!';
+
+// Change its style
+myDiv.style.color = 'blue';
+
+// Add a class
+myDiv.classList.add('active');
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Alerts, Prompts, and Confirms</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment" data-fragment-index="0">The `alert()` method displays a dialog box with a specified
+                message and an OK button.</p>
+              <p class="fragment" data-fragment-index="1">The `prompt()` method displays a dialog box that prompts the
+                user for input.</p>
+              <p class="fragment" data-fragment-index="2">The `confirm()` method displays a dialog box with a specified
+                message, and OK and Cancel buttons.</p>
+            </div>
+            <div class="col-span-1">
+              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="0" data-trim data-noescape>
+alert('Hello, world!');
+</code></pre>
+              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="1" data-trim data-noescape>
+const userName = prompt('Please enter your name:');
+if (userName) {
+  alert(`Hello, ${userName}!`);
+}
+
+</code></pre>
+              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="2" data-trim data-noescape>
+const userConfirmed = confirm('Are you sure you want to proceed?');
+if (userConfirmed) {
+  alert('You clicked OK!');
+} else {
+  alert('You clicked Cancel!');
+}
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Debugging JavaScript</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1 text-3xl">
+              <p class="fragment">The `console.log()` method is your best friend for debugging. It prints information to
+                the browser's developer console.</p>
+              <p class="fragment">Breakpoints are another powerful debugging tool. You can set them in the "Sources" tab
+                of the dev tools to pause code execution.</p>
+              <p class="fragment">The `debugger` statement can also be used to pause code execution in your script.</p>
+            </div>
+            <div class="col-span-1">
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+function calculateSum(a, b) {
+  console.log(`The value of 'a' is: ${a}`);
+  debugger; // This will pause execution
+  const sum = a + b;
+  return sum;
+}
+              </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Event Listeners</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">An event listener "listens" for a specific event to occur on an element, such as a
+                click, mouseover, or keypress.</p>
+              <p class="fragment">The <code>addEventListener()</code> method is used to attach an event handler to an
+                element.</p>
+            </div>
+            <div class="col-span-1">
+              <button id="my-button" class="px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded">
+                Click Me
+              </button>
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+const myButton = document.getElementById('my-button');
+
+myButton.addEventListener('click', () => {
+  alert('Button was clicked!');
+});
+      </code></pre>
+              <pre class="fragment"><code data-trim data-noescape>
+&lt;button id="my-button" class="..."&gt;Click Me&lt;/button&gt;
+      </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Types of Event Available -->
+        <section>
+          <h3>Types of Events Available</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">Events in JavaScript are broadly categorized, such as:</p>
+              <ul>
+                <li class="fragment"><strong>Mouse Events</strong>: <code>click</code>, <code>dblclick</code>,
+                  <code>mouseover</code>
+                </li>
+                <li class="fragment"><strong>Keyboard Events</strong>: <code>keydown</code>, <code>keyup</code></li>
+                <li class="fragment"><strong>Form Events</strong>: <code>submit</code>, <code>change</code>,
+                  <code>focus</code>
+                </li>
+                <li class="fragment"><strong>Window Events</strong>: <code>load</code>, <code>resize</code>,
+                  <code>scroll</code>
+                </li>
+              </ul>
+            </div>
+            <div class="col-span-1">
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+// Mouse event
+document.addEventListener('click', () => {
+  console.log('Document clicked');
+});
+
+// Keyboard event
+document.addEventListener('keydown', (e) => {
+  console.log('Key pressed:', e.key);
+});
+      </code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dispatch Custom Event -->
+        <section>
+          <h3>Dispatch Custom Event</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">You can create and dispatch your own custom events using the <code>CustomEvent</code>
+                constructor.</p>
+              <p class="fragment">This allows different parts of your application to communicate without being directly
+                coupled.</p>
+            </div>
+            <div class="col-span-1">
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+
+                  // Listen for the custom event
+                  document.addEventListener('greet', (e) => {
+                    alert(e.detail.message);
+                  });
+                })
+
+              </script>
+              <button id="dispatchButton" class="px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded"
+                onclick="document.dispatchEvent(new CustomEvent('greet',{detail: {message: 'Hello from custom event!'}}))">
+                Dispatch Event
+              </button>
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+// Create a custom event
+const myEvent = new CustomEvent('greet', {
+  detail: { message: 'Hello from custom event!' }
+});
+
+// Listen for the custom event
+document.addEventListener('greet', (e) => {
+  alert(e.detail.message);
+});
+
+// Dispatch the custom event
+document.dispatchEvent(myEvent);
+      </code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <section>
+          <h3>Form Handling</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">JavaScript is essential for handling form submissions, validating user input, and
+                interacting with form data.</p>
+              <p class="fragment">The `submit` event on a form is a common event to listen for. You can prevent the
+                default form submission behavior using `event.preventDefault()`.</p>
+            </div>
+            <div class="col-span-1">
+              <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
+const myForm = document.getElementById('my-form');
+
+myForm.addEventListener('submit', (event) => {
+  // Prevent the default form submission
+  event.preventDefault();
+
+  // Get the value of an input field
+  const emailInput = document.getElementById('email');
+  console.log(`Email submitted: ${emailInput.value}`);
+});
+              </code></pre>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section>
+        <section>
+          <h2>Common UI Components</h2>
+          <div class="grid grid-cols-2 gap-4 items-center">
+            <div class="col-span-1">
+              <p class="fade-in-then-semi-out">UI components are reusable solutions to common user interface
+                design problems. They provide a predictable experience for users.</p>
+              <p class="fragment fade-in-then-semi-out">Let's look at some of the most widely used components.</p>
+            </div>
+            <div class="col-span-1">
+              <img src="https://assets.justinmind.com/wp-content/uploads/2022/03/web-ui-components.png"
+                alt="UI Components diagram">
+              <span class="text-sm">Taken from Just In Mind</span>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Navbar (Navigation Bar)</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">A horizontal or vertical bar containing links to different sections of a website.</p>
+              <p class="fragment">Crucial for navigation and providing a consistent user experience across pages.</p>
+              <p class="fragment">Often includes a logo and links to key pages like "Home," "About," and "Contact."</p>
+            </div>
+            <div class="col-span-1 flex flex-col items-center justify-center">
+              <div class="fragment flex justify-between w-full bg-black text-emerald-400 text-xl items-center px-2">
+                <div class="flex gap-4">
+                  <span>Home</span>
+                  <span>Products</span>
+                  <span class="text-red-400 underline">Services</span>
+                </div>
+                <div>
+                  <img class="rounded-full" src="https://placehold.co/32" alt="Avatar">
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Sidebar</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">A vertical navigation column, usually on the left or right side of the main content.
+              </p>
+              <p class="fragment">Ideal for applications with many sections or filters, providing a persistent and
+                accessible navigation menu.</p>
+            </div>
+            <div class="col-span-1 flex flex-col items-center">
+              <div
+                class="fragment flex flex-col w-48 h-full justify-between bg-black text-emerald-400 text-xl items-start p-2">
+                <div class="flex flex-col gap-4 items-start">
+                  <span>Home</span>
+                  <span>Products</span>
+                  <span class="text-red-400">Services</span>
+                </div>
+                <div>
+                  <span class="font-bold">Log out</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Modals (Dialogs)</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">A pop-up window that appears on top of the main page, requiring user interaction
+                before they can return to the underlying content.</p>
+              <p class="fragment">Used for critical information, confirmations, or to collect user input without
+                navigating away from the page.</p>
+            </div>
+            <div
+              class="col-span-1 flex flex-col items-center justify-center w-full h-full bg-[url(https://placehold.co/480)] bg-cover">
+              <div class="h-36 w-64 bg-white shadow-md rounded">
+                <p class="text-center text-2xl ">Hello, world</p>
+                <button class="bg-red-400 text-white p-2 text-2xl rounded">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Breadcrumbs</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">A navigation aid that shows a user's location within a hierarchical site structure.
+              </p>
+              <p class="fragment">Typically displayed as a horizontal list of links, from the highest level (home) to
+                the current page.</p>
+              <p class="fragment">Enhances user orientation, especially on large, complex websites.</p>
+            </div>
+            <div class="col-span-1 flex flex-col items-center text-2xl h-auto justify-center">
+              <nav aria-label="Breadcrumb" class="fragment  bg-white rounded-md shadow-md p-4 w-full">
+                <ol class="breadcrumb list-none p-0 m-0 flex">
+                  <li class="inline-flex items-center">
+                    <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors">Home</a>
+                  </li> &gt;
+                  <li class="inline-flex items-center">
+                    <a href="#" class="text-gray-600 hover:text-blue-500 transition-colors">Products</a>
+                  </li> &gt;
+                  <li class="inline-flex items-center">
+                    <span class="text-gray-400 font-medium">Electronics</span>
+                  </li>
+                </ol>
+              </nav>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Dropdown</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">A UI element that, when clicked, reveals a list of options or a menu.</p>
+              <p class="fragment">Saves screen space by hiding a long list of options until they are needed.</p>
+              <p class="fragment">Commonly used for navigation menus, select boxes, and sorting options.</p>
+            </div>
+            <div class="col-span-1 flex flex-col items-center  text-lg h-full justify-center">
+              <div class="fragment w-full flex justify-between h-auto py-2 px-4 bg-black text-white">
+                <span href="#">Home</span>
+                <div x-data="{dropdown:false}" class="relative">
+                  <button @click="dropdown = !dropdown">Menu</button>
+                  <div id="dropdown" class="absolute bg-gray-900 text-white p-2 right-8 w-32 rounded-md"
+                    x-show="dropdown">
+                    <ul>
+                      <li>Contact</li>
+                      <li>Features</li>
+                      <li>Our Team</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Tooltip</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+              <p class="fragment">Tooltips provide extra information when a user hovers or focuses on an element.</p>
+              <p class="fragment">They can be created using the <code>title</code> attribute or with custom HTML/CSS for
+                more control.</p>
+            </div>
+            <div class="col-span-1">
+              <div class="fragment">
+                <button class="relative group px-4 py-2 bg-blue-500 text-white rounded">
+                  Hover me
+                  <span
+                    class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-700 text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                    This is a tooltip!
+                  </span>
+                </button>
+              </div>
+              <pre class="fragment"><code class="language-html" data-trim data-noescape>
+&lt;button class="relative group"&gt;
+Hover me
+&lt;span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-gray-700 text-white text-xs rounded py-1 px-2"&gt;
+This is a tooltip!
+&lt;/span&gt;
+&lt;/button&gt;
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      pdfMaxPagesPerSlide: 1,
+      pdfSeparateFragments: false,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+</body>
+
+</html>
