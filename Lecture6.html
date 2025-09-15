@@ -41,7 +41,16 @@
         data-background="https://www.google.com/url?sa=i&url=https%3A%2F%2Flottiefiles.com%2Ffree-animation%2Fweb-development-wPWwuRFmPs&psig=AOvVaw10Gww1sFlnNUyW0HYGl9Vb&ust=1755901191579000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCNDZuOn3nI8DFQAAAAAdAAAAABAE">
         <h3>Web Based Application Development</h3>
         <h3 class="pt-16">Lecture 6</h3>
-        <p class="text-2xl">11th September 2025</p>
+        <p class="text-2xl">15th September 2025</p>
+      </section>
+
+      <section>
+        <h3>Quiz</h3>
+        <img class="!mx-auto h-64"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://forms.cloud.microsoft/r/U5at54siHB"
+          alt="">
+
+        <p>https://forms.cloud.microsoft/r/U5at54siHB</p>
       </section>
 
       <section>
@@ -188,7 +197,7 @@ function calculateSum(a, b) {
                 element.</p>
             </div>
             <div class="col-span-1">
-              <button id="my-button" class="px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded">
+              <button x-data="{}" @click="alert('You clicked me!')" class=" fragment px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded">
                 Click Me
               </button>
               <pre class="fragment"><code class="language-javascript" data-trim data-noescape>
@@ -261,7 +270,7 @@ document.addEventListener('keydown', (e) => {
                 })
 
               </script>
-              <button id="dispatchButton" class="px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded"
+              <button id="dispatchButton" class="fragment px-4 py-2 text-white bg-red-400 hover:scale-105 transition rounded"
                 onclick="document.dispatchEvent(new CustomEvent('greet',{detail: {message: 'Hello from custom event!'}}))">
                 Dispatch Event
               </button>
