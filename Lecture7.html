@@ -29,13 +29,13 @@
 <body>
 	<div class="reveal">
 		<!-- Header -->
-		<div style="position: absolute; right: 0; left:0; top:-4%; z-index: 10;">
-			<p style="text-align: center; font-size: 0.5em;"><img class="inline h-8"
+		<div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;"><img class="inline h-6"
 					src="https://www.iba.edu.pk/favicon.ico" alt=""> Institute of Business Administration Karachi</p>
 		</div>
 		<!-- Footer -->
-		<div style="position: absolute; right: 0; left:0; bottom:0; z-index: 10;">
-			<p style="text-align: center; font-size: 0.5em;">CSE 308: Web Based Application Development - Fall 2025</p>
+		<div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">CSE 308: Web Based Application Development - Fall 2025</p>
 		</div>
 		<div class="slides">
 			<section
@@ -58,10 +58,18 @@
 			<section>
 				<h3>Agenda</h3>
 				<ul>
+					<li>How does the web work?</li>
 					<li>Web Servers</li>
+					<li>HTTP</li>
+					<li>Architectural Components of the Web</li>
+					<li>Demo: PHP built in server</li>
 				</ul>
 			</section>
 
+			<section>
+				<h3>Some content of today's lecture is from the book:</h3>
+				<h2>HTTP: The Definitive Guide</h2>
+			</section>
 			<section>
 				<section>How does the web work? 🤔</section>
 				<section>
@@ -80,14 +88,428 @@
 				</section>
 				<section>
 					<p>The unique number returned by the DNS server allows your browser to connect to the web server
-					hosting the requested site.</p>
-					<p class="fragment text-gray-500">A web server is a computer that stays online continuously and is designed to deliver web pages to
-					users.</p>
+						hosting the requested site.</p>
+					<p class="fragment text-gray-500">A web server is a computer that stays online continuously and is
+						designed to deliver web pages to
+						users.</p>
 				</section>
 
 				<section>
 					<p>Once connected, the web server sends the requested page back to your web browser.</p>
 				</section>
+			</section>
+			<section>
+				<!-- Intro -->
+				<section>
+					<h2>What is a Web Server?</h2>
+					<p>
+						A <strong>web server</strong> is software (and sometimes hardware) that delivers
+						web content to clients over the internet using the <strong>HTTP/HTTPS protocol</strong>.
+					</p>
+					<p class="fragment">
+						In simple terms, it handles requests from browsers and responds with
+						the appropriate web pages, files, or data.
+					</p>
+				</section>
+
+				<!-- How it works -->
+				<section>
+					<h4>How Does a Web Server Work?</h4>
+					<ol class="leading-relaxed text-4xl">
+						<li class="fragment"><strong>Set up connection:</strong> Accept a client connection or close if
+							not allowed.</li>
+						<li class="fragment"><strong>Receive request:</strong> Read the HTTP request from the client.
+						</li>
+						<li class="fragment"><strong>Process request:</strong> Interpret the request and decide what
+							action to take.</li>
+						<li class="fragment"><strong>Access resource:</strong> Retrieve the resource (file, script, or
+							data) requested.</li>
+						<li class="fragment"><strong>Construct response:</strong> Build an HTTP response with correct
+							headers and content.</li>
+						<li class="fragment"><strong>Send response:</strong> Return the response to the client.</li>
+						<li class="fragment"><strong>Log transaction:</strong> Record details of the request and
+							response.</li>
+					</ol>
+				</section>
+
+				<!-- Static vs. Dynamic -->
+				<section>
+					<h2>Static vs. Dynamic Content</h2>
+					<ul>
+						<li class="fragment"><strong>Static:</strong> Server directly returns files (HTML, CSS, images).
+						</li>
+						<li class="fragment"><strong>Dynamic:</strong> Server runs applications (PHP, Python, Node.js)
+							to generate responses.</li>
+					</ul>
+				</section>
+
+				<!-- Examples -->
+				<section>
+					<h2>Popular Web Servers</h2>
+					<ul>
+						<li class="fragment">Apache HTTP Server</li>
+						<li class="fragment">Nginx</li>
+						<li class="fragment">Microsoft IIS</li>
+					</ul>
+				</section>
+
+				<!-- Role in modern apps -->
+				<section>
+					<h2>Web Servers in Modern Applications</h2>
+					<p class="fragment">
+						Today, web servers often sit behind <strong>reverse proxies, load balancers,</strong>
+						and work with <strong>application servers</strong> to handle complex workloads.
+					</p>
+					<p class="fragment">
+						Example: Nginx as a reverse proxy forwarding requests to a Laravel/PHP application server.
+					</p>
+				</section>
+			</section>
+
+			<section>
+				<!-- Intro -->
+				<section>
+					<h2>HTTP</h2>
+					<p>
+						<strong>HyperText Transfer Protocol (HTTP)</strong> is the foundation of data
+						communication on the web. It defines how clients (browsers) and servers
+						exchange requests and responses.
+					</p>
+					<p class="fragment">It is a <strong>stateless</strong>, <strong>application-layer</strong> protocol
+						built on top of TCP/IP.</p>
+				</section>
+
+				<!-- Resources -->
+				<section>
+					<h2>HTTP Resources</h2>
+					<p>Everything on the web is treated as a <strong>resource</strong>.</p>
+					<ul>
+						<li class="fragment">HTML documents</li>
+						<li class="fragment">Images (JPG, PNG, SVG)</li>
+						<li class="fragment">Stylesheets (CSS)</li>
+						<li class="fragment">Scripts (JavaScript)</li>
+						<li class="fragment">APIs returning JSON or XML</li>
+					</ul>
+					<p class="fragment">Resources are identified using <strong>URLs</strong>.</p>
+				</section>
+
+
+				<!-- Transaction -->
+				<section>
+					<h2>HTTP Transaction</h2>
+					<div class="grid grid-cols-2 text-4xl">
+						<div>
+							<ol>
+								<li class="fragment">Client sends a <strong>request</strong> (GET, POST, etc.)</li>
+								<li class="fragment">Server processes and returns a <strong>response</strong></li>
+							</ol>
+
+							<p class="fragment">Composite web pages require separate HTTP transactions for each embedded
+								resource</p>
+						</div>
+						<div>
+							<img src="images/http_transaction.png" alt="">
+						</div>
+					</div>
+				</section>
+
+
+				<!-- Message -->
+				<section>
+					<h2>A Closer Look at an HTTP Message</h2>
+					<table class="w-full">
+						<thead>
+							<tr>
+								<th>Request</th>
+								<th>Response</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<pre>
+GET /index.html HTTP/1.1
+Host: example.com
+User-Agent: Chrome/123
+Accept: text/html
+            </pre>
+								</td>
+								<td>
+									<pre>
+HTTP/1.1 200 OK
+Date: Mon, 15 Sep 2025
+Content-Type: text/html
+Content-Length: 1024
+            </pre>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<!-- Connections -->
+				<section>
+					<h2>TCP Connection</h2>
+					<img src="images/tcp_connection.png" alt="IP and Ports Diagram" class="!mx-auto r-stretch" />
+				</section>
+
+				<!-- URL Syntax -->
+				<section>
+					<h2>URL Syntax</h2>
+					<pre class="fragment">
+scheme://hostname:port/path?query#fragment
+    </pre>
+					<ul>
+						<li class="fragment"><strong>Scheme:</strong> http, https, ftp</li>
+						<li class="fragment"><strong>Hostname:</strong> example.com</li>
+						<li class="fragment"><strong>Port:</strong> 80 (default) or custom</li>
+						<li class="fragment"><strong>Path:</strong> /products/item1</li>
+						<li class="fragment"><strong>Query:</strong> ?id=10&sort=asc</li>
+						<li class="fragment"><strong>Fragment:</strong> #section2</li>
+					</ul>
+				</section>
+
+				<!-- Encode/Decode -->
+				<section>
+					<h2>HTTP Encode / Decode</h2>
+					<p>URLs must use <strong>percent-encoding</strong> for special characters:</p>
+					<table>
+						<thead>
+							<tr class="fragment">
+								<th>Character</th>
+								<th>Encoded</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="fragment">
+								<td>Space</td>
+								<td>%20</td>
+							</tr>
+							<tr class="fragment">
+								<td>:</td>
+								<td>%3A</td>
+							</tr>
+							<tr class="fragment">
+								<td>/</td>
+								<td>%2F</td>
+							</tr>
+							<tr class="fragment">
+								<td>?</td>
+								<td>%3F</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<!-- Status Codes -->
+				<section>
+					<h2>HTTP Status Codes</h2>
+					<table>
+						<thead>
+							<tr class="fragment">
+								<th>Class</th>
+								<th>Examples</th>
+								<th>Meaning</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="fragment">
+								<td>1xx</td>
+								<td>100 Continue</td>
+								<td>Informational</td>
+							</tr>
+							<tr class="fragment">
+								<td>2xx</td>
+								<td>200 OK, 201 Created</td>
+								<td>Success</td>
+							</tr>
+							<tr class="fragment">
+								<td>3xx</td>
+								<td>301 Moved Permanently, 302 Found</td>
+								<td>Redirection</td>
+							</tr>
+							<tr class="fragment">
+								<td>4xx</td>
+								<td>400 Bad Request, 404 Not Found</td>
+								<td>Client Error</td>
+							</tr>
+							<tr class="fragment">
+								<td>5xx</td>
+								<td>500 Internal Server Error, 503 Service Unavailable</td>
+								<td>Server Error</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<section>
+					<h2>HTTP Methods</h2>
+					<p>HTTP defines different <strong>methods</strong> to indicate the desired action on a resource.</p>
+					<table class="text-2xl">
+						<thead>
+							<tr>
+								<th>Method</th>
+								<th>Usage</th>
+								<th>Idempotent?</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="fragment">
+								<td><strong>GET</strong></td>
+								<td>Retrieve a resource (read-only)</td>
+								<td>Yes ✅</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>POST</strong></td>
+								<td>Create a new resource / submit data</td>
+								<td>No ❌</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>PUT</strong></td>
+								<td>Replace an existing resource</td>
+								<td>Yes ✅</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>PATCH</strong></td>
+								<td>Partially update a resource</td>
+								<td>No ❌</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>DELETE</strong></td>
+								<td>Remove a resource</td>
+								<td>Yes ✅</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>HEAD</strong></td>
+								<td>Like GET but returns only headers</td>
+								<td>Yes ✅</td>
+							</tr>
+							<tr class="fragment">
+								<td><strong>OPTIONS</strong></td>
+								<td>Describes supported methods</td>
+								<td>Yes ✅</td>
+							</tr>
+						</tbody>
+					</table>
+					<p class="fragment text-2xl">
+						👉 Idempotent = multiple identical requests produce the same result.
+					</p>
+				</section>
+
+
+				<!-- MIME Types -->
+				<section>
+					<h2>MIME Types</h2>
+					<p>MIME tells the browser what type of content is being sent:</p>
+					<table>
+						<thead>
+							<tr class="fragment">
+								<th>Type</th>
+								<th>Example</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="fragment">
+								<td>text/html</td>
+								<td>Web pages</td>
+							</tr>
+							<tr class="fragment">
+								<td>image/png</td>
+								<td>Images</td>
+							</tr>
+							<tr class="fragment">
+								<td>application/json</td>
+								<td>APIs</td>
+							</tr>
+							<tr class="fragment">
+								<td>video/mp4</td>
+								<td>Videos</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</section>
+			<section>
+				<!-- Intro -->
+				<section>
+					<h2>Architectural Components of the Web</h2>
+					<p>
+						Beyond clients and servers, the web includes additional <strong>intermediary components</strong>
+						that improve performance, security, and flexibility.
+					</p>
+					<img src="https://via.placeholder.com/700x300?text=Client+%E2%86%92+Proxy/Cache+%E2%86%92+Gateway+%E2%86%92+Server"
+						alt="Web Architecture Components Diagram" class="fragment r-stretch" />
+				</section>
+
+				<!-- Proxies -->
+				<section>
+					<h2>Proxies</h2>
+					<p>A <strong>proxy</strong> is an intermediary that sits between the client and the server.</p>
+					<ul>
+						<li class="fragment">Forward Proxy: represents the client (e.g., for anonymity, filtering).</li>
+						<li class="fragment">Reverse Proxy: represents the server (e.g., load balancing, SSL
+							termination).</li>
+					</ul>
+					<img src="images/proxy.png"
+						alt="Proxy Diagram" class="fragment !mx-auto" />
+				</section>
+
+				<!-- Caches -->
+				<section>
+					<h2>Caches</h2>
+					<p>A <strong>cache</strong> stores frequently accessed responses to reduce load and latency.</p>
+					<ul>
+						<li class="fragment">Browser Cache - stores local copies of resources.</li>
+						<li class="fragment">Proxy Cache - shared by many users to save bandwidth.</li>
+						<li class="fragment">CDN (Content Delivery Network) - global distributed caches.</li>
+					</ul>
+				</section>
+
+				<!-- Gateways -->
+				<section>
+					<h2>Gateways</h2>
+					<p>
+						A <strong>gateway</strong> acts as a translator between <strong>different protocols</strong>.
+					</p>
+					<ul class="text-2xl">
+						<li class="fragment">Example: HTTP client connects to a gateway that speaks FTP, SMTP, or
+							database protocols.</li>
+						<li class="fragment">Common use: API Gateways in microservices architecture.</li>
+					</ul>
+					<img src="images/gateway.png"
+						alt="Gateway Diagram" class="fragment !mx-auto h-64" />
+				</section>
+
+				<!-- Tunnels -->
+				<section>
+					<h2>Tunnels</h2>
+					<p>
+						A <strong>tunnel</strong> allows secure passage of data through an intermediary without
+						interpretation.
+					</p>
+					<ul>
+						<li class="fragment">Used in <strong>HTTPS</strong>: HTTP traffic is tunneled through TCP port
+							443.</li>
+						<li class="fragment">Also used in VPNs for secure communication.</li>
+					</ul>
+					
+				</section>
+
+				<!-- Agents -->
+				<section>
+					<h2>Agents</h2>
+					<p>
+						An <strong>agent</strong> is software that acts on behalf of the user.
+					</p>
+					<ul>
+						<li class="fragment">User Agents → browsers like Chrome, Firefox, Safari.</li>
+						<li class="fragment">Automated Agents → crawlers, bots, and scripts.</li>
+					</ul>
+				</section>
+			</section>
+
+			<section>
+				<h3>Demo: Serving a page from a web server</h3>
 			</section>
 		</div>
 
