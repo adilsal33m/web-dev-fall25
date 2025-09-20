@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Web-Based Application Development — Lecture 8</title>
+	<meta name="description" content="Lecture 8 - Web Based Application Development">
+	<meta name="author" content="Muhammad Adil Saleem">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<!-- Header -->
+		<div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				<img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+				Institute of Business Administration Karachi
+			</p>
+		</div>
+		<!-- Footer -->
+		<div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				CSE 308: Web Based Application Development - Fall 2025
+			</p>
+		</div>
+
+		<div class="slides">
+
+			<!-- Title -->
+			<section>
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 8</h3>
+				<p class="text-2xl">23rd September 2025</p>
+			</section>
+
+			<!-- Agenda -->
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>PHP backend setup (Windows)</li>
+					<li>Headers (examples)</li>
+					<li>Database (SQLite + PDO) — nested</li>
+					<li>REST API (CRUD) — build StudentController step by step</li>
+				</ul>
+			</section>
+
+			<!-- 1. PHP Backend Setup -->
+			<section>
+				<section>
+					<h3>1) PHP Backend Setup (Windows)</h3>
+				</section>
+
+				<section>
+					<h4>Install & Verify PHP (Windows)</h4>
+					<ol>
+						<li>Download PHP for Windows: <code>https://windows.php.net/download/</code></li>
+						<li>Extract to <code>C:\php</code>, add <code>C:\php</code> to PATH (Environment Variables)</li>
+						<li>Open PowerShell / cmd and run:
+							<pre><code class="bash">php -v</code></pre>
+						</li>
+						<li>Ensure PDO SQLite extension is enabled in <code>php.ini</code> (uncomment
+							<code>;extension=pdo_sqlite</code>)
+						</li>
+					</ol>
+				</section>
+
+				<section>
+					<h4>Quick test — Hello World</h4>
+					<p>Save the file <code>public/index.php</code> with this content:</p>
+					<pre><code class="language-php">&lt;?php
+echo "Hello from PHP on Windows!";
+?&gt;</code></pre>
+					<p>Serve with built-in server (run from project root):</p>
+					<pre><code class="bash">php -S localhost:8000 -t public</code></pre>
+					<p>Open <code>http://localhost:8000</code> in the browser.</p>
+				</section>
+
+				<section>
+					<h4>PHP Superglobals for HTTP Handling</h4>
+					<p>These special variables are always available — no import needed.</p>
+					<ul>
+						<li>
+							<code>$_SERVER</code> — Info about request &amp; server
+							<br><small>e.g. <code>$_SERVER['REQUEST_METHOD']</code>,
+								<code>$_SERVER['REQUEST_URI']</code></small>
+						</li>
+						<li>
+							<code>$_GET</code> — Query string parameters
+							<br><small>From URLs like <code>?id=5&amp;name=Ali</code></small>
+						</li>
+						<li>
+							<code>$_POST</code> — Form fields from an HTML <code>&lt;form method="POST"&gt;</code>
+						</li>
+					</ul>
+				</section>
+				<section>
+					<pre><code class="php">&lt;?php
+// Inspecting a request
+echo $_SERVER['REQUEST_METHOD']; // GET, POST, PUT, DELETE
+echo $_SERVER['REQUEST_URI'];    // /students?id=1
+
+// Query parameter
+echo $_GET['id'] ?? 'not provided';
+
+// Form parameter
+echo $_POST['name'] ?? 'anonymous';
+?&gt;</code></pre>
+				</section>
+
+			</section>
+
+			<!-- 2. Headers -->
+			<section>
+				<section>
+					<h3>2) Headers</h3>
+					<p>Headers tell the browser how to interpret the server response.</p>
+					<p><code>header()</code> must be called <strong>before any output</strong>.</p>
+				</section>
+
+				<!-- Content-Type -->
+				<section>
+					<h4>Content-Type examples</h4>
+					<pre><code class="php">&lt;?php
+// JSON response
+header('Content-Type: application/json; charset=utf-8');
+echo json_encode(["message" => "Hello API"]);
+
+// HTML response
+header('Content-Type: text/html; charset=utf-8');
+echo "&lt;h1&gt;Hello Web Page&lt;/h1&gt;";
+
+// Plain text
+header('Content-Type: text/plain; charset=utf-8');
+echo "Just some text";
+?&gt;</code></pre>
+				</section>
+
+				<!-- Redirect -->
+				<section>
+					<h4>Redirect example</h4>
+					<pre><code class="php">&lt;?php
+// Redirect user to another page
+header('Location: /new-page.php');
+http_response_code(302); // Found (default redirect)
+exit;
+?&gt;</code></pre>
+				</section>
+
+				<!-- File Download -->
+				<section>
+					<h4>Force file download</h4>
+					<pre><code class="php">&lt;?php
+$file = 'report.pdf';
+
+// Tell browser to download instead of open
+header('Content-Type: application/pdf');
+header('Content-Disposition: attachment; filename="myreport.pdf"');
+header('Content-Length: ' . filesize($file));
+
+readfile($file);
+exit;
+?&gt;</code></pre>
+				</section>
+
+				<!-- CORS -->
+				<section>
+					<h4>Minimal CORS Example</h4>
+					<p>Allows a frontend (JavaScript in the browser) to call your API.</p>
+					<pre><code class="php">&lt;?php
+// Allow requests from any origin
+header('Access-Control-Allow-Origin: *');
+
+// Allow specific methods (optional)
+header('Access-Control-Allow-Methods: GET, POST');
+
+// Allow custom headers (optional)
+header('Access-Control-Allow-Headers: Content-Type');
+?&gt;</code></pre>
+					<p class="note">For now, we only use the <code>Access-Control-Allow-Origin</code> header so the demo
+						works.</p>
+				</section>
+			</section>
+
+			<!-- 3. Database (SQLite + PDO) -->
+			<section>
+				<section>
+					<h3>3) Database (SQLite + PDO)</h3>
+				</section>
+
+				<section>
+					<h4>Why SQLite for this class</h4>
+					<ul>
+						<li>File-based, zero-install DB — good for prototyping and demos</li>
+						<li>Works well with PDO (same API as other DBs)</li>
+						<li>We will keep DB file outside the web-root</li>
+					</ul>
+				</section>
+
+				<section>
+					<h4>File: <code>src/Database.php</code></h4>
+					<p>Creates and returns a PDO instance configured for SQLite.</p>
+					<pre><code class="language-php">&lt;?php
+// src/Database.php
+class Database {
+    private $pdo;
+
+    public function __construct() {
+        // database file placed in data/ to keep out of public web root
+        $dbPath = __DIR__ . '/../data/database.sqlite';
+        if (!is_dir(dirname($dbPath))) {
+            mkdir(dirname($dbPath), 0755, true);
+        }
+        $this->pdo = new PDO('sqlite:' . $dbPath);
+        $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // Recommended: enforce foreign keys
+        $this->pdo->exec('PRAGMA foreign_keys = ON');
+        // WAL may help concurrency in dev
+        $this->pdo->exec('PRAGMA journal_mode = WAL');
+    }
+
+    public function getConnection() {
+        return $this->pdo;
+    }
+}
+?&gt;</code></pre>
+				</section>
+
+				<section>
+					<h4>Schema creation script: <code>scripts/create_db.php</code></h4>
+					<p>Run this once to create the DB and the <code>students</code> table.</p>
+					<pre><code class="language-php">&lt;?php
+// scripts/create_db.php
+$dbPath = __DIR__ . '/../data/database.sqlite';
+if (!is_dir(dirname($dbPath))) mkdir(dirname($dbPath), 0755, true);
+
+$pdo = new PDO('sqlite:' . $dbPath);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+$pdo->exec(<<<'SQL'
+CREATE TABLE IF NOT EXISTS students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE,
+    enrolled_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+SQL
+);
+
+echo "Database and 'students' table created at: $dbPath\n";</code></pre>
+				</section>
+
+				<section>
+					
+
+					<p><strong>How to run (Windows):</strong></p>
+					<ol>
+						<li>Open PowerShell or Command Prompt in your project root.</li>
+						<li>Run: <code>php scripts/create_db.php</code></li>
+						<li>Start server from project root: <code>php -S localhost:8000 -t public</code></li>
+						<li>Open browser for API calls: <code>http://localhost:8000/api/students</code></li>
+					</ol>
+					<p class="note">You can inspect the DB with "DB Browser for SQLite" GUI on Windows.</p>
+				</section>
+
+				<section>
+					<h4>PDO basics (used throughout)</h4>
+					<ul>
+						<li>Use prepared statements to avoid SQL injection.</li>
+						<li><code>PDO::prepare()</code>, then <code>execute([$param])</code>.</li>
+						<li>Fetch types: <code>PDO::FETCH_ASSOC</code> returns associative arrays.</li>
+					</ul>
+					<pre><code class="language-php">// example
+$stmt = $pdo->prepare('SELECT id,name FROM students WHERE id = ?');
+$stmt->execute([$id]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);</code></pre>
+				</section>
+			</section>
+
+			<!-- 4. REST API (after DB) -->
+			<section>
+				<section>
+					<h3>4) REST API — Overview (after Database)</h3>
+					<p>All routes are under <code>/api/students</code>. We'll build a simple router and a
+						<code>StudentController</code> which uses PDO.
+					</p>
+					<ul>
+						<li>GET /api/students — list (index)</li>
+						<li>GET /api/students/{id} — show</li>
+						<li>POST /api/students — store</li>
+						<li>PUT /api/students/{id} — update</li>
+						<li>DELETE /api/students/{id} — destroy</li>
+					</ul>
+				</section>
+
+				<!-- Sub: Project structure -->
+				<section>
+					<h4>Recommended project structure (simple)</h4>
+					<pre><code class="language-none">my-api/
+├─ public/                 # web root (put index.php here)
+│  └─ index.php
+├─ src/
+│  ├─ Database.php
+│  └─ StudentController.php
+├─ scripts/
+│  └─ create_db.php
+├─ data/
+│  └─ database.sqlite      # generated by script
+├─ .env (optional)
+└─ composer.json (optional)</code></pre>
+					<p class="note">Keep the DB file outside web root (here it's in <code>data/</code>).</p>
+				</section>
+
+				<section>
+					<h4>File: <code>public/index.php</code> — simple router (no regex)</h4>
+					<p>We explode the path into segments and dispatch.</p>
+					<pre><code class="language-php">&lt;?php
+// public/index.php
+require __DIR__ . '/../src/Database.php';
+require __DIR__ . '/../src/StudentController.php';
+
+// Basic headers
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+$method = $_SERVER['REQUEST_METHOD'];
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$parts = explode('/', trim($uri, '/')); // e.g. ['api','students','1']
+
+if (isset($parts[0]) && $parts[0] === 'api' && isset($parts[1]) && $parts[1] === 'students') {
+    $db = (new Database())->getConnection();
+    $ctrl = new StudentController($db);
+
+    // no ID => collection
+    if ($method === 'GET' && !isset($parts[2])) { $ctrl->index(); exit; }
+    // show single
+    if ($method === 'GET' && isset($parts[2])) { $ctrl->show((int)$parts[2]); exit; }
+    if ($method === 'POST') { $ctrl->store(); exit; }
+    if ($method === 'PUT' && isset($parts[2])) { $ctrl->update((int)$parts[2]); exit; }
+    if ($method === 'DELETE' && isset($parts[2])) { $ctrl->destroy((int)$parts[2]); exit; }
+
+    http_response_code(405);
+    echo json_encode(['error' => 'Method Not Allowed']);
+    exit;
+}
+
+// fallback
+http_response_code(404);
+echo json_encode(['error' => 'Not Found']);</code></pre>
+
+					<p class="note"><strong>Explanation:</strong> We use <code>$_SERVER['REQUEST_METHOD']</code> and
+						<code>$_SERVER['REQUEST_URI']</code> to know what the client requested.
+					</p>
+				</section>
+
+				<!-- StudentController step-by-step: skeleton -->
+				<section>
+					<h4><code>src/StudentController.php</code> — Skeleton</h4>
+					<pre><code class="language-php">&lt;?php
+// src/StudentController.php
+class StudentController {
+    private $pdo;
+
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+    }
+
+    // helper to send JSON
+    protected function json($data, $status = 200) {
+        http_response_code($status);
+        echo json_encode($data);
+    }
+
+    // methods to implement: index(), show($id), store(), update($id), destroy($id)
+}
+?&gt;</code></pre>
+					<p>We'll implement each method one HTTP verb at a time (next slides).</p>
+				</section>
+
+				<!-- GET /api/students -> index() -->
+				<section>
+					<h4>GET /api/students — <code>index()</code> (step 1)</h4>
+					<p>Step A — prepare the SQL and fetch all rows.</p>
+					<pre><code class="language-php">public function index() {
+    // SQL: select all students (we select specific columns)
+    $sql = 'SELECT id, name, email, enrolled_at FROM students ORDER BY id DESC';
+    $stmt = $this->pdo->query($sql);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $this->json(['data' =&gt; $rows], 200);
+}</code></pre>
+				</section>
+
+				<!-- GET single -->
+				<section>
+					<h4>GET /api/students/{id} — <code>show($id)</code> (step 1)</h4>
+					<p>Step A — use a prepared statement to fetch one row safely.</p>
+					<pre><code class="language-php">public function show(int $id) {
+    $stmt = $this->pdo->prepare('SELECT id, name, email, enrolled_at FROM students WHERE id = ?');
+    $stmt->execute([$id]);
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$student) {
+        $this->json(['error' =&gt; 'Not Found'], 404);
+        return;
+    }
+    $this->json(['data' =&gt; $student], 200);
+}</code></pre>
+					<p class="note">Explain <code>prepare()</code> &amp; <code>execute()</code> — placeholders avoid SQL
+						injection.</p>
+				</section>
+
+				<!-- POST /api/students -> store() part 1: read input -->
+				<section>
+					<h4>POST /api/students — <code>store()</code> (step-by-step)</h4>
+					<h5>Step 1: read input (JSON or form)</h5>
+					<pre><code class="language-php">// preferred for APIs: JSON body
+$raw = file_get_contents('php://input');
+$payload = json_decode($raw, true);
+
+// fallback for HTML forms: $_POST
+if (!$payload) {
+    $payload = $_POST;
+}
+
+$name = trim($payload['name'] ?? '');
+$email = trim($payload['email'] ?? '');</code></pre>
+					<p class="note">Explain: <code>php://input</code> holds raw body data (useful for JSON and PUT).</p>
+				</section>
+
+				<!-- POST store: step 2 prepare/insert -->
+				<section>
+					<h4>POST /api/students — <code>store()</code> (step 2: validate &amp; insert)</h4>
+					<pre><code class="language-php">// validation (simple)
+if (!$name) {
+    $this->json(['error' =&gt; 'Name is required'], 400);
+    return;
+}
+
+// insert using prepared statement
+$stmt = $this->pdo->prepare('INSERT INTO students (name, email) VALUES (?, ?)');
+try {
+    $stmt->execute([$name, $email]);
+    $id = (int)$this->pdo->lastInsertId();
+    // return created entity (and 201 status)
+    $this->json(['data' =&gt; ['id' =&gt; $id, 'name' =&gt; $name, 'email' =&gt; $email]], 201);
+} catch (PDOException $e) {
+    // unique email conflict or other DB error
+    $this->json(['error' =&gt; 'Insert failed', 'message' =&gt; $e->getMessage()], 500);
+}</code></pre>
+				</section>
+
+				<!-- PUT /api/students/{id} -> update() step 1 & 2 -->
+				<section>
+					<h4>PUT /api/students/{id} — <code>update($id)</code> (step-by-step)</h4>
+					<h5>Step 1: read raw input (PUT usually uses raw body)</h5>
+					<pre><code class="language-php">$raw = file_get_contents('php://input');
+$payload = json_decode($raw, true);
+$name = trim($payload['name'] ?? '');
+$email = trim($payload['email'] ?? '');</code></pre>
+
+					<h5>Step 2: update using prepared statement</h5>
+					<pre><code class="language-php">$stmt = $this->pdo->prepare('UPDATE students SET name = ?, email = ? WHERE id = ?');
+$stmt->execute([$name, $email, $id]);
+if ($stmt->rowCount() === 0) {
+    // either not found or no change
+    $this->json(['error' =&gt; 'Not Found or no changes'], 404);
+    return;
+}
+$this->json(['data' =&gt; ['id' =&gt; $id, 'name' =&gt; $name, 'email' =&gt; $email]], 200);</code></pre>
+				</section>
+
+				<!-- DELETE /api/students/{id} -->
+				<section>
+					<h4>DELETE /api/students/{id} — <code>destroy($id)</code></h4>
+					<pre><code class="language-php">public function destroy(int $id) {
+    $stmt = $this->pdo->prepare('DELETE FROM students WHERE id = ?');
+    $stmt->execute([$id]);
+    if ($stmt->rowCount() === 0) {
+        $this->json(['error' =&gt; 'Not Found'], 404);
+        return;
+    }
+    // 204 No Content is a common response for successful DELETE
+    http_response_code(204);
+    // no body
+}</code></pre>
+				</section>
+
+				<!-- Full StudentController (final) -->
+				<section>
+					<h4>Full <code>src/StudentController.php</code> (final)</h4>
+					<pre><code class="language-php">&lt;?php
+// src/StudentController.php
+class StudentController {
+    private $pdo;
+    public function __construct(PDO $pdo) {
+        $this->pdo = $pdo;
+    }
+
+    protected function json($data, $status = 200) {
+        http_response_code($status);
+        echo json_encode($data);
+    }
+
+    // GET /api/students
+    public function index() {
+        $stmt = $this->pdo->query('SELECT id, name, email, enrolled_at FROM students ORDER BY id DESC');
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $this->json(['data' =&gt; $rows], 200);
+    }
+
+    // GET /api/students/{id}
+    public function show(int $id) {
+        $stmt = $this->pdo->prepare('SELECT id, name, email, enrolled_at FROM students WHERE id = ?');
+        $stmt->execute([$id]);
+        $student = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$student) { $this->json(['error' =&gt; 'Not Found'], 404); return; }
+        $this->json(['data' =&gt; $student], 200);
+    }
+
+    // POST /api/students
+    public function store() {
+        $raw = file_get_contents('php://input');
+        $payload = json_decode($raw, true);
+        if (!$payload) $payload = $_POST; // fallback for form POST
+
+        $name = trim($payload['name'] ?? '');
+        $email = trim($payload['email'] ?? '');
+
+        if (!$name) { $this->json(['error' =&gt; 'Name required'], 400); return; }
+
+        $stmt = $this->pdo->prepare('INSERT INTO students (name, email) VALUES (?, ?)');
+        try {
+            $stmt->execute([$name, $email]);
+            $id = (int)$this->pdo->lastInsertId();
+            $this->json(['data' =&gt; ['id' =&gt; $id, 'name' =&gt; $name, 'email' =&gt; $email]], 201);
+        } catch (PDOException $e) {
+            $this->json(['error' =&gt; 'Insert failed', 'message' =&gt; $e->getMessage()], 500);
+        }
+    }
+
+    // PUT /api/students/{id}
+    public function update(int $id) {
+        $raw = file_get_contents('php://input');
+        $payload = json_decode($raw, true);
+        $name = trim($payload['name'] ?? '');
+        $email = trim($payload['email'] ?? '');
+
+        $stmt = $this->pdo->prepare('UPDATE students SET name = ?, email = ? WHERE id = ?');
+        $stmt->execute([$name, $email, $id]);
+        if ($stmt->rowCount() === 0) { $this->json(['error' =&gt; 'Not Found or no change'], 404); return; }
+        $this->json(['data' =&gt; ['id' =&gt; $id, 'name' =&gt; $name, 'email' =&gt; $email]], 200);
+    }
+
+    // DELETE /api/students/{id}
+    public function destroy(int $id) {
+        $stmt = $this->pdo->prepare('DELETE FROM students WHERE id = ?');
+        $stmt->execute([$id]);
+        if ($stmt->rowCount() === 0) { $this->json(['error' =&gt; 'Not Found'], 404); return; }
+        http_response_code(204);
+    }
+}
+?&gt;</code></pre>
+
+					<p class="note">Place this file at <code>src/StudentController.php</code> and ensure
+						<code>public/index.php</code> requires it.
+					</p>
+				</section>
+
+				<!-- Final notes and end -->
+				<section>
+					<h4>Final Notes</h4>
+					<ul>
+						<li>All DB operations use prepared statements — good habit for security.</li>
+						<li>Keep the DB file outside public/ for safety (<code>data/database.sqlite</code>).</li>
+						<li>Start the server from project root: <code>php -S localhost:8000 -t public</code>.</li>
+						<li>Run DB create script first: <code>php scripts/create_db.php</code>.</li>
+					</ul>
+				</section>
+			</section>
+
+		</div> <!-- .slides -->
+	</div> <!-- .reveal -->
+
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+	</script>
+</body>
+
+</html>
