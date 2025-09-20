@@ -74,7 +74,7 @@
               <p class="fragment fade-in-then-semi-out">Think of it as a tree-like structure where each node is an
                 object representing a part of the document.</p>
             </div>
-            <div class="col-span-1 h-96">
+            <div class="fragment col-span-1 h-96">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/DOM-model.svg/800px-DOM-model.svg.png"
                 alt="Diagram of the Document Object Model tree structure">
             </div>
@@ -87,12 +87,12 @@
           <h2>Using JavaScript in the Browser</h2>
           <div class="grid grid-cols-2 gap-4 items-center">
             <div class="col-span-1">
-              <p class="fragment fade-in-then-semi-out">JavaScript is a versatile language primarily used for creating
+              <p class="fragment fade-in-then-semi-out" data-fragment-index="0">JavaScript is a versatile language primarily used for creating
                 interactive web pages.</p>
               <p class="fragment fade-in-then-semi-out">When a web page loads, the browser creates a Document Object
                 Model of the page, which JavaScript can then interact with.</p>
             </div>
-            <div class="col-span-1">
+            <div class="fragment col-span-1" data-fragment-index="0">
               <img class="h-96 !mx-auto" src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png"
                 alt="JavaScript Logo">
             </div>
@@ -104,7 +104,7 @@
           <div class="grid grid-cols-2 gap-4">
             <div class="col-span-1">
               <p class="fragment">You can select HTML elements using methods like:</p>
-              <ul>
+              <ul class="fragment">
                 <li>document.getElementById()</li>
                 <li>document.querySelector()</li>
                 <li>document.querySelectorAll()</li>
@@ -142,17 +142,17 @@ myDiv.classList.add('active');
                 message, and OK and Cancel buttons.</p>
             </div>
             <div class="col-span-1">
-              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="0" data-trim data-noescape>
+              <pre class="fragment" data-fragment-index="0"><code class="fragment language-javascript" data-fragment-index="0" data-trim data-noescape>
 alert('Hello, world!');
 </code></pre>
-              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="1" data-trim data-noescape>
+              <pre class="fragment" data-fragment-index="1"><code class="fragment language-javascript" data-fragment-index="1" data-trim data-noescape>
 const userName = prompt('Please enter your name:');
 if (userName) {
   alert(`Hello, ${userName}!`);
 }
 
 </code></pre>
-              <pre class="fragment"><code class="fragment language-javascript" data-fragment-index="2" data-trim data-noescape>
+              <pre class="fragment" data-fragment-index="2"><code class="fragment language-javascript" data-fragment-index="2" data-trim data-noescape>
 const userConfirmed = confirm('Are you sure you want to proceed?');
 if (userConfirmed) {
   alert('You clicked OK!');
