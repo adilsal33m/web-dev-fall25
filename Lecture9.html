@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Web-Based Application Development — Lecture 9</title>
+	<meta name="description" content="Lecture 8 - Web Based Application Development">
+	<meta name="author" content="Muhammad Adil Saleem">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				<img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+				Institute of Business Administration Karachi
+			</p>
+		</div>
+		<div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				CSE 308: Web Based Application Development - Fall 2025
+			</p>
+		</div>
+
+		<div class="slides">
+
+			<section>
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 9</h3>
+				<p class="">25th September 2025</p>
+			</section>
+
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>Frontend for the backend REST API</li>
+					<li>AJAX</li>
+					<li>Sessions & Cookies</li>
+					<li>Bonus: jQuery</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>Frontend for the Backend REST API</h3>
+				<p class="fragment ">In our previous lectures, we built a <strong>RESTful API</strong> on the backend
+					using PHP and SQLite.</p>
+				<p class="fragment ">Now, we'll shift our focus to the frontend. The goal is to build a client-side
+					application that can <strong>consume</strong> and interact with the API we created.</p>
+			</section>
+
+			<section>
+				<h3>So, What Are We Building? 🤔</h3>
+				<ul class="">
+					<li class="fragment">A simple web page with a user interface.</li>
+					<li class="fragment">This page will have forms to <strong>create</strong> and
+						<strong>update</strong> data (e.g., creating a
+						new user or a new blog post).
+					</li>
+					<li class="fragment">It will also display a list of items fetched from our API (e.g., a list of all
+						users or all posts).</li>
+					<li class="fragment">And buttons to <strong>delete</strong> items.</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>CRUD with Traditional PHP</h3>
+				<pre><code class="language-php" data-trim data-noescape>
+&lt;?php
+// public/index.php
+require __DIR__ . '/../src/Database.php';
+require __DIR__ . '/../src/StudentController.php';
+
+// Instantiate the controller and database connection once
+$db = (new Database())-&gt;getConnection();
+$ctrl = new StudentController($db);
+
+$students = $ctrl-&gt;all();
+
+$redirect_url = strtok($_SERVER['REQUEST_URI'], '?');
+
+// Handle form submissions (Create, Update, Delete)
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check for a hidden method override for PUT and DELETE
+    $method = $_POST['_method'] ?? 'POST';
+
+    // Handle Create
+    if (isset($_POST['name'], $_POST['email']) && $method === 'POST') {
+        $ctrl-&gt;store();
+    }
+
+    // Handle Update
+    if (isset($_POST['id'], $_POST['name'], $_POST['email']) && $method === 'PUT') {
+        $ctrl-&gt;update((int)$_POST['id']);
+    }
+
+    // Handle Delete
+    if (isset($_POST['id']) && $method === 'DELETE') {
+        $ctrl-&gt;destroy((int)$_POST['id']);
+        header("Location: $redirect_url");
+        exit;
+    }
+}
+
+// Handle Read operations (displaying the main page)
+// No specific logic is needed here for the new inline editing,
+// as all data is displayed by default.
+$students = $ctrl-&gt;all();
+
+?&gt;
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Simple Student CRUD&lt;/title&gt;
+    &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body class="bg-gray-50 text-gray-800 p-8"&gt;
+
+    &lt;div class="container max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-xl"&gt;
+        &lt;h1 class="text-3xl font-bold mb-6 text-center"&gt;Student Records&lt;/h1&gt;
+
+        &lt;div class="bg-gray-100 p-6 rounded-lg shadow-inner mb-8"&gt;
+            &lt;h2 class="text-2xl font-semibold mb-4"&gt;Add New Student&lt;/h2&gt;
+            &lt;form method="POST" action="&lt;?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?&gt;" class="flex flex-col space-y-4"&gt;
+                &lt;div&gt;
+                    &lt;label for="name" class="block text-sm font-medium text-gray-700"&gt;Name:&lt;/label&gt;
+                    &lt;input type="text" id="name" name="name"
+                            required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border"&gt;
+                &lt;/div&gt;
+                &lt;div&gt;
+                    &lt;label for="email" class="block text-sm font-medium text-gray-700"&gt;Email:&lt;/label&gt;
+                    &lt;input type="email" id="email" name="email"
+                            required
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-2 border"&gt;
+                &lt;/div&gt;
+                &lt;button type="submit"
+                        class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"&gt;
+                    Add Student
+                &lt;/button&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+
+        &lt;h2 class="text-2xl font-semibold mb-4 text-center"&gt;Existing Students&lt;/h2&gt;
+        &lt;div class="overflow-x-auto"&gt;
+            &lt;table class="min-w-full divide-y divide-gray-200"&gt;
+                &lt;thead class="bg-gray-200"&gt;
+                    &lt;tr&gt;
+                        &lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;ID&lt;/th&gt;
+                        &lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Name&lt;/th&gt;
+                        &lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Email&lt;/th&gt;
+                        &lt;th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"&gt;Actions&lt;/th&gt;
+                    &lt;/tr&gt;
+                &lt;/thead&gt;
+                &lt;tbody class="bg-white divide-y divide-gray-200"&gt;
+                    &lt;?php if (count($students) &gt; 0): ?&gt;
+                        &lt;?php foreach ($students as $student): ?&gt;
+                            &lt;tr&gt;
+                                &lt;form method="POST" action="&lt;?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?&gt;" class="inline-flex"&gt;
+                                    &lt;input type="hidden" name="_method" value="PUT"&gt;
+                                    &lt;input type="hidden" name="id" value="&lt;?php echo htmlspecialchars($student['id']); ?&gt;"&gt;
+
+                                    &lt;td class="px-6 py-4 whitespace-nowrap"&gt;
+                                        &lt;?php echo htmlspecialchars($student['id']); ?&gt;
+                                    &lt;/td&gt;
+                                    &lt;td class="px-6 py-4 whitespace-nowrap"&gt;
+                                        &lt;input type="text" name="name"
+                                                value="&lt;?php echo htmlspecialchars($student['name']); ?&gt;"
+                                                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-1 border"&gt;
+                                    &lt;/td&gt;
+                                    &lt;td class="px-6 py-4 whitespace-nowrap"&gt;
+                                        &lt;input type="email" name="email"
+                                                value="&lt;?php echo htmlspecialchars($student['email']); ?&gt;"
+                                                class="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 p-1 border"&gt;
+                                    &lt;/td&gt;
+                                    &lt;td class="px-6 py-4 whitespace-nowrap space-x-2"&gt;
+                                        &lt;button type="submit"
+                                                class="text-green-600 hover:text-green-900 font-medium"&gt;
+                                            Save
+                                        &lt;/button&gt;
+                                    &lt;/form&gt;
+                                        &lt;form method="POST" action="&lt;?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?&gt;" class="inline"&gt;
+                                            &lt;input type="hidden" name="_method" value="DELETE"&gt;
+                                            &lt;input type="hidden" name="id" value="&lt;?php echo htmlspecialchars($student['id']); ?&gt;"&gt;
+                                            &lt;button type="submit"
+                                                    onclick="return confirm('Are you sure you want to delete this student?');"
+                                                    class="text-red-600 hover:text-red-900 font-medium"&gt;
+                                                Delete
+                                            &lt;/button&gt;
+                                        &lt;/form&gt;
+                                    &lt;/td&gt;
+                            &lt;/tr&gt;
+                        &lt;?php endforeach; ?&gt;
+                    &lt;?php else: ?&gt;
+                        &lt;tr&gt;
+                            &lt;td colspan="4" class="px-6 py-4 text-center text-gray-500"&gt;No student records found.&lt;/td&gt;
+                        &lt;/tr&gt;
+                    &lt;?php endif; ?&gt;
+                &lt;/tbody&gt;
+            &lt;/table&gt;
+        &lt;/div&gt;
+
+    &lt;/div&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+    </code></pre>
+			</section>
+			<section>
+				<h3>Do you see any anomaly with this approach?</h3>
+				<p class="!text-gray-500">Hint: Observe the page after each action</p>
+			</section>
+			<section>
+				<section>
+					<h3>What is AJAX?</h3>
+					<p class="fragment ">Asynchronous JavaScript And XML</p>
+					<p class="fragment ">Despite its name, XML is rarely used today. We primarily use JSON to
+						exchange data.</p>
+					<p class="fragment ">It's a technique for creating asynchronous web applications.</p>
+					<p class="fragment ">The core idea is to make HTTP requests from the browser without reloading the
+						entire page.</p>
+				</section>
+				<section>
+					<h3>AJAX vs. Traditional Web Pages</h3>
+					<div class="flex text-4xl">
+						<div class="w-1/2 p-4">
+							<h4>Traditional Web Pages</h4>
+							<ul class="text-left ">
+								<li class="fragment">User clicks a link or submits a form.</li>
+								<li class="fragment">Browser sends a request to the server.</li>
+								<li class="fragment">Server processes the request and sends back a new HTML page.
+								</li>
+								<li class="fragment">Browser reloads the entire page.</li>
+								<li class="fragment">This causes a noticeable flicker and can be slow.</li>
+							</ul>
+						</div>
+						<div class="w-1/2 p-4">
+							<h4>AJAX-enabled Pages</h4>
+							<ul class="text-left ">
+								<li class="fragment">User clicks a button.</li>
+								<li class="fragment">A JavaScript function sends an asynchronous request to the
+									server in the background.</li>
+								<li class="fragment">Server sends back only the data (e.g., JSON).</li>
+								<li class="fragment">JavaScript receives the data and updates a specific part of the
+									page without a full reload.</li>
+								<li class="fragment">This provides a smoother, more interactive user experience.</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+
+				<!-- Old way: XHR -->
+				<section>
+
+					<h3>How do we make an AJAX request?</h3>
+					<h4>Before <code>fetch()</code>: using <code>XMLHttpRequest</code></h4>
+					<pre><code class="javascript">// Old verbose way
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "https://api.example.com/data", true);
+xhr.onreadystatechange = function () {
+  if (xhr.readyState === 4 && xhr.status === 200) {
+    var data = JSON.parse(xhr.responseText);
+    console.log(data);
+  }
+};
+xhr.send();
+		</code></pre>
+					<p class="note">Clunky: lots of boilerplate, callbacks, manual parsing.</p>
+				</section>
+
+				<!-- Modern way: fetch -->
+				<section>
+					<h4>Modern way: <code>fetch()</code></h4>
+					<pre><code class="javascript">fetch("https://api.example.com/data")
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error("Error:", error));
+		</code></pre>
+					<p class="fragment pt-4">Cleaner, promise-based, built into browsers.</p>
+				</section>
+			</section>
+
+			<section>
+				<h3>Question</h3>
+				<p class=" pt-16">Can someone tell me why we might prefer a full page reload over an AJAX request in
+					some cases?</p>
+				<p class=" pt-8 fragment">(Hint: Think about simpler websites or accessibility).</p>
+			</section>
+
+			<section>
+				<section>
+					<h3>Sessions and Cookies</h3>
+					<p class="fragment ">So far, our API has been stateless. Each request is independent. But what
+						about maintaining user state?</p>
+					<p class="fragment ">Think about a login system. We need to remember a user after they've logged in.
+					</p>
+					<p class="fragment ">This is where sessions and cookies come in.</p>
+				</section>
+				<section>
+					<h3>What is a Session?</h3>
+					<p class="">A session is a temporary, interactive information exchange between two or more
+						communicating devices or between a computer and user.</p>
+					<p class="fragment ">On the web, it's a way for the server to remember a user across multiple
+						requests.</p>
+					<p class="fragment ">The server stores a unique session ID for each user and associates it with
+						user-specific data (e.g., their login status, shopping cart contents).</p>
+				</section>
+				<section>
+					<h3>How do Sessions Work?</h3>
+					<ul class="">
+						<li class="fragment">1. User logs in.</li>
+						<li class="fragment">2. Server generates a unique session ID and stores it (e.g., in a
+							database or in memory).</li>
+						<li class="fragment">3. Server sends this session ID back to the browser, typically as a
+							cookie.</li>
+						<li class="fragment">4. For subsequent requests, the browser automatically sends the cookie with
+							the session ID.</li>
+						<li class="fragment">5. The server looks up the session ID and retrieves the associated user
+							data.</li>
+					</ul>
+					<p class=" pt-16 fragment">This leads us to the client-side part: Cookies.</p>
+				</section>
+				<section>
+					<h3>What are Cookies? 🍪</h3>
+					<p class="">A cookie is a small piece of data that a server sends to a user's web browser.</p>
+					<p class="fragment ">The browser may store it and send it back with the next request to the same
+						server.</p>
+					<p class="fragment ">They are primarily used for:</p>
+					<ul class="fragment ">
+						<li>Session management: Remembering user logins.</li>
+						<li>Personalization: Storing user preferences.</li>
+						<li>Tracking: Recording and analyzing user behavior.</li>
+					</ul>
+				</section>
+				<section>
+					<h3>Sessions vs. Cookies</h3>
+					<div class="flex">
+						<div class="w-1/2 p-4">
+							<h4>Cookies</h4>
+							<ul class="text-left ">
+								<li class="fragment">Stored on the client side (in the user's browser).</li>
+								<li class="fragment">Limited in size (around 4 KB).</li>
+								<li class="fragment">Can be viewed and sometimes modified by the user.</li>
+								<li class="fragment">Can have expiration dates.</li>
+							</ul>
+						</div>
+						<div class="w-1/2 p-4">
+							<h4>Sessions</h4>
+							<ul class="text-left ">
+								<li class="fragment">Stored on the server side.</li>
+								<li class="fragment">Can hold a larger amount of data.</li>
+								<li class="fragment">More secure, as the data is not exposed to the client.</li>
+								<li class="fragment">Typically expire after a period of inactivity.</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<!-- Cookies -->
+				<section>
+					<h4>Using Cookies</h4>
+					<pre><code class="php">&lt;?php
+// Set a cookie (lasts 1 hour)
+setcookie("theme", "dark", time() + 3600);
+
+// Read cookie
+if (isset($_COOKIE["theme"])) {
+    echo "Preferred theme: " . $_COOKIE["theme"];
+}
+?&gt;</code></pre>
+					<p class="note">Cookies are stored in the browser and sent with each request.</p>
+				</section>
+
+				<!-- Sessions -->
+				<section>
+					<h4>Using Sessions</h4>
+					<pre><code class="php">&lt;?php
+session_start();
+
+// Track number of visits
+if (!isset($_SESSION["visits"])) {
+    $_SESSION["visits"] = 1;
+} else {
+    $_SESSION["visits"]++;
+}
+
+echo "You have visited this page " . $_SESSION["visits"] . " times.";
+?&gt;</code></pre>
+					<p class="note">Sessions are stored on the server; the browser only keeps a session ID cookie.
+					</p>
+				</section>
+				<section>
+					<h4>Precautions with <code>session_start()</code></h4>
+					<ul>
+						<li>Call <code>session_start()</code> <strong>before any output</strong>
+							(e.g. no <code>echo</code>, no HTML before it), otherwise headers cannot be sent.</li>
+						<li>Only call it once per request — multiple calls cause warnings.</li>
+						<li>Don’t store large data (images, objects) in sessions → keep it lightweight.</li>
+						<li>Be aware: session data lives on the server, tied to a session ID cookie.</li>
+					</ul>
+				</section>
+			</section>
+			<section>
+				<section>
+
+					<h2>jQuery</h2>
+					<p>jQuery simplified web development with its powerful features.</p>
+					<p>Even though jQuery is outdated, you may still encounter it here and there.</p>
+
+				</section>
+				<section>jQuery makes asynchronous requests incredibly easy.</p>
+					<pre><code class="javascript">
+$.ajax({
+  url: 'data.json',
+  type: 'GET',
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+    $('#content').text(data.message);
+  },
+  error: function(jqXHR, textStatus, errorThrown) {
+    console.log('Error:', textStatus, errorThrown);
+  }
+});
+    </code></pre>
+					<p>In this example, we fetch data from a <code>data.json</code> file and update an element with the
+						ID <code>content</code> on success.</p>
+				</section>
+
+				<section>
+					<h3>2. Selecting Elements with Ease</h3>
+					<p>jQuery's powerful selectors, inspired by CSS, make it simple to find and manipulate elements on
+						the page.</p>
+					<pre><code class="javascript">
+// Select an element by ID
+$('#myButton').on('click', function() {
+  alert('Button clicked!');
+});
+
+// Select all elements with a specific class
+$('.card').hide();
+
+// Select a specific element within another element
+$('ul li:first-child').css('color', 'blue');
+    </code></pre>
+					<p>Whether it's by ID, class, or a more complex selector, jQuery provides a concise way to target
+						elements.</p>
+				</section>
+
+				<section>
+					<h3>3. Smooth Animations</h3>
+					<p>jQuery's built-in animation functions let you create dynamic and engaging user interfaces with
+						minimal code.</p>
+					<pre><code class="javascript">
+// Fade an element out
+$('#banner').fadeOut(1000, function() {
+  console.log('Banner is now hidden.');
+});
+
+// Slide an element down
+$('.hidden-panel').slideDown('slow');
+
+// Custom animation with multiple properties
+$('#box').animate({
+  width: '500px',
+  opacity: '0.5'
+}, 1500);
+    </code></pre>
+				</section>
+			</section>
+
+		</div>
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+	</script>
+</body>
+
+</html>
