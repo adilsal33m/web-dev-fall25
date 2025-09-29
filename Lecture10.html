@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Web-Based Application Development — Lecture 10</title>
+	<meta name="description" content="Lecture 10 - Web Based Application Development">
+	<meta name="author" content="Muhammad Adil Saleem">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				<img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+				Institute of Business Administration Karachi
+			</p>
+		</div>
+		<div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				CSE 308: Web Based Application Development - Fall 2025
+			</p>
+		</div>
+
+		<div class="slides">
+
+			<section>
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 10</h3>
+				<p class="">30th September 2025</p>
+			</section>
+
+
+			<section>
+				<h3>Quiz</h3>
+				<img class="!mx-auto h-64"
+					src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://forms.office.com/r/jJXPNXjcfh"
+					alt="">
+
+				<p>https://forms.office.com/r/jJXPNXjcfh</p>
+			</section>
+
+			<section>
+				<h3>Agenda</h3>
+				<ul>
+					<li>Server-Side Rendering (SSR) vs Single Page Applications (SPA)</li>
+					<li>Introduction to Vue.js</li>
+				</ul>
+			</section>
+
+			<section>
+				<h3>Attribution</h3>
+				<p>The contents of today's lecture are taken from:</p>
+				<ul>
+					<li><a href="https://prismic.io/blog/client-side-vs-server-side-rendering">Prismic.IO</a></li>
+					<li><a href="https://vuejs.org/tutorial">Vue.JS Tutorial</a></li>
+				</ul>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Decisions in Web Development
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					Building a new website or web application from scratch can be tricky,
+					particularly because of the various decisions developers have to make,
+					like <span class="!font-semibold">“Which CSS framework should I use?”</span>
+					or <span class="!font-semibold">“Should I have a light/dark mode switcher?”</span>
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					Another important decision that can truly affect several aspects of a web project—its
+					<span class="!font-semibold">performance</span>, <span class="!font-semibold">SEO</span>,
+					<span class="!font-semibold">page load speed</span>, and <span class="!font-semibold">user
+						experience</span>—
+					is the rendering method you choose.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					The two most popular strategies are
+					<span class="!font-bold">Client-Side Rendering (CSR)</span>
+					and <span class="!font-bold">Server-Side Rendering (SSR)</span>.
+				</p>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Client-Side Rendering (CSR)
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					Client-side rendering (CSR) is a JavaScript rendering technique where the final
+					HTML content and user interface (UI) components are generated on the client's
+					browser using JavaScript.
+				</p>
+				<ul class="fragment fade-in-then-semi-out list-disc pl-10 !leading-relaxed  text-3xl">
+					<li>The server sends an initial HTML file with minimal content</li>
+					<li>The client-side JavaScript code fetches data from the server</li>
+					<li>The JavaScript code renders the complete UI on the browser</li>
+				</ul>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					CSR Advantages & Use Cases
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					A major advantage of CSR is its ability to create highly interactive and
+					dynamic web applications.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					Best fit for <span class="!font-semibold">chat apps</span>,
+					<span class="!font-semibold">social media platforms</span>,
+					and <span class="!font-semibold">single-page applications (SPAs)</span>
+					where content frequently updates without full page reload.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					Popular frameworks include
+					<span class="!font-semibold">React</span>, <span class="!font-semibold">Vue.js</span>,
+					<span class="!font-semibold">Angular</span>, <span class="!font-semibold">Svelte</span>,
+					<span class="!font-semibold">Backbone.js</span>, and <span class="!font-semibold">Ember.js</span>.
+				</p>
+			</section>
+
+			<section>
+				<h3>Workflow for CSR</h3>
+				<div class="grid grid-cols-2 gap-8">
+					<ul class="text-2xl space-y-4">
+						<li class="">A server sends a blank HTML page with links to CSS and JavaScript files to the
+							browser.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							The browser parses the HTML and constructs the page's Document Object Model (DOM) tree.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							The browser downloads the CSS and JavaScript resources. After that, it renders the web page
+							and includes necessary elements like text, images, buttons, and styles.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							The browser executes the JavaScript code to add interactivity and dynamic content like
+							animations, form validations, and data fetched from an API.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							The browser re-renders and updates parts of the web page based on user interactions like
+							button clicks and form submissions.</li>
+					</ul>
+					<img class="!mx-auto" src="/images/csr.avif" alt="">
+				</div>
+			</section>
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Advantages of Client-Side Rendering
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">Provides faster interactivity</span> — CSR not only
+					renders the page in the browser but also updates content instantly. Users get
+					near-instant feedback on actions like button clicks and form submissions
+					without a full page reload.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">Reduced server load</span> — with CSR, the server
+					mainly sends a minimal HTML file, while the browser handles rendering. This
+					reduces strain on the server during high-traffic periods.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">Great for dynamic updates</span> — CSR works well
+					for real-time dashboards, collaborative tools, and online games where content
+					changes frequently without requiring page reloads.
+				</p>
+			</section>
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Disadvantages of Client-Side Rendering
+				</h3>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">SEO limitations</span> — CSR sends mostly empty HTML
+					at first, making it harder for crawlers to index content. This hurts search
+					rankings, so CSR is not ideal for SEO-focused sites but fine for apps like chats
+					or dashboards.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					<span class="!font-semibold">Longer initial load</span> — the browser must
+					download and run JavaScript before rendering. Users may see a blank page or
+					loading screen, especially on slow networks or large apps. Code splitting and
+					lazy-loading can ease this.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">Caching delay</span> — pages can’t be cached until
+					JavaScript finishes rendering, which slows performance on weaker devices or
+					connections.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed  text-3xl">
+					<span class="!font-semibold">JavaScript dependency</span> — if JavaScript is
+					disabled, users only see the bare HTML shell, leading to a broken experience.
+				</p>
+			</section>
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Server-Side Rendering (SSR)
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					Server-side rendering (SSR) is a rendering approach where the rendering process
+					occurs on the server.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					In this approach, the server generates the complete HTML page with the rendered
+					UI and sends it to the client’s browser. The browser then displays the fully
+					rendered page without running any client-side JavaScript code.
+				</p>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					SSR in Practice
+				</h3>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					SSR is the traditional method of rendering web pages and has been widely used
+					for many years.
+				</p>
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					It is well-suited for applications like ecommerce platforms and landing pages
+					where search engine optimization (SEO) and fast initial page loads are
+					important.
+				</p>
+			</section>
+			<section>
+				<h3>Workflow for SSR</h3>
+				<div class="grid grid-cols-2 gap-8">
+					<ul class="text-2xl space-y-4">
+						<li class="">A server receives a request for a web page, retrieves the necessary data for that
+							page, and populates that data into an HTML template.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							The server generates the HTML markup for the page, renders its content, and applies the
+							necessary styles.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							After rendering the page, the server sends the fully rendered page to the browser to
+							display. With SSR, the browser doesn't have to execute any JavaScript code since the initial
+							page load does not require JavaScript.
+						</li>
+						<li class="fragment fade-in-then-semi-out">
+							For subsequent user interactions and updates, the client-side JavaScript code takes over and
+							handles the rendering and data fetching.
+						</li>
+					</ul>
+					<img class="!mx-auto" src="/images/ssr.avif" alt="">
+				</div>
+			</section>
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Advantages of Server-Side Rendering
+				</h3>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					<span class="!font-semibold">Improves SEO</span> — since pages are fully rendered
+					on the server, search engines can easily crawl and index them. This improves
+					visibility in search results and helps achieve higher rankings.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Faster loading times</span> — SSR removes the need
+					for extra JavaScript downloads before rendering, leading to faster initial page
+					loads. This improves user experience and supports SEO, as faster sites rank
+					better.
+				</p>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Advantages of Server-Side Rendering
+				</h3>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					<span class="!font-semibold">Great for static websites</span> — landing pages,
+					blogs, and documentation benefit from SSR since rendered HTML can be cached and
+					delivered quickly with minimal server effort.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Eliminates loading screens</span> — users receive a
+					fully rendered page immediately, without waiting for JavaScript execution or UI
+					skeletons. This creates a smoother perceived loading experience.
+				</p>
+			</section>
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Disadvantages of Server-Side Rendering
+				</h3>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					<span class="!font-semibold">Increased server load</span> — the server must
+					render the entire UI for each request, which can strain resources under heavy
+					traffic or many concurrent users.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Delayed interactivity</span> — updates require
+					round-trips to the server, which can slow responsiveness compared to CSR. This
+					makes SSR better for static-focused sites like blogs and landing pages.
+				</p>
+			</section>
+
+
+			<section>
+				<div class="overflow-auto h-[80vh] text-3xl">
+					<table>
+						<thead>
+							<tr>
+								<th>Aspect</th>
+								<th>Client-side rendering</th>
+								<th>Server-side rendering</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Rendering process</td>
+								<td class="text-2xl tracking-wider leading-loose">Rendering process occurs on the
+									browser using JavaScript</td>
+								<td class="text-2xl tracking-wider leading-loose">Rendering process occurs on the server
+								</td>
+							</tr>
+							<tr>
+								<td>SEO</td>
+								<td class="text-2xl tracking-wider leading-loose">Harder for search engines to crawl and
+									index content</td>
+								<td class="text-2xl tracking-wider leading-loose">Easier for SEO as search engines can
+									crawl rendered HTML</td>
+							</tr>
+							<tr>
+								<td>Initial page load</td>
+								<td class="text-2xl tracking-wider leading-loose">Initially loads an HTML shell, then
+									JavaScript bundle is fetched and executed to
+									render the UI</td>
+								<td class="text-2xl tracking-wider leading-loose">Initially loads a fully rendered HTML
+									page from the server</td>
+							</tr>
+							<tr>
+								<td>Initial page load experience</td>
+								<td class="text-2xl tracking-wider leading-loose">User sees a blank page or loading
+									spinner until the JavaScript bundle is downloaded
+									and executed</td>
+								<td class="text-2xl tracking-wider leading-loose">User sees the rendered content
+									immediately upon page load</td>
+							</tr>
+							<tr>
+								<td>Type of application</td>
+								<td class="text-2xl tracking-wider leading-loose">Ideal for SPAs, highly interactive web
+									apps like social media platforms and chat
+									apps, and internal apps user dashboards</td>
+								<td class="text-2xl tracking-wider leading-loose">Ideal for content-heavy websites and
+									apps with limited interactivity requirements
+									like landing pages, ecommerce apps, documentation, and media publications</td>
+							</tr>
+							<tr>
+								<td>Framework that support it</td>
+								<td class="text-2xl tracking-wider leading-loose">Frameworks include React, Angular,
+									Vue, Svelte, Backbone.js, and Ember.js</td>
+								<td class="text-2xl tracking-wider leading-loose">Frameworks include Next.js, Nuxt.js,
+									Remix, SvelteKit, Angular Universal, Astro, and
+									Qwik. Note that some of these frameworks also support CSR.</td>
+							</tr>
+							<tr>
+								<td>Interactivity</td>
+								<td class="text-2xl tracking-wider leading-loose">Highly interactive and responsive
+									after the initial load, as subsequent interactions
+									are handled client-side without requiring full page refreshes</td>
+								<td class="text-2xl tracking-wider leading-loose">Initial interactivity is limited to
+									the pre-rendered content; subsequent
+									interactions may require full page refreshes or client-side rendering</td>
+							</tr>
+							<tr>
+								<td>Loading speed</td>
+								<td class="text-2xl tracking-wider leading-loose">Slower initial load time due to
+									fetching and parsing JavaScript files</td>
+								<td class="text-2xl tracking-wider leading-loose">Faster initial load time as HTML is
+									pre-rendered</td>
+							</tr>
+							<tr>
+								<td>Caching</td>
+								<td class="text-2xl tracking-wider leading-loose">Difficult to cache rendered pages</td>
+								<td class="text-2xl tracking-wider leading-loose">Easier to cache rendered HTML pages on
+									servers or CDNs</td>
+							</tr>
+							<tr>
+								<td>Data fetching</td>
+								<td class="text-2xl tracking-wider leading-loose">Data is fetched via API calls after
+									the initial load</td>
+								<td class="text-2xl tracking-wider leading-loose">Data is fetched on the server</td>
+							</tr>
+							<tr>
+								<td>Server load</td>
+								<td class="text-2xl tracking-wider leading-loose">Reduced server load since rendering
+									occurs on the browser</td>
+								<td class="text-2xl tracking-wider leading-loose">Increased server load since rendering
+									occurs on the server</td>
+							</tr>
+							<tr>
+								<td>HTTP requests</td>
+								<td class="text-2xl tracking-wider leading-loose">Makes fewer HTTP requests to the
+									server</td>
+								<td class="text-2xl tracking-wider leading-loose">Requires more HTTP requests to the
+									server</td>
+							</tr>
+							<tr>
+								<td>JavaScript dependency</td>
+								<td class="text-2xl tracking-wider leading-loose">Depends heavily on JavaScript</td>
+								<td class="text-2xl tracking-wider leading-loose">Minimal JavaScript dependency</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="!text-left">
+				<h3 class="!font-bold !mb-8">
+					Why Frameworks Are Widely Used
+				</h3>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+					<span class="!font-semibold">Faster development</span> — frameworks provide
+					ready-made components, templates, and utilities that reduce repetitive coding.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Consistency and standards</span> — they enforce
+					coding best practices, making applications easier to read, maintain, and scale.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Cross-browser and device support</span> — frameworks
+					handle many quirks and compatibility issues out of the box.
+				</p>
+
+				<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl mt-6">
+					<span class="!font-semibold">Ecosystem and community</span> — strong communities
+					offer plugins, tools, and support, speeding up problem-solving and innovation.
+				</p>
+			</section>
+
+			<section>
+				<h3>Vue.js</h3>
+
+				<div class="grid grid-cols-2 text-left">
+					<div>
+						<p>Vue is a JavaScript framework for building user interfaces. It builds
+							on top of standard HTML, CSS, and JavaScript and provides a declarative, component-based
+							programming
+							model that helps you efficiently develop user interfaces of any complexity.</p>
+					</div>
+					<div>
+						<pre>
+							<code>
+&lt;div id=&quot;app&quot;&gt;
+	&lt;button class=&quot;...&quot; @click=&quot;count++&quot;&gt;
+    	Count is: {{ count }}
+	&lt;/button&gt;
+&lt;/div&gt;
+						
+const { createApp, ref } = Vue;
+createApp({
+	setup() {
+		return {
+			count: ref(0)
+		}
+	}
+}).mount(&#39;#app&#39;)
+						</code>
+						</pre>
+						<div id="app">
+							<button
+								class="mx-auto px-4 py-2 rounded-md bg-indigo-500 hover:shadow-md hover:bg-indigo-600 transition text-white"
+								@click="count++">
+								Count is: {{ count }}
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<h2><a href="https://vuejs.org/tutorial/#step-1">Vue.JS tutorial</a></h2>
+				<h4>Topics we'll cover</h4>
+				<div class="grid grid-cols-2">
+					<p>Vue Composition vs Options API</p>
+					<p>Vue HTML vs SPC</p>
+					<p>Declarative Rendering</p>
+					<p>Attribute Binding</p>
+					<p>Event Listeners</p>
+					<p>Form Bindings</p>
+				</div>
+			</section>
+		</div>
+	</div>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+	</script>
+	<script>
+		const { createApp, ref } = Vue;
+		createApp({
+			setup() {
+				return {
+					count: ref(0)
+				}
+			}
+		}).mount('#app')
+	</script>
+</body>
+
+</html>
