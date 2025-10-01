@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>Web-Based Application Development — Lecture 10</title>
+	<meta name="description" content="Lecture 11 - Web Based Application Development">
+	<meta name="author" content="Muhammad Adil Saleem">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+	<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+	<div class="reveal">
+		<div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				<img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+				Institute of Business Administration Karachi
+			</p>
+		</div>
+		<div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+			<p style="text-align: center; font-size: 0.4em;">
+				CSE 308: Web Based Application Development - Fall 2025
+			</p>
+		</div>
+
+		<div class="slides">
+
+			<section>
+				<h2>Web Based Application Development</h2>
+				<h3 class="pt-16">Lecture 11</h3>
+				<p class="">2nd October 2025</p>
+			</section>
+
+			<section>
+				<h2>Agenda</h2>
+				<ul>
+					<li>Vue Tutorial</li>
+					<li>Routing</li>
+					<li>State Management</li>
+				</ul>
+			</section>
+
+			<section>
+				<section>
+					<h2>Vue Tutorial</h2>
+					<div class="grid grid-cols-2">
+						<p>Conditional Rendering</p>
+						<p>List Rendering</p>
+						<p>Computed Properties</p>
+						<p>Lifecycle and Template Refs</p>
+						<p>Watchers</p>
+						<p>Components</p>
+						<p>Props</p>
+						<p>Emits</p>
+						<p>Slots</p>
+					</div>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Routing</h2>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Frontend routing allows Single Page Applications (SPAs) to change views without reloading the
+						page.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						It improves user experience by making navigation seamless, faster, and more app-like.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Instead of requesting a new HTML page from the server, routing swaps components on the client
+						side.
+					</p>
+				</section>
+				<section>
+					<h2>Vue Router</h2>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Vue uses Vue Router, the official routing library, to manage navigation in SPAs.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Routes are mapped to Vue components, so different URLs load different components without
+						refreshing.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						It supports dynamic routes, nested routes, programmatic navigation, and guards.
+					</p>
+				</section>
+				<section>
+					<h3>Minimal Example</h3>
+					<p class="!leading-relaxed text-3xl">
+						Example of Vue Router setup:
+					</p>
+					<div class="grid grid-cols-2 gap-8">
+						<div>
+							<pre>
+								<code>
+// main.js
+import { createApp } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import Home from './Home.vue'
+import About from './About.vue'
+
+const routes = [
+  { path: '/', component: Home },
+  { path: '/about', component: About }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+createApp(App).use(router).mount('#app')
+								</code>
+							</pre>
+						</div>
+
+						<div>
+							<pre>
+								<code>
+<!-- App.vue -->
+<template>
+  <nav>
+    <router-link to="/">Home</router-link> |
+    <router-link to="/about">About</router-link>
+  </nav>
+  <router-view />
+</template>
+								</code>
+							</pre>
+						</div>
+					</div>
+				</section>
+				<section>
+					<h2>Dynamic Routes</h2>
+					<p class="!leading-relaxed text-3xl">
+						Dynamic routes allow URLs with parameters, such as /users/123.
+					</p>
+					<pre>
+						<code>
+const routes = [
+  { path: '/users/:id', component: User }
+]
+
+// User.vue
+<template>
+  <p>User ID: {{ $route.params.id }}</p>
+</template>
+
+						</code>
+					</pre>
+				</section>
+				<section>
+					<h2>Nested Routes</h2>
+					<p class="!leading-relaxed text-3xl">
+						Nested routes allow you to create parent-child relationships between views.
+					</p>
+					<p class="!leading-relaxed text-3xl">
+						They are useful when a page shares a common layout (like a sidebar or header) but shows
+						different child content.
+					</p>
+					<pre>
+    <code>
+const routes = [
+  { 
+    path: '/users', 
+    component: UsersLayout,   // parent view
+    children: [
+      { path: '', component: UserList },     // default child
+      { path: ':id', component: UserProfile } // child with param
+    ]
+  }
+]
+    </code>
+  </pre>
+					<p class="!leading-relaxed text-3xl">
+						Example: <b>/users</b> shows the list, while <b>/users/123</b> shows profile — both inside the
+						same layout.
+					</p>
+				</section>
+				<section>
+					<h2>Programmatic Navigation</h2>
+					<p class="!leading-relaxed text-3xl">
+						Vue Router allows programmatic navigation using router.push().
+					</p>
+					<pre><code>
+export default {
+  methods: {
+    goToAbout() {
+      this.$router.push('/about')
+    }
+  }
+}
+					</code></pre>
+				</section>
+				<section>
+					<h2>Route Guards</h2>
+					<p class="!leading-relaxed text-3xl">
+						Route guards protect routes, ensuring only authorized users can access them.
+					</p>
+					<pre>
+	<code>
+const routes = [
+  { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } }
+]
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isLoggedIn()) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
+	</code>
+</pre>
+				</section>
+				<section>
+					<h2>History Modes</h2>
+					<p class="!leading-relaxed text-3xl">
+						History modes control how Vue Router manages navigation and URLs.
+					</p>
+					<div class="text-left">
+						<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+							- <b>Hash mode</b>: uses <code>#</code> in the URL (e.g., <i>example.com/#/about</i>).
+							No server config needed, but less clean URLs.
+						</p>
+						<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+							- <b>History mode</b>: uses the HTML5 History API (e.g., <i>example.com/about</i>).
+							Cleaner URLs but requires server setup to redirect all requests to <code>index.html</code>.
+						</p>
+					</div>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Choosing the right mode depends on your hosting setup and whether you need clean URLs.
+					</p>
+				</section>
+			</section>
+			<section>
+				<section>
+					<h2>Why State Management?</h2>
+					<p class="!leading-relaxed text-3xl">
+						As Vue apps grow, managing shared state across components becomes challenging.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Without a central store, you end up passing props deeply or emitting events upward, which can
+						get messy.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						State management libraries solve this by providing a <b>single source of truth</b> for your
+						app’s data.
+					</p>
+				</section>
+
+				<section>
+					<h2>What is Pinia?</h2>
+					<p class="!leading-relaxed text-3xl">
+						<b>Pinia</b> is Vue’s official state management library and the successor to Vuex.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						It is designed to be simpler, more intuitive, and fully compatible with Vue 3’s Composition API.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						With Pinia, you define <b>stores</b> that hold state, getters, and actions to manage app-wide
+						data.
+					</p>
+				</section>
+
+				<section>
+					<h2>Minimal Example</h2>
+					<pre>
+    <code>
+import { defineStore } from 'pinia'
+
+export const useCounterStore = defineStore('counter', {
+  state: () => ({ count: 0 }),
+  actions: {
+    increment() {
+      this.count++
+    }
+  }
+})
+    </code>
+  </pre>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						Components can import the store and use its state and actions directly.
+					</p>
+				</section>
+
+				<section>
+					<h2>Using the Store in a Component</h2>
+					<pre>
+    <code>
+import { useCounterStore } from '@/stores/counter'
+
+export default {
+  setup() {
+    const counter = useCounterStore()
+    return { counter }
+  }
+}
+    </code>
+  </pre>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						<code>counter.count</code> is reactive, and <code>counter.increment()</code> updates the state.
+					</p>
+				</section>
+
+				<section>
+					<h2>State in Nested Components</h2>
+					<p class="!leading-relaxed text-3xl">
+						Without Pinia, passing state through multiple layers of props can get messy.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						With Pinia, child components can directly access the shared store — no prop drilling needed.
+					</p>
+					<pre>
+    <code>
+// Parent.vue
+&lt;Child /&gt;
+
+// Child.vue
+import { useCounterStore } from '@/stores/counter'
+export default {
+  setup() {
+    const counter = useCounterStore()
+    return { counter }
+  }
+}
+// Both Parent and Child share the same reactive count
+    </code>
+  </pre>
+				</section>
+
+				<section>
+					<h2>State Across Multiple Pages</h2>
+					<p class="!leading-relaxed text-3xl">
+						Pinia stores persist as long as the app is running, so data stays available across routes.
+					</p>
+					<p class="fragment fade-in-then-semi-out !leading-relaxed text-3xl">
+						For example, a user logs in on <b>/login</b> and their info is available on <b>/dashboard</b>.
+					</p>
+					<pre>
+    <code>
+// auth.js store
+export const useAuthStore = defineStore('auth', {
+  state: () => ({ user: null }),
+  actions: {
+    login(name) {
+      this.user = { name }
+    }
+  }
+})
+
+// Login.vue
+const auth = useAuthStore()
+auth.login('Alice')
+
+// Dashboard.vue
+const auth = useAuthStore()
+console.log(auth.user.name) // Alice
+    </code>
+  </pre>
+				</section>
+				<section>
+					<h2>Persisting State Across Reloads</h2>
+					<p class="!leading-relaxed text-3xl">
+						By default, Pinia state is lost when the page reloads.
+						To keep data (like auth info or cart items), we use persistence. A common solution is the
+						<code>pinia-plugin-persistedstate</code> plugin,
+						which saves state to <b>localStorage</b> or <b>sessionStorage</b>.
+					</p>
+					<pre>
+    <code>
+// Install: npm install pinia-plugin-persistedstate
+
+// main.js
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+// store.js
+export const useAuthStore = defineStore('auth', {
+  state: () => ({ user: null }),
+  persist: true
+})
+    </code>
+  </pre>
+				</section>
+			</section>
+		</div>
+	</div>
+	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+	<script>
+		Reveal.initialize({
+			width: 1200,
+			height: 700,
+			slideNumber: 'c/t',
+			controls: true,
+			progress: true,
+			center: true,
+			hash: true,
+			plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+		});
+	</script>
+	<script>
+		const { createApp, ref } = Vue;
+		createApp({
+			setup() {
+				return {
+					count: ref(0)
+				}
+			}
+		}).mount('#app')
+	</script>
+</body>
+
+</html>
