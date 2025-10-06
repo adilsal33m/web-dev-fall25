@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Web-Based Application Development — Lecture 12</title>
+  <meta name="description" content="Lecture 10 - Web Based Application Development">
+  <meta name="author" content="Muhammad Adil Saleem">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        <img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+        Institute of Business Administration Karachi
+      </p>
+    </div>
+    <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        CSE 308: Web Based Application Development - Fall 2025
+      </p>
+    </div>
+
+    <div class="slides">
+
+      <section>
+        <h2>Web Based Application Development</h2>
+        <h3 class="pt-16">Lecture 12</h3>
+        <p class="">7th October 2025</p>
+      </section>
+
+
+      <section>
+        <h3>Quiz</h3>
+        <img class="!mx-auto h-64"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://forms.office.com/r/7i6rUK8zWs"
+          alt="">
+
+        <p>https://forms.office.com/r/7i6rUK8zWs</p>
+      </section>
+
+      <section>
+        <h3>Agenda</h3>
+        <ul>
+          <li>Introduction to Laravel</li>
+          <li>Code Structure</li>
+          <li>.env</li>
+          <li>artisan</li>
+          <li>Blade Template</li>
+        </ul>
+      </section>
+
+      <section>
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Introduction to Laravel</h2>
+          <p class="mt-4">Laravel is a modern PHP framework designed for building web applications quickly and
+            elegantly.</p>
+          <ul class="mt-4 list-disc pl-10">
+            <li>Built on top of PHP</li>
+            <li>Follows MVC architecture</li>
+            <li>Provides routing, ORM (Eloquent), and Blade templating</li>
+            <li>Supports REST APIs and web apps</li>
+          </ul>
+        </section>
+
+        <!-- How to Setup Laravel -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Setting up Laravel</h2>
+          <p class="mt-4">You can start using Laravel by:</p>
+          <pre><code class="language-bash"># Step 1: Install Laravel globally
+composer global require laravel/installer
+
+# Step 2: Create a new project
+laravel new blog
+
+# Alternatively, using Composer directly
+composer create-project laravel/laravel blog
+
+# Step 3: Start the development server
+cd blog
+php artisan serve
+          </code></pre>
+        </section>
+
+        <!-- Starter Kits -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Starter Kits</h2>
+          <p class="mt-4">Laravel offers official starter kits that simplify authentication and frontend setup for
+            modern applications.</p>
+
+          <div class="mt-8">
+            <p class="text-4xl text-left"><strong>React</strong> - Build single-page apps using React 19, TypeScript,
+              Tailwind,
+              and shadcn/ui via Inertia.</p>
+          </div>
+
+          <div class="mt-8">
+            <p class="text-4xl text-left"> <strong>Vue</strong> - Create modern Vue apps using Composition API,
+              TypeScript,
+              Tailwind, and shadcn-vue via
+              Inertia.</p>
+          </div>
+
+          <div class="mt-8">
+            <p class="text-4xl text-left"><strong>Livewire</strong> - Build reactive Blade-based UIs with Livewire,
+              Tailwind, and
+              the Flux UI component library.
+            </p>
+          </div>
+        </section>
+
+
+        <!-- Composer -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Composer</h2>
+          <p class="mt-4">Composer is PHP's dependency manager. Laravel relies heavily on it to manage packages.</p>
+          <pre><code class="language-bash"># Add a package
+composer require guzzlehttp/guzzle
+
+# Update dependencies
+composer update
+
+# Check installed packages
+composer show
+          </code></pre>
+          <p class="mt-4">All dependencies are listed in <code>composer.json</code>.</p>
+        </section>
+
+        <!-- Autoloading (Part 1: Concept & Example) -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">5. Autoloading</h2>
+          <p class="mt-4">Composer automatically handles class loading using the <strong>PSR-4</strong> standard, so you
+            never need to manually include files.</p>
+
+          <div class="grid grid-cols-2">
+            <pre><code class="language-php">&lt;?php
+namespace App\Services;
+
+class GreetingService {
+    public function sayHello($name) {
+        return "Hello, $name!";
+    }
+}
+  </code></pre>
+
+            <pre><code class="language-php">&lt;?php
+// In a controller
+use App\Services\GreetingService;
+
+$greet = new GreetingService();
+echo $greet->sayHello('Adil');
+  </code></pre>
+          </div>
+
+          <p class="mt-4">Laravel automatically loads all classes inside the <code>app/</code> directory using namespace
+            conventions.</p>
+        </section>
+
+        <!-- Autoloading (Part 2: PSR-4 Mapping) -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">PSR-4 Autoloading</h2>
+          <p class="mt-4">PSR-4 defines how namespaces map to directory structures. The mapping is defined in
+            <code>composer.json</code> under the <code>autoload</code> section.
+          </p>
+
+          <pre><code class="language-json">{
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "Database\\Factories\\": "database/factories/",
+      "Database\\Seeders\\": "database/seeders/"
+    }
+  }
+}
+  </code></pre>
+
+          <p class="mt-4">This means that any class with the namespace <code>App\Services</code> is automatically loaded
+            from <code>app/Services</code>.</p>
+        </section>
+
+      </section>
+      <!-- Code Organization in Laravel -->
+      <section>
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">6. Code Organization in Laravel</h2>
+          <p class="mt-4">Laravel’s folder structure is designed for clarity, modularity, and scalability. Let’s explore
+            the key directories.</p>
+        </section>
+
+        <!-- app/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-amber-300">app/</h3>
+          <p class="mt-4">Contains the core application logic, including models, controllers, middleware, policies, and
+            services.</p>
+          <pre><code class="language-bash">app/
+├── Console/
+├── Exceptions/
+├── Http/
+│   ├── Controllers/
+│   ├── Middleware/
+│   └── Requests/
+├── Models/
+└── Providers/
+    </code></pre>
+          <p class="mt-4">Most of your PHP code lives here, organized by namespace under <code>App\</code>.</p>
+        </section>
+
+        <!-- database/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-emerald-300">database/</h3>
+          <p class="mt-4">Holds your migrations, model factories, and seeders that define and populate your database
+            schema.</p>
+          <pre><code class="language-bash">database/
+├── factories/
+├── migrations/
+└── seeders/
+    </code></pre>
+          <p class="mt-4">Use <code>php artisan migrate</code> and <code>php artisan db:seed</code> to manage your
+            database lifecycle.</p>
+        </section>
+
+        <!-- config/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-indigo-300">config/</h3>
+          <p class="mt-4">Stores configuration files for your application — such as database, cache, mail, and session
+            settings.</p>
+          <pre><code class="language-bash">config/
+├── app.php
+├── database.php
+├── mail.php
+└── cache.php
+    </code></pre>
+          <p class="mt-4">Access values using <code>config('app.name')</code>.</p>
+        </section>
+
+        <!-- routes/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-blue-300">routes/</h3>
+          <p class="mt-4">Defines all your web, API, and console routes.</p>
+          <pre><code class="language-bash">routes/
+├── web.php       # Browser routes
+├── api.php       # API routes
+├── console.php   # Artisan commands
+└── channels.php  # Event broadcasting channels
+    </code></pre>
+          <p class="mt-4">Each file maps URL patterns to controllers or closures.</p>
+        </section>
+
+        <!-- resources/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-pink-300">resources/</h3>
+          <p class="mt-4">Contains your frontend assets and Blade templates.</p>
+          <pre><code class="language-bash">resources/
+├── views/          # Blade templates
+├── css/
+├── js/
+└── lang/           # Localization files
+    </code></pre>
+          <p class="mt-4">Files here are compiled with <strong>Vite</strong> for frontend performance and modularity.
+          </p>
+        </section>
+
+        <!-- vendor/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-gray-300">vendor/</h3>
+          <p class="mt-4">Contains all PHP dependencies installed via Composer.</p>
+          <pre><code class="language-bash">vendor/
+├── laravel/
+├── symfony/
+└── psr/
+    </code></pre>
+          <p class="mt-4">You should never manually edit files in this folder.</p>
+        </section>
+
+        <!-- node_modules/ -->
+        <section>
+          <h3 class="text-3xl font-semibold text-lime-300">node_modules/</h3>
+          <p class="mt-4">Holds JavaScript and CSS dependencies installed via npm.</p>
+          <pre><code class="language-bash">node_modules/
+├── tailwindcss/
+├── vite/
+└── axios/
+    </code></pre>
+          <p class="mt-4">Used for frontend builds managed by <strong>Vite</strong>.</p>
+        </section>
+
+        <!-- Vite -->
+        <section>
+          <h3 class="text-3xl font-semibold text-yellow-300">Vite</h3>
+          <p class="mt-4">Vite is Laravel’s default frontend bundler for fast builds and hot module replacement.</p>
+          <pre><code class="language-bash"># Run development server
+npm run dev
+
+# Build for production
+npm run build
+    </code></pre>
+          <p class="mt-4">It compiles your <code>resources/js</code> and <code>resources/css</code> files and injects
+            them into your Blade templates.</p>
+        </section>
+      </section>
+      <!-- .env File -->
+      <section>
+        <section>
+          <h3 class="text-3xl font-semibold text-blue-300">.env File</h3>
+          <p class="mt-4">The <code>.env</code> file stores environment-specific configuration such as database
+            credentials, app keys, and mail settings.</p>
+
+          <pre><code class="language-bash"># .env
+
+APP_NAME="MyLaravelApp"
+APP_ENV=local
+APP_KEY=base64:randomgeneratedkey==
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=myapp_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+  </code></pre>
+        </section>
+        <section>
+          <h3 class="text-3xl font-semibold text-blue-300">.env File</h3>
+          <p class="mt-4">These values are loaded into Laravel using the <code>env()</code> helper and can be accessed
+            via
+            <code>config()</code> files.
+          </p>
+          <pre><code class="language-php">&lt;?php
+// Example: config/database.php
+'host' => env('DB_HOST', '127.0.0.1'),
+  </code></pre>
+
+          <p class="mt-4">Keep the <code>.env</code> file private — never commit it to version control. Use
+            <code>.env.example</code> for sharing defaults.
+          </p>
+        </section>
+      </section>
+      <!-- Artisan -->
+      <section>
+        <!-- Intro -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Artisan CLI</h2>
+          <p class="mt-4">Artisan is Laravel’s command-line interface that automates common tasks such as code
+            generation, database migrations, and caching.</p>
+          <pre><code class="language-bash"># View all available commands
+php artisan list
+
+# Display help for a specific command
+php artisan help migrate
+    </code></pre>
+          <p class="mt-4">Artisan helps streamline development and maintenance through expressive, easy-to-use commands.
+          </p>
+        </section>
+
+        <!-- Common Commands -->
+        <section>
+          <h3 class="text-3xl font-semibold text-amber-300">Common Commands</h3>
+          <p class="mt-4">Some of the most frequently used Artisan commands include:</p>
+          <pre><code class="language-bash">php artisan serve           # Start the local development server
+php artisan migrate         # Run all pending migrations
+php artisan make:model User # Create a new model
+php artisan make:controller UserController
+php artisan tinker          # Interact with your app via REPL
+php artisan route:list      # Display all registered routes
+    </code></pre>
+          <p class="mt-4">Use <code>php artisan list</code> anytime to explore available commands by category.</p>
+        </section>
+
+        <!-- Make Commands -->
+        <section>
+          <h3 class="text-3xl font-semibold text-emerald-300">"make" Commands</h3>
+          <p class="mt-4">The <code>make:</code> commands generate Laravel components automatically, ensuring consistent
+            structure and naming conventions.</p>
+          <pre><code class="language-bash">php artisan make:model Product -mcr
+# -m: Create migration
+# -c: Create controller
+# -r: Make it a resource controller
+
+php artisan make:middleware CheckRole
+php artisan make:request StoreUserRequest
+php artisan make:seeder ProductSeeder
+php artisan make:event OrderPlaced
+php artisan make:listener SendOrderNotification
+    </code></pre>
+          <p class="mt-4">This approach keeps your application modular and reduces repetitive setup work.</p>
+        </section>
+
+        <!-- Migrations & Database -->
+        <section>
+          <h3 class="text-3xl font-semibold text-indigo-300">Database & Migrations</h3>
+          <p class="mt-4">Artisan provides tools to manage your database schema and seed test data.</p>
+          <pre><code class="language-bash">php artisan migrate           # Run all pending migrations
+php artisan migrate:rollback  # Undo last migration batch
+php artisan db:seed           # Seed the database
+php artisan migrate:fresh --seed # Recreate database and seed it
+    </code></pre>
+          <p class="mt-4">These commands let you version-control database structure and automate seeding for testing or
+            local development.</p>
+        </section>
+
+        <!-- Cache & Config Management -->
+        <section>
+          <h3 class="text-3xl font-semibold text-yellow-300">Cache & Config Management</h3>
+          <p class="mt-4">Artisan provides commands to manage application cache, routes, and configurations efficiently.
+          </p>
+          <pre><code class="language-bash">php artisan cache:clear        # Clear application cache
+php artisan route:clear        # Clear route cache
+php artisan config:cache       # Cache configuration for faster load
+php artisan view:clear         # Clear compiled Blade templates
+php artisan optimize           # Optimize framework performance
+    </code></pre>
+          <p class="mt-4">These are especially useful when deploying applications to production.</p>
+        </section>
+
+        <!-- Custom Commands -->
+        <section>
+          <h3 class="text-3xl font-semibold text-pink-300">Custom Commands</h3>
+          <p class="mt-4">You can create your own Artisan commands for repetitive or project-specific tasks.</p>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="mt-4">Create a new command:</p>
+              <pre><code class="language-bash">php artisan make:command GreetUser
+</code></pre>
+
+              <p class="mt-4">Run it using:</p>
+              <pre><code class="language-bash">php artisan app:greet
+</code></pre>
+            </div>
+            <div>
+              <pre><code class="language-php">&lt;?php
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+
+class GreetUser extends Command
+{
+    protected $signature = 'app:greet';
+    protected $description = 'Display a greeting message';
+
+    public function handle()
+    {
+        $this->info('Hello! Welcome to Laravel!');
+    }
+}
+</code></pre>
+            </div>
+          </div>
+        </section>
+
+      </section>
+      <!-- Blade Templates -->
+      <section>
+        <!-- Introduction / Basics -->
+        <section>
+          <h2 class="text-4xl font-semibold text-blue-300">Blade Templates</h2>
+          <p class="mt-4">Blade is Laravel’s templating engine — simple, yet powerful, and compiles down to plain PHP.
+            :contentReference[oaicite:0]{index=0}</p>
+          <p class="mt-4">Blade files use the `.blade.php` extension and are stored in `resources/views`.</p>
+        </section>
+
+        <!-- Displaying Data & Escaping -->
+        <section>
+          <h3 class="text-3xl font-semibold text-emerald-300">Displaying Data & Escaping</h3>
+          <p class="mt-4">Use `{{ }}` for escaped output (protected against XSS).
+          </p>
+          <pre><code class="language-php">{ $name }}}</code></pre>
+          <p class="mt-4">To render unescaped HTML (be careful!), use `{!! !!}`.
+          </p>
+          <pre><code class="language-php">{!! $htmlContent !!}</code></pre>
+        </section>
+
+        <!-- Raw PHP & @use -->
+        <section>
+          <h3 class="text-3xl font-semibold text-yellow-300">Raw PHP & @use</h3>
+          <p class="mt-4">Inline PHP is supported using `@php ... @endphp`.</p>
+          <pre><code class="language-php">@php
+  $counter = 1;
+@endphp</code></pre>
+          <p class="mt-4">You can import classes or functions/constants with `@use` (and optionally alias them).
+          </p>
+          <pre><code class="language-php">@use('App\\Models\\Flight')
+@use(function App\\Helpers\\format_currency, 'formatMoney')</code></pre>
+        </section>
+
+        <!-- Blade Directives: Conditionals / Loops -->
+        <section>
+          <h3 class="text-3xl font-semibold text-pink-300">Directives: Conditionals</h3>
+          <p class="mt-4">Blade provides clean syntax for `if`, `unless`, `isset`, `empty`, etc.
+          </p>
+          <pre><code class="language-php">@if (count($records) === 1)
+  One record
+@elseif (count($records) > 1)
+  Multiple records
+@else
+  No records
+@endif
+
+@unless (Auth::check())
+  You are not signed in.
+@endunless</code></pre>
+        </section>
+        <section>
+
+          <h3 class="text-3xl font-semibold text-pink-300">Directives:Loops</h3>
+          <p class="mt-4">Loops: `@foreach`, `@for`, `@while`, `@forelse`.</p>
+          <pre><code class="language-php">@foreach ($users as $user)
+  <p>{{ $user->name }}</p>
+@endforeach
+
+@forelse ($users as $user)
+  <p>{{ $user->name }}</p>
+@empty
+  <p>No users</p>
+@endforelse</code></pre>
+        </section>
+
+        <!-- The $loop Variable & Nested Loops -->
+        <section>
+          <h3 class="text-3xl font-semibold text-cyan-300">Loop Info: $loop & Nested Loops</h3>
+          <p class="mt-4">Inside loops, Blade provides a `$loop` variable with useful info: `first`, `last`, `index`,
+            `count`, `parent`, etc.</p>
+          <pre><code class="language-php">@foreach ($items as $item)
+  @if ($loop->first) First iteration @endif
+  @if ($loop->last) Last iteration @endif
+  Index: {{ $loop->index }}
+@endforeach</code></pre>
+          <p class="mt-4">In nested loops, use `$loop->parent` to access parent loop’s state.
+          </p>
+        </section>
+
+        <!-- Conditional Classes & Styles -->
+        <section>
+          <h3 class="text-3xl font-semibold text-emerald-300">Conditional Classes & Styles</h3>
+          <p class="mt-4">Use `@class` directive to conditionally include CSS classes.
+          </p>
+          <pre><code class="language-php">@php
+  $isActive = false;
+  $hasError = true;
+@endphp
+
+&lt;span @class([
+  'p-4',
+  'font-bold' => $isActive,
+  'text-gray-500' => ! $isActive,
+  'bg-red' => $hasError,
+])&gt;&lt;/span&gt;</code></pre>
+          <p class="mt-4">Similarly, `@style` lets you conditionally set inline styles.
+          </p>
+          <pre><code class="language-php">&lt;span @style([
+  'background-color: red',
+  'font-weight: bold' => $isActive,
+])&gt;&lt;/span&gt;</code></pre>
+        </section>
+
+        <!-- Additional Attributes: @checked, @selected, etc. -->
+        <section>
+          <h3 class="text-3xl font-semibold text-indigo-300">Attribute Directives</h3>
+          <p class="mt-4">Blade offers directives for HTML attributes: `@checked`, `@selected`, `@disabled`,
+            `@readonly`, `@required`.</p>
+          <pre><code class="language-html">&lt;input type="checkbox" @checked(old('active', $user->active))&gt;
+&lt;select name="version"&gt;
+  @foreach ($product->versions as $version)
+    &lt;option value="{{ $version }}" @selected(old('version') == $version)&gt;{{ $version }}&lt;/option&gt;
+  @endforeach
+&lt;/select&gt;
+&lt;button type="submit" @disabled($errors->isNotEmpty())&gt;Submit&lt;/button&gt;</code></pre>
+        </section>
+
+        <!-- Including Subviews & @each -->
+        <section>
+          <h3 class="text-3xl font-semibold text-pink-300">Includes & @each</h3>
+          <p class="mt-4">Use `@include` to embed subviews; data from parent is available.
+          </p>
+          <pre><code class="language-php">@include('shared.errors')
+@include('view.name', ['status' => 'complete'])
+@includeIf('view.name', ['status' => 'complete'])
+@includeWhen($condition, 'view.name', ['status' => 'complete'])
+@includeUnless($condition, 'view.name', ['status' => 'complete'])</code></pre>
+          <p class="mt-4">Use `@each` for compact looping + include syntax.</p>
+          <pre><code class="language-php">@each('view.name', $jobs, 'job', 'view.empty')</code></pre>
+        </section>
+
+        <!-- Blade Components: Slots -->
+        <section>
+          <h3 class="text-3xl font-semibold text-cyan-300">Blade Component Slots</h3>
+          <p class="mt-4">Slots let you inject custom content into components. Use <code>{{ $slot }}</code> for
+            default slot content.</p>
+
+          <pre><code class="language-html">&lt;!-- resources/views/components/layout.blade.php --&gt;
+&lt;div class="p-6 border rounded-lg"&gt;
+  &lt;header&gt;{{ $header ?? 'Default Header' }}&lt;/header&gt;
+  &lt;main&gt;{{ $slot }}&lt;/main&gt;
+&lt;/div&gt;</code></pre>
+
+          <pre><code class="language-html">&lt;x-layout&gt;
+  &lt;x-slot name="header"&gt;
+    &lt;h1&gt;Dashboard&lt;/h1&gt;
+  &lt;/x-slot&gt;
+
+  &lt;p&gt;Welcome to your dashboard.&lt;/p&gt;
+&lt;/x-layout&gt;</code></pre>
+        </section>
+        <section>
+          
+          <h3 class="text-3xl font-semibold text-cyan-300">Blade Component Slots</h3>
+          <p class="mt-4">You can define multiple named slots using <code>&lt;x-slot name="..."&gt;</code> and access
+            them via variables.</p>
+
+          <p class="mt-4">To pass attributes like classes or IDs from component calls to their root element, use
+            <code>{{ $attributes }}</code> merging:
+          </p>
+          <pre><code class="language-php">&lt;div {{ $attributes-&gt;merge(['class' =&gt; 'p-4 rounded']) }}&gt;
+  {{ $slot }}
+&lt;/div&gt;
+  </code></pre>
+        </section>
+
+        <!-- Blade Layouts -->
+        <section>
+          <h3 class="text-3xl font-semibold text-emerald-300">Blade Layouts & Template Inheritance</h3>
+          <p class="text-3xl">Layouts define a common structure for multiple pages using <code>@extends</code>,
+            <code>@section</code>, and <code>@yield</code>.
+          </p>
+<p class="text-3xl">You can also use <code>@section</code> and <code>@show</code> to define default replaceable
+            blocks.</p>
+          <div class="grid grid-cols-2">
+<pre><code class="language-html">&lt;!-- resources/views/layouts/app.blade.php --&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My App - @yield('title')&lt;/title&gt;
+&lt;/head&gt;
+&lt;body class="bg-gray-50"&gt;
+  &lt;header&gt;@include('partials.navbar')&lt;/header&gt;
+
+  &lt;main class="container mx-auto mt-6"&gt;
+    @yield('content')
+  &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          <pre><code class="language-html">&lt;!-- resources/views/home.blade.php --&gt;
+@extends('layouts.app')
+
+@section('title', 'Home')
+
+@section('content')
+  &lt;h1 class="text-2xl font-bold"&gt;Welcome Home&lt;/h1&gt;
+  &lt;p&gt;This page uses the main layout.&lt;/p&gt;
+@endsection</code></pre>
+          </div>
+        </section>
+      </section>
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        return {
+          count: ref(0)
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
