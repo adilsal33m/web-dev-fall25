@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Web-Based Application Development — Lecture 12</title>
+  <meta name="description" content="Lecture 10 - Web Based Application Development">
+  <meta name="author" content="Muhammad Adil Saleem">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        <img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+        Institute of Business Administration Karachi
+      </p>
+    </div>
+    <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        CSE 308: Web Based Application Development - Fall 2025
+      </p>
+    </div>
+
+    <div class="slides">
+
+      <section>
+        <h2>Web Based Application Development</h2>
+        <h3 class="pt-16">Lecture 13</h3>
+        <p class="">9th October 2025</p>
+      </section>
+
+      <!-- Title -->
+      <section>
+        <h2 class="text-4xl font-bold mb-6">Building a Simple Notes App — Hands-on</h2>
+        <p class="mb-4">We’ll continue building our Notes App’s database layer using Laravel’s migration tools and
+          Tinker.</p>
+        <ul class="list-disc pl-8 space-y-2">
+          <li>Focus: <strong>Migrations, Seeders, and Schema Changes</strong></li>
+          <li>All data generation via <strong>Tinker</strong></li>
+          <li>No controllers or routes yet!</li>
+        </ul>
+      </section>
+
+      <!-- Agenda -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Agenda</h3>
+        <ul class="list-disc pl-8 space-y-2">
+          <li>Database Design in Laravel</li>
+          <li>Migration</li>
+          <li>Seeders</li>
+          <li>Factories (optional)</li>
+        </ul>
+      </section>
+
+      <!-- Database Design -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Database Design in Laravel</h3>
+        <p class="mb-4">Let’s start with a simple <strong>notes</strong> table:</p>
+        <ul class="list-disc pl-8 space-y-2">
+          <li><code>id</code> – primary key</li>
+          <li><code>title</code> – string</li>
+          <li><code>content</code> – text</li>
+          <li><code>timestamps</code></li>
+        </ul>
+        <p class="mt-4">We’ll later add <code>tags</code> with a foreign key relationship.</p>
+      </section>
+
+      <!-- Migration -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Creating Migration</h3>
+        <p>Create the table:</p>
+        <pre><code>php artisan make:migration create_notes_table --create=notes</code></pre>
+
+        <p>Edit the migration file:</p>
+        <pre><code class="language-php">
+Schema::create('notes', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('content')->nullable();
+    $table->timestamps();
+});
+  </code></pre>
+
+        <p>Run the migration:</p>
+        <pre><code>php artisan migrate</code></pre>
+      </section>
+
+      <!-- Tinker Test -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Testing with Tinker</h3>
+        <pre><code>php artisan tinker</code></pre>
+        <pre><code class="language-php">
+use App\Models\Note;
+
+$note = new Note();
+$note->title = 'First Note';
+$note->content = 'Testing migrations!';
+$note->save();
+
+Note::all();
+  </code></pre>
+      </section>
+
+      <!-- Seeders -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Seeders</h3>
+        <p>Automatically create sample data:</p>
+        <pre><code>php artisan make:seeder NoteSeeder</code></pre>
+
+        <pre><code class="language-php">
+public function run(): void
+{
+    \App\Models\Note::create([
+        'title' => 'Seeded Note',
+        'content' => 'Generated via seeder.'
+    ]);
+}
+  </code></pre>
+
+        <p>Register in <code>DatabaseSeeder.php</code> and run:</p>
+        <pre><code>php artisan db:seed</code></pre>
+      </section>
+
+      <!-- Factories -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Factories (Optional)</h3>
+        <pre><code>php artisan make:factory NoteFactory --model=Note</code></pre>
+        <pre><code class="language-php">
+public function definition(): array
+{
+    return [
+        'title' => fake()->sentence(),
+        'content' => fake()->paragraph(),
+    ];
+}
+  </code></pre>
+
+        <p>Generate multiple notes:</p>
+        <pre><code class="language-php">Note::factory()->count(5)->create();</code></pre>
+      </section>
+
+      <!-- Modifying Table -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Modifying a Table</h3>
+        <p>Let’s say we want to add a <code>pinned</code> column to highlight important notes.</p>
+
+        <p>Create a new migration to modify the table:</p>
+        <pre><code>php artisan make:migration add_pinned_to_notes_table --table=notes</code></pre>
+
+        <p>Edit the migration:</p>
+        <pre><code class="language-php">
+Schema::table('notes', function (Blueprint $table) {
+    $table->boolean('pinned')->default(false);
+});
+  </code></pre>
+
+        <p>Run it:</p>
+        <pre><code>php artisan migrate</code></pre>
+
+        <p>Verify using Tinker:</p>
+        <pre><code class="language-php">
+$note = Note::first();
+$note->pinned = true;
+$note->save();
+  </code></pre>
+      </section>
+
+      <!-- Rollback -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Rolling Back Migrations</h3>
+        <p>If something goes wrong or you want to undo recent migrations:</p>
+        <pre><code>php artisan migrate:rollback</code></pre>
+
+        <p class="mt-4">To reset everything:</p>
+        <pre><code>php artisan migrate:reset</code></pre>
+
+        <p class="mt-4">Or rebuild everything from scratch:</p>
+        <pre><code>php artisan migrate:fresh --seed</code></pre>
+
+        <p class="mt-4">These commands are especially helpful during development and experimentation.</p>
+      </section>
+
+      <!-- Foreign Keys -->
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Adding Foreign Keys</h3>
+        <div class="grid grid-cols-2">
+          <div>
+            <p class="mb-4">We’ll add a <strong>tags</strong> table and link each note to a tag using a foreign key.</p>
+
+            <pre><code>php artisan make:migration create_tags_table --create=tags</code></pre>
+
+            <pre><code class="language-php">
+Schema::create('tags', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+  </code></pre>
+          </div>
+          <div>
+            <p class="mt-4">Now modify <code>notes</code> to include a <code>tag_id</code> column:</p>
+            <pre><code>php artisan make:migration add_tag_id_to_notes_table --table=notes</code></pre>
+
+            <pre><code class="language-php">
+Schema::table('notes', function (Blueprint $table) {
+    $table->foreignId('tag_id')->constrained()->cascadeOnDelete();
+});
+  </code></pre>
+            <p class="mt-4">Run the migration:</p>
+            <pre><code>php artisan migrate</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Using <code>index()</code> and <code>constrained()</code></h3>
+
+        <p class="mb-4">
+          Laravel migration helpers make it easy to create foreign-key columns with optional indexing.
+        </p>
+
+        <pre><code class="language-php">
+Schema::table('notes', function (Blueprint $table) {
+    // Adds tag_id column + index + foreign key constraint (DB-dependent)
+    $table->foreignId('tag_id')
+          ->index()         // explicitly create an index
+          ->constrained()   // assumes references('id')->on('tags')
+          ->cascadeOnDelete();
+});
+  </code></pre>
+      </section>
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Using <code>index()</code> and <code>constrained()</code></h3>
+
+        <ul class="list-disc pl-8 mt-4 space-y-2">
+          <li><code>index()</code> → ensures faster lookups when filtering by <code>tag_id</code></li>
+          <li><code>constrained()</code> → automatically links to the <code>tags</code> table’s <code>id</code></li>
+          <li>
+            The index creation behavior may vary by database engine — use <code>index()</code> for portability
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3 class="text-4xl font-bold mb-4">Delete & Update Actions</h3>
+
+        <p class="mb-4">
+          You can define how related records behave when a parent record is deleted or updated.
+        </p>
+
+        <pre><code class="language-php">
+// Example: notes linked to tags
+$table->foreignId('tag_id')
+      ->constrained()
+      ->cascadeOnDelete();   // delete notes when tag is deleted
+  </code></pre>
+
+        <ul class="list-disc pl-8 mt-4 space-y-2">
+          <li><code>cascadeOnDelete()</code> → automatically deletes child rows</li>
+          <li><code>restrictOnDelete()</code> → prevents deletion if child rows exist</li>
+          <li><code>nullOnDelete()</code> → sets the foreign key column to <code>NULL</code></li>
+          <li><code>cascadeOnUpdate()</code> → updates FK column if parent key changes</li>
+        </ul>
+
+        <p class="mt-4 text-gray-500">
+          Use cascade carefully — great for cleanup, risky if you don’t expect data loss.
+        </p>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        return {
+          count: ref(0)
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
