@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Web-Based Application Development — Lecture 14</title>
+  <meta name="description" content="Lecture 14 - Web Based Application Development">
+  <meta name="author" content="Muhammad Adil Saleem">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        <img class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" alt="">
+        Institute of Business Administration Karachi
+      </p>
+    </div>
+    <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        CSE 308: Web Based Application Development - Fall 2025
+      </p>
+    </div>
+
+    <div class="slides">
+      <section>
+        <h2>Web Based Application Development</h2>
+        <h3 class="pt-16">Lecture 14</h3>
+        <p class="">28th October 2025</p>
+      </section>
+
+      <!-- Overview -->
+      <section>
+        <h2 class="text-4xl font-bold mb-6">Agenda</h2>
+
+        <ul class="list-disc pl-8 space-y-2">
+          <li>Object Relation Mapper or ORM</li>
+          <li>Relations in Laravel</li>
+        </ul>
+      </section>
+
+
+      <section>
+        <!-- What is ORM -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">What is an ORM?</h3>
+          <p class="mb-4  fragment fade-in-then-semi-out">ORM = <strong>Object Relational Mapper</strong>. It maps
+            database tables to language-native
+            objects (classes) so you can work with your data using code instead of writing SQL for common operations.
+          </p>
+          <ul class="list-disc pl-8 space-y-2">
+            <li class="fragment fade-in-then-semi-out">Simplifies CRUD (Create, Read, Update, Delete)</li>
+            <li class="fragment fade-in-then-semi-out">Helps avoid repetitive SQL</li>
+            <li class="fragment fade-in-then-semi-out">Makes code more expressive and testable</li>
+            <li class="fragment">Provides abstraction over different database engines</li>
+          </ul>
+        </section>
+
+        <!-- Example: Without and With ORM -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Example: raw SQL vs ORM (conceptual)</h3>
+          <div class="grid grid-cols-1 gap-8">
+            <div class="fragment fade-in-then-semi-out">
+              <h4 class="font-semibold">Raw SQL</h4>
+              <pre><code class="language-sql">-- Get active users
+SELECT * FROM users WHERE active = 1 ORDER BY created_at DESC LIMIT 10;</code></pre>
+            </div>
+            <div class="fragment fade-in-then-semi-out">
+              <h4 class="font-semibold">Eloquent (ORM)</h4>
+              <pre><code class="language-php">$users = App\Models\User::where('active', 1)
+    ->orderBy('created_at', 'desc')
+    ->take(10)
+    ->get();</code></pre>
+            </div>
+          </div>
+          <p class="mt-4 fragment fade-in-then-semi-out">Eloquent reads like PHP — easier to refactor and test. Behind
+            the scenes it still issues SQL
+            to
+            the DB.</p>
+        </section>
+
+        <section>
+          <h3 class="text-3xl !font-bold mb-4">Question</h3>
+          <p>What is the biggest advantage of using an ORM, especially in Laravel?</p>
+        </section>
+
+        <!-- Eloquent hides DB engine -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Abstraction: Hiding the DB engine</h3>
+          <p class="fragment fade-in-then-semi-out">Eloquent provides a DB-agnostic layer: your queries are written in
+            PHP and Laravel translates them to SQL
+            specific to the configured DB driver (MySQL, PostgreSQL, SQLite, etc.).</p>
+          <p class="mt-4 fragment">If you switch DB under the hood, <strong>most</strong> Eloquent code keeps working —
+            that
+            is
+            the power of abstraction.</p>
+        </section>
+
+        <section>
+          <h3 class="text-3xl !font-bold mb-4">Can Eloquent Do Everything?</h3>
+          <p class="fragment fade-in-then-semi-out">Short answer, NO</p>
+          <p class="fragment fade-in-then-semi-out">Eloquent will work for most common use cases that you may encounter
+            including selecting, filtering, joining, and ordering</p>
+          <p class="fragment fade-in-then-semi-out">But sometimes, you will need to perform operations that the DB can
+            handle much faster. </p>
+        </section>
+
+        <!-- Raw queries -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Raw SQL / Query Builder / When to use RAW</h3>
+          <p>Sometimes raw queries are necessary for complex queries, performance, or features not supported by
+            Eloquent's
+            API.</p>
+          <pre><code class="language-php">use Illuminate\Support\Facades\DB;
+
+$users = DB::table('users')
+            ->select(DB::raw('id, name, RANK() OVER (ORDER BY score DESC) as rank'))
+            ->get();
+          </code></pre>
+          <p class="mt-2">Prefer Eloquent for maintainability; use raw for special cases or micro-optimizations.</p>
+        </section>
+
+        <!-- CRUD examples -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Basic CRUD with Eloquent (self-contained example)</h3>
+          
+          <div class="grid grid-cols-2">
+            <pre><code class="language-php">// Model: app/Models/Article.php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Model;
+
+class Article extends Model
+{
+    protected $fillable = ['title',
+                           'body',
+                           'published'];
+}
+</code></pre>
+            <pre><code class="language-php">// Create (store)
+$art = Article::create(['title' => 'Hello',
+                            'body' => 'World',
+                            'published' => true]);
+
+// Read
+$all = Article::all();
+$one = Article::find(1);
+
+// Update
+$one->title = 'Updated';
+$one->save();
+
+// Delete
+$one->delete();</code></pre>
+          </div>
+        </section>
+
+        <!-- Filters: where, whereIn, whereBetween, date filters -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Filtering: where, whereIn, whereBetween, date filters</h3>
+          <div class="grid grid-cols-2">
+<pre><code class="language-php">// Basic where
+$published = Article::where('published', true)->get();
+
+// whereIn
+$articles = Article::whereIn('id', [1,2,3])->get();
+
+// whereBetween
+$recent = Article::whereBetween('created_at', [now()->subDays(7), now()])->get();
+
+// Date specific helpers
+$july = Article::whereYear('created_at', 2025)
+    ->whereMonth('created_at', 7)
+    ->get();
+</code></pre>
+    <pre><code class="language-php">
+// Complex chaining
+$results = Article::where('published', true)
+    ->whereBetween('views', [100, 1000])
+    ->whereIn('category_id', [2,3])
+    ->orderBy('created_at', 'desc')
+    ->get();</code></pre>
+          </div>
+        </section>
+
+        <!-- Group by and order by -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Group By, Order By & Aggregates</h3>
+          <pre><code class="language-php">use Illuminate\Support\Facades\DB;
+
+// Group by category and count
+$stats = Article::select('category_id', DB::raw('count(*) as total'))
+    ->groupBy('category_id')
+    ->get();
+
+// Using aggregates
+$maxViews = Article::max('views');
+$avg = Article::avg('views');
+
+// Order by
+$top = Article::orderBy('views', 'desc')->take(10)->get();</code></pre>
+        </section>
+
+        <!-- Joins -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Joins (Query Builder) — when you need them</h3>
+          <p>Eloquent relationships usually remove the need for manual joins, but joins are useful for complex reports
+            or
+            when avoiding N+1 queries.</p>
+          <pre><code class="language-php">// Using query builder join
+$rows = DB::table('articles')
+    ->join('users', 'articles.user_id', '=', 'users.id')
+    ->select('articles.*', 'users.name as author')
+    ->where('users.active', 1)
+    ->get();
+
+// Left join
+$rows = DB::table('articles')
+    ->leftJoin('comments', 'articles.id', '=', 'comments.article_id')
+    ->select('articles.*', DB::raw('count(comments.id) as comment_count'))
+    ->groupBy('articles.id')
+    ->get();</code></pre>
+        </section>
+      </section>
+
+      <section>
+
+        <!-- Eloquent relationships intro -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Relations — connecting models</h3>
+          <p>Different models represent different concepts (User, Post, Comment). Relations let models reference each
+            other and let Eloquent fetch related data conveniently.</p>
+        </section>
+
+        <!-- One to One -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">One-to-One Relationship</h3>
+          <p>Use one-to-one when a model has a single related model (User -> Profile).</p>
+          <pre><code class="language-php">// app/Models/User.php
+public function profile() {
+    return $this->hasOne(Profile::class);
+}
+
+// app/Models/Profile.php
+public function user() {
+    return $this->belongsTo(User::class);
+}
+
+// Usage
+$profile = User::find(1)->profile; // eager-load if needed
+$owner = Profile::find(1)->user;</code></pre>
+        </section>
+
+        <!-- One to Many -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">One-to-Many Relationship</h3>
+          <p>Use one-to-many when one model owns many related models (Post -> Comments).</p>
+          <pre><code class="language-php">// posts, comments migrations (comments has post_id)
+
+// app/Models/Post.php
+public function comments() {
+    return $this->hasMany(Comment::class);
+}
+
+// app/Models/Comment.php
+public function post() {
+    return $this->belongsTo(Post::class);
+}
+
+// Usage
+$post = Post::with('comments')->find(1);
+foreach ($post->comments as $comment) {
+    echo $comment->body;
+}
+
+// Create a comment via relation
+$post->comments()->create(['body' => 'Nice post!', 'user_id' => 3]);</code></pre>
+        </section>
+
+        <!-- Many to Many and pivot -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Many-to-Many & Pivot Tables</h3>
+          <p>Many-to-many relations (User &lt;-&gt; Role) use a pivot table (role_user) to store associations.</p>
+          <pre><code class="language-php">// Migration: create roles and role_user pivot
+Schema::create('roles', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->timestamps();
+});
+
+Schema::create('role_user', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('role_id')->constrained()->cascadeOnDelete();
+    $table->timestamps();
+    // additional pivot columns
+    $table->string('granted_by')->nullable();
+});
+
+// app/Models/User.php
+public function roles() {
+    return $this->belongsToMany(Role::class)->withTimestamps()->withPivot('granted_by');
+}
+
+// app/Models/Role.php
+public function users() {
+    return $this->belongsToMany(User::class)->withTimestamps()->withPivot('granted_by');
+}
+
+// Attach / detach / sync
+$user = User::find(1);
+$user->roles()->attach(2, ['granted_by' => 'admin']);
+$user->roles()->detach(2);
+// sync replaces existing pivot entries with provided IDs
+$user->roles()->sync([1,3]); // user will have only roles 1 and 3
+
+// Access pivot data
+foreach ($user->roles as $role) {
+    echo $role->pivot->granted_by;
+}
+</code></pre>
+        </section>
+
+        <!-- Reciprocal relations -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Reciprocal Relations</h3>
+          <p>Define relations on both models so you can navigate in either direction (e.g., Post->comments and
+            Comment->post). This is especially useful when eager loading with <code>with()</code>.</p>
+          <pre><code class="language-php">// Eager loading example to avoid N+1
+$posts = Post::with(['comments.user', 'author'])->get();
+
+// Now each comment's user and the post's author are already loaded.</code></pre>
+        </section>
+
+        <!-- Pivot extra info and sync details -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Pivot Tables: extra info &amp; sync behavior</h3>
+          <ul class="list-disc pl-8 space-y-2">
+            <li><code>sync()</code> accepts an array or associative array:
+              <code>sync([id =&gt; ['granted_by' =&gt; 'admin']])</code>
+            </li>
+            <li><code>syncWithoutDetaching()</code> adds new pivots without removing existing ones</li>
+          </ul>
+          <pre><code class="language-php">// sync with pivot data
+$user->roles()->sync([2 =&gt; ['granted_by' =&gt; 'super'], 3 =&gt; ['granted_by' =&gt; 'hr']]);
+
+// syncWithoutDetaching
+$user->roles()->syncWithoutDetaching([4 =&gt; ['granted_by' =&gt; 'bot']]);</code></pre>
+        </section>
+
+        <!-- Morph relations -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Polymorphic (Morph) Relations</h3>
+          <p>Use morph relations when multiple models share a relation type — e.g., <code>Photo</code> can belong to
+            either a <code>User</code> or a <code>Product</code>.</p>
+          <pre><code class="language-php">// Migration: photos table
+Schema::create('photos', function (Blueprint $table) {
+    $table->id();
+    $table->string('url');
+    // polymorphic columns
+    $table->unsignedBigInteger('imageable_id');
+    $table->string('imageable_type');
+    $table->timestamps();
+});
+
+// app/Models/Photo.php
+public function imageable() {
+    return $this->morphTo();
+}
+
+// app/Models/User.php
+public function photos() {
+    return $this->morphMany(Photo::class, 'imageable');
+}
+
+// app/Models/Product.php
+public function photos() {
+    return $this->morphMany(Photo::class, 'imageable');
+}
+
+// Usage
+$user = User::find(1);
+$user->photos()->create(['url' => '/images/avatar.jpg']);
+
+$product = Product::find(1);
+$product->photos()->create(['url' => '/images/cover.jpg']);
+
+// Get owner from photo
+$photo = Photo::find(1);
+$owner = $photo->imageable; // either User or Product instance</code></pre>
+        </section>
+
+        <!-- Eager loading and performance -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Eager Loading & Performance</h3>
+          <p>Avoid N+1 queries using <code>with()</code> and <code>load()</code>. Use <code>withCount()</code> for
+            counts without loading full relations.</p>
+          <pre><code class="language-php">// Eager load
+$posts = Post::with('author', 'comments')->get();
+
+// Load later
+$post = Post::find(1);
+$post->load('comments.user');
+
+// withCount
+$posts = Post::withCount('comments')->get();
+// $post->comments_count available</code></pre>
+        </section>
+      </section>
+
+      <!-- Best practices -->
+      <section>
+        <h3 class="text-3xl font-bold mb-4">Best Practices & Tips</h3>
+        <ul class="list-disc pl-8 space-y-2">
+          <li>Keep models skinny — business logic in services or domain classes</li>
+          <li>Use Scopes for reusable query fragments
+            (<code>public function scopeActive($q) { return $q->where('active',1); }</code>)</li>
+          <li>Index foreign keys and columns used in WHERE clauses</li>
+          <li>Use eager loading to avoid N+1 queries</li>
+          <li>Prefer Eloquent for readability; use raw SQL for performance-critical paths</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        return { count: ref(0) }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
