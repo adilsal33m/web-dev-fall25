@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Web-Based Application Development — Lecture 15</title>
+  <meta content="Lecture 15 - Web Based Application Development" name="description" />
+  <meta content="Muhammad Adil Saleem" name="author" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="reveal">
+    <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        <img alt="" class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" />
+        Institute of Business Administration Karachi
+      </p>
+    </div>
+    <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+      <p style="text-align: center; font-size: 0.4em;">
+        CSE 308: Web Based Application Development - Fall 2025
+      </p>
+    </div>
+    <div class="slides">
+      <section>
+        <h2>Web Based Application Development</h2>
+        <h3 class="pt-16">Lecture 15</h3>
+        <p class="">4th November 2025</p>
+      </section>
+
+      
+
+			<section>
+				<h3>Quiz</h3>
+				<img class="!mx-auto h-64"
+					src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://forms.office.com/r/m2nYJGnaRw"
+					alt="">
+
+				<p>https://forms.office.com/r/m2nYJGnaRw</p>
+			</section>
+
+      <!-- Overview -->
+      <section>
+        <h2 class="text-4xl font-bold mb-6">Agenda</h2>
+        <ul class="list-disc pl-8 space-y-2">
+          <li>Database Transactions</li>
+          <li>Collections</li>
+        </ul>
+      </section>
+
+
+      <!-- Best practices -->
+
+
+      <section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Using DB Facade</h3>
+          <p class="fragment fade-in-then-semi-out">Database transactions in Laravel are managed via the <code>DB</code>
+            facade.</p>
+          <p class="fragment fade-in-then-semi-out">The <strong>Facade pattern</strong> provides a static interface to
+            classes available in the service container.</p>
+          <pre class="fragment"><code class="language-php">use Illuminate\Support\Facades\DB;</code></pre>
+        </section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Problem At Hand</h3>
+          <p class="fragment fade-in-then-semi-out">Imagine two dependent operations:</p>
+          <ul class="list-disc pl-8">
+            <li class="fragment">Deduct amount from user’s wallet</li>
+            <li class="fragment">Record transaction in payment history</li>
+          </ul>
+          <p class="fragment fade-in-then-semi-out">If the first operation succeeds but the second fails, your data
+            becomes inconsistent!</p>
+          <p class="fragment"><strong>Question:</strong> What should be the solution to ensure consistency?</p>
+        </section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Database Transactions</h3>
+          <p class="fragment fade-in-then-semi-out">Laravel provides a convenient way to run multiple database
+            operations as a single <strong>transaction</strong>.</p>
+          <p class="fragment">If any operation fails, all previous operations in that transaction are <strong>rolled
+              back</strong>.</p>
+        </section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">How to Write Transactions in Laravel</h3>
+          <pre><code class="language-php">DB::transaction(function () {
+    DB::table('users')-&gt;decrement('balance', 1000);
+    DB::table('payments')-&gt;insert(['amount' =&gt; 1000]);
+});</code></pre>
+          <p class="fragment fade-in-then-semi-out">Laravel will automatically <strong>commit</strong> if everything
+            runs successfully, or <strong>rollback</strong> on exception.</p>
+        </section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Manual Transaction Syntax</h3>
+          <pre><code class="language-php">DB::beginTransaction();
+try {
+    // Perform DB operations
+    DB::commit();
+} catch (Exception $e) {
+    DB::rollback();
+}</code></pre>
+          <p class="fragment fade-in-then-semi-out">Manual syntax offers finer control when multiple operations need
+            custom handling.</p>
+        </section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Deadlocks in Transactions</h3>
+          <p class="fragment fade-in-then-semi-out">Deadlocks occur when two transactions wait for each other to release
+            locks on resources.</p>
+          <p class="fragment fade-in-then-semi-out">Laravel automatically retries transactions that fail due to
+            deadlocks.</p>
+          <p class="fragment">Best practice: Wrap in a loop to retry on deadlock up to a few times.</p>
+          <pre><code class="language-php">DB::transaction(function () {
+    // Your logic
+}, 5); // Retries up to 5 times</code></pre>
+        </section>
+      </section>
+
+      <section>
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Collections in Laravel</h3>
+          <p class="fragment fade-in-then-semi-out">Collections are powerful wrappers around arrays providing chainable,
+            expressive methods.</p>
+          <p class="fragment">They are returned by Eloquent queries like <code>Model::all()</code>.</p>
+        </section>
+
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Advantages of Collections</h3>
+          <ul class="list-disc pl-8">
+            <li class="fragment">Fluent, chainable interface</li>
+            <li class="fragment">Simplifies data manipulation (filter, map, reduce, etc.)</li>
+            <li class="fragment">Encourages functional programming style</li>
+          </ul>
+        </section>
+
+        <!-- append -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">append()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>append()</code> adds computed or accessor-based attributes to
+            model instances dynamically.</p>
+          <pre class="fragment"><code class="language-php">$users->append('is_active');</code></pre>
+          <p class="fragment">Useful with model accessors (e.g., <code>getIsActiveAttribute()</code>).</p>
+        </section>
+
+        <!-- contains -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">contains()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>contains()</code> checks whether a given item exists in the
+            collection.</p>
+          <pre class="fragment"><code class="language-php">$users->contains('email', 'test@example.com');</code></pre>
+          <p class="fragment">Returns <code>true</code> if found, <code>false</code> otherwise.</p>
+        </section>
+
+        <!-- diff -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">diff()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>diff()</code> returns items that are present in one collection
+            but missing in another.</p>
+          <pre class="fragment"><code class="language-php">$diff = $a->diff($b);</code></pre>
+        </section>
+
+        <!-- except -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">except()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>except()</code> removes specified keys from a collection.</p>
+          <pre
+            class="fragment"><code class="language-php">$filtered = $users->except(['password', 'remember_token']);</code></pre>
+          <p class="fragment">Often used when sanitizing API output.</p>
+        </section>
+
+        <!-- find / findOrFail -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">find() / findOrFail()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>find()</code> retrieves an item by its key, while
+            <code>findOrFail()</code> throws an exception if not found.</p>
+          <pre class="fragment"><code class="language-php">$user = $users->find(1);
+$user = $users->findOrFail(1);</code></pre>
+        </section>
+
+        <!-- fresh -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">fresh()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>fresh()</code> re-fetches models from the database to ensure
+            up-to-date data.</p>
+          <pre class="fragment"><code class="language-php">$freshUsers = $users->fresh();</code></pre>
+        </section>
+
+        <!-- intersect -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">intersect()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>intersect()</code> returns items that are common between two
+            collections.</p>
+          <pre class="fragment"><code class="language-php">$common = $a->intersect($b);</code></pre>
+        </section>
+
+        <!-- unique -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">unique()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>unique()</code> filters out duplicate items, keeping the first
+            occurrence.</p>
+          <pre class="fragment"><code class="language-php">$uniqueEmails = $users->unique('email');</code></pre>
+        </section>
+
+        <!-- collapse -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">collapse()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>collapse()</code> merges multiple arrays or sub-collections
+            into one flat collection.</p>
+          <pre
+            class="fragment"><code class="language-php">$collapsed = collect([[1, 2, 3], [4, 5, 6]])->collapse();</code></pre>
+        </section>
+
+        <!-- flatten -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">flatten()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>flatten()</code> recursively flattens nested arrays or
+            collections into a single level.</p>
+          <pre
+            class="fragment"><code class="language-php">$flattened = collect(['a', ['b', ['c']]])->flatten();</code></pre>
+        </section>
+
+        <!-- flip -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">flip()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>flip()</code> swaps keys and values of the collection.</p>
+          <pre
+            class="fragment"><code class="language-php">$flipped = collect(['name' => 'Adil', 'age' => 25])->flip();</code></pre>
+        </section>
+
+        <!-- keys -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">keys()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>keys()</code> retrieves all keys of the collection as a new
+            collection.</p>
+          <pre
+            class="fragment"><code class="language-php">$keys = collect(['name' => 'Adil', 'email' => 'adil@iba.edu.pk'])->keys();</code></pre>
+        </section>
+
+        <!-- pluck -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">pluck()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>pluck()</code> extracts all values for a specific key.</p>
+          <pre class="fragment"><code class="language-php">$emails = $users->pluck('email');</code></pre>
+        </section>
+
+        <!-- zip -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">zip()</h3>
+          <p class="fragment fade-in-then-semi-out"><code>zip()</code> combines values from multiple collections by
+            their indexes.</p>
+          <pre
+            class="fragment"><code class="language-php">$zipped = collect(['name', 'email'])->zip(['Adil', 'adil@iba.edu.pk']);</code></pre>
+        </section>
+
+        <!-- Conversion -->
+        <section>
+          <h3 class="text-3xl font-bold mb-4">Conversion to Base Collection</h3>
+          <p class="fragment fade-in-then-semi-out">Operations such as <code>collapse</code>, <code>flatten</code>,
+            <code>flip</code>, and <code>pluck</code> return base collections (not model-aware).</p>
+          <p class="fragment">That means model methods are lost, so always verify if you are still working with Eloquent
+            models or base data.</p>
+        </section>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1200,
+      height: 700,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      hash: true,
+      plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+    });
+  </script>
+  <script>
+    const { createApp, ref } = Vue;
+    createApp({
+      setup() {
+        return { count: ref(0) }
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
