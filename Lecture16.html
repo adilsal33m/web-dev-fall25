@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture 16</title>
+    <meta content="Lecture 15 - Web Based Application Development" name="description" />
+    <meta content="Muhammad Adil Saleem" name="author" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* keep similar look & sizes as reference slides */
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace
+        }
+
+        .fragment {
+            opacity: 0.0
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                <img alt="" class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" />
+                Institute of Business Administration Karachi
+            </p>
+        </div>
+        <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                CSE 308: Web Based Application Development - Fall 2025
+            </p>
+        </div>
+        <div class="slides">
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 16</h3>
+                <p class="">6th November 2025</p>
+            </section>
+
+            <section>
+                <h2 class="text-4xl font-bold mb-6">Agenda</h2>
+                <ul class="list-disc pl-8 space-y-2">
+                    <li>Routing</li>
+                    <li>Middleware</li>
+                </ul>
+            </section>
+
+            <!-- ROUTING -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">How to define routes (Route verbs & basic structure)</h3>
+                    <p class="fragment">Routes are defined in <code>routes/web.php</code> (for web) or
+                        <code>routes/api.php</code> (for API).
+                    </p>
+                    <pre class="fragment"><code class="language-php">// web.php
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::post('/submit', function (Illuminate\Http\Request $req) {
+    // handle POST
+});
+
+Route::put('/profile/{id}', function ($id) {
+    // update profile
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Route verb wildcard: match() & any()</h3>
+                    <p class="fragment">Use <code>match</code> to accept specific verbs and <code>any</code> to accept
+                        all HTTP verbs.</p>
+                    <pre class="fragment"><code class="language-php">// match specific verbs
+Route::match(['get', 'post'], '/search', function () {
+    // handle GET and POST
+});
+
+// any verb
+Route::any('/hook', function () {
+    // handles GET, POST, PUT, DELETE, ...
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Default route files</h3>
+                    <p class="fragment">Laravel ships with route files placed under <code>routes/</code>:</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><code>web.php</code> — browser routes (session, CSRF)</li>
+                        <li class="fragment"><code>api.php</code> — stateless API routes</li>
+                        <li class="fragment"><code>console.php</code> — artisan console commands</li>
+                        <li class="fragment"><code>channels.php</code> — broadcast channel authorization</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Dependency Injection in routes</h3>
+                    <p class="fragment">You can type-hint services and framework will inject them automatically.</p>
+                    <pre class="fragment"><code class="language-php">use Illuminate\Http\Request;
+use App\Services\PaymentGateway;
+
+Route::post('/pay', function (Request $request, PaymentGateway $gateway) {
+    // $gateway resolved from service container
+    return $gateway->charge($request->input('amount'));
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Redirect Routes</h3>
+                    <p class="fragment">Convenience for redirecting to other URIs or named routes.</p>
+                    <pre class="fragment"><code class="language-php">// redirect to a given URI
+Route::redirect('/here', '/there', 301);
+
+// redirect to named route
+Route::get('/home', fn() =&gt; redirect()->route('dashboard'));
+
+// short helper
+Route::permanentRedirect('/old', '/new');</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">View Routes</h3>
+                    <p class="fragment">Return a view directly without a closure/controller.</p>
+                    <pre class="fragment"><code class="language-php">// simple view route
+Route::view('/about', 'pages.about');
+
+// with data
+Route::view('/terms', 'pages.terms', ['version' =&gt; '1.2.3']);</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Routes with Controllers</h3>
+                    <p class="fragment">Map routes to controller actions for cleaner code.</p>
+                    <pre class="fragment"><code class="language-php">use App\Http\Controllers\ProfileController;
+
+Route::get('/profile/{id}', [ProfileController::class, 'show']);
+
+// single-action controller (invokable)
+Route::get('/checkout', App\Http\Controllers\CheckoutController::class);</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Route list using Artisan</h3>
+                    <p class="fragment">Inspect registered routes with artisan command.</p>
+                    <pre class="fragment"><code class="language-bash">php artisan route:list
+
+# useful flags
+php artisan route:list --path=api
+php artisan route:list --name=users</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Route parameters (required & optional)</h3>
+                    <p class="fragment">Parameters are captured from the URI. Optional parameters use <code>?</code> &
+                        default.</p>
+                    <pre class="fragment"><code class="language-php">// required parameter
+Route::get('/user/{id}', function ($id) {
+    return "User: $id";
+});
+
+// optional parameter
+Route::get('/post/{slug?}', function ($slug = null) {
+    return $slug ? "Post: $slug" : "All posts";
+});
+
+// constraints (regular expression)
+Route::get('/order/{id}', function ($id) {
+    // only numeric id
+})->where('id', '[0-9]+');
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Named Routes (use case)</h3>
+                    <p class="fragment">Name routes for easier referencing (avoid hardcoding URLs in Blade).</p>
+                    <pre class="fragment"><code class="language-php">Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// in Blade
+&lt;a href="{{ route('dashboard') }}"&gt;Dashboard&lt;/a&gt;
+
+// when URL changes, templates remain intact</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Route resource (resourceful controllers)</h3>
+                    <p class="fragment">Quickly define standard CRUD routes for a controller.</p>
+                    <pre class="fragment"><code class="language-php">Route::resource('photos', PhotoController::class);
+
+// to limit to specific methods
+Route::resource('comments', CommentController::class)->only(['index','store']);
+
+// to exclude methods
+Route::resource('users', UserController::class)->except(['create','edit']);</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Route groups & prefixes</h3>
+                    <p class="fragment">Group routes to apply common attributes like middleware, prefix, or namespace.
+                    </p>
+                    <pre class="fragment"><code class="language-php">Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
+    Route::get('/dashboard', [Admin\DashboardController::class, 'index']);
+    Route::resource('posts', Admin\PostController::class);
+});
+
+// applying name prefix
+Route::name('admin.')->group(function () {
+    Route::get('/reports', [ReportController::class,'index'])->name('reports');
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Subdomain routing</h3>
+                    <p class="fragment">Define routes that respond to specific subdomains.</p>
+                    <pre class="fragment"><code class="language-php">Route::domain('{account}.example.com')->group(function () {
+    Route::get('user/{id}', function ($account, $id) {
+        // handle per-account routing
+    });
+});
+
+// or fixed subdomain
+Route::domain('api.example.com')->group(function () {
+    Route::get('/v1/users', fn() =&gt; 'users');
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Implicit Route Model Binding (custom key)</h3>
+                    <p class="fragment">Type-hint an Eloquent model in your route to get the model instance
+                        automatically.</p>
+                    <pre class="fragment"><code class="language-php">// default binds by id
+Route::get('/product/{product}', function (App\Models\Product $product) {
+    return $product; // model instance
+});
+
+// customize key on model
+class Product extends Model {
+    public function getRouteKeyName() {
+        return 'slug';
+    }
+}
+
+// now /product/{slug} will resolve by slug</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Explicit Route Model Binding</h3>
+                    <p class="fragment">Register binding in <code>RouteServiceProvider</code> for complex resolution
+                        logic.</p>
+                    <pre class="fragment"><code class="language-php">// in RouteServiceProvider::boot()
+use App\Models\User;
+
+Route::bind('user', function ($value) {
+    return User::where('username', $value)->firstOrFail();
+});
+
+// route
+Route::get('/u/{user}', function (User $user) {
+    return $user;
+});</code></pre>
+                </section>
+            </section>
+
+            <!-- MIDDLEWARE -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">What is Middleware?</h3>
+                    <p class="fragment">Middleware acts as filters that inspect or modify HTTP requests entering your
+                        application.</p>
+                    <p class="fragment">Common use cases: authentication, logging, CORS, trimming input, verifying CSRF
+                        tokens.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">How to create a middleware</h3>
+                    <p class="fragment">Use artisan to generate middleware class.</p>
+                    <pre
+                        class="fragment"><code class="language-bash">php artisan make:middleware EnsureUserIsAdmin</code></pre>
+                    <pre class="fragment"><code class="language-php">// app/Http/Middleware/EnsureUserIsAdmin.php
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class EnsureUserIsAdmin
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if (! $request->user() || ! $request->user()->is_admin) {
+            return redirect('/');
+        }
+
+        return $next($request);
+    }
+}
+</code></pre>
+                </section>
+                <section>
+                    <h3 class="text-2xl font-semibold">How to register middleware (global, group, alias)</h3>
+                    <p class="fragment">Middleware are registered in <code>bootstrap/app.php</code></p>
+                    <pre class="fragment"><code class="language-php">use App\Http\Middleware\EnsureTokenIsValid;
+
+->withMiddleware(function (Middleware $middleware): void {
+     $middleware->append(EnsureTokenIsValid::class);
+
+     $middleware->appendToGroup('group-name', [
+        First::class,
+        Second::class,
+    ]);
+
+    $middleware->alias([
+        'subscribed' => EnsureUserIsSubscribed::class
+    ]);
+})</code></pre>
+                </section>
+
+                <section>
+                    <p class="fragment">Apply middleware to a route:</p>
+                    <pre class="fragment"><code class="language-php">// Single route middleware
+Route::get('/admin', function () {
+    // only for admins
+})->middleware('admin');
+
+// Middleware group usage
+Route::middleware(['auth','admin'])->group(function () {
+    Route::get('/dashboard', fn() => 'admin');
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">How to exclude a route from middleware</h3>
+                    
+                    <pre class="fragment"><code class="language-php">use App\Http\Middleware\EnsureTokenIsValid;
+
+Route::withoutMiddleware([EnsureTokenIsValid::class])->group(function () {
+    Route::get('/profile', function () {
+        // ...
+    });
+});
+</code></pre>
+                    <p class="fragment">Alternatively, avoid adding it to the group and use explicit application only on
+                        routes you want.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Execute code before and after the request</h3>
+                    <p class="fragment">Middleware can run code before passing to next middleware/controller and after
+                        response is generated.</p>
+                    <pre class="fragment"><code class="language-php">public function handle($request, Closure $next)
+{
+    // before
+    logger()->info('Before request');
+
+    $response = $next($request);
+
+    // after
+    logger()->info('After request');
+
+    return $response;
+}
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Common middleware in the web group (examples)</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><strong>EncryptCookies</strong> — encrypts cookies before sending.</li>
+                        <li class="fragment"><strong>StartSession</strong> — starts session for request.</li>
+                        <li class="fragment"><strong>VerifyCsrfToken</strong> — protects against CSRF attacks.</li>
+                        <li class="fragment"><strong>TrimStrings</strong> — trims whitespace from input.</li>
+                        <li class="fragment"><strong>SubstituteBindings</strong> — performs route model binding.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Middleware priority</h3>
+                    <p class="fragment">In app/bootstrap you can define <code>$middlewarePriority</code> to ensure certain middleware run
+                        in specific order.</p>
+                    <pre class="fragment"><code class="language-php">->withMiddleware(function (Middleware $middleware): void {
+    $middleware->priority([
+        \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
+        \Illuminate\Cookie\Middleware\EncryptCookies::class,
+        \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        ...
+    ]);
+})
+</code></pre>
+                    <p class="fragment">Important when middleware depend on each other's effects (e.g., session must
+                        start before auth).</p>
+                </section>
+
+                        <section>
+          <h3 class="text-2xl font-semibold">Middleware Parameters</h3>
+          <p class="fragment">Middleware can accept parameters to make them more flexible and reusable.</p>
+          <p class="fragment">Parameters are passed after the middleware name, separated by colons.</p>
+          <pre class="fragment"><code class="language-php">// Example route using middleware parameters
+Route::get('/profile', function () {
+    // ...
+})->middleware('role:admin,editor');</code></pre>
+
+</section>
+
+                <section>
+          <p class="fragment">Inside the middleware, parameters are received after the <code>$next</code> closure argument:</p>
+          <pre class="fragment"><code class="language-php">namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+
+class RoleMiddleware
+{
+    public function handle(Request $request, Closure $next, ...$roles)
+    {
+        if (! in_array($request->user()->role, $roles)) {
+            abort(403, 'Unauthorized');
+        }
+
+        return $next($request);
+    }
+}</code></pre>
+          <p class="fragment">This allows one middleware to enforce different role-based or configuration-based logic.</p>
+        </section>
+
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Terminable Middleware</h3>
+                    <p class="fragment">Middleware that implements
+                        <code>\Illuminate\Contracts\Pipeline\Terminable</code> can perform work after response is sent
+                        to the client.
+                    </p>
+                    <pre class="fragment"><code class="language-php">// example terminable middleware
+public function terminate($request, $response)
+{
+    // runs after response sent — good for logging, cleanup, long-running tasks
+    \Log::info('Request finished', ['path' =&gt; $request->path()]);
+}
+</code></pre>
+                </section>
+
+            </section>
+
+            <section>
+                <h3 class="text-2xl font-semibold">Further reading & references</h3>
+                <p class="fragment">Official docs — Routing: https://laravel.com/docs/12.x/routing</p>
+                <p class="fragment">Official docs — Middleware: https://laravel.com/docs/12.x/middleware</p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200,
+            height: 700,
+            slideNumber: 'c/t',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+        });
+    </script>
+    <script>
+        const { createApp, ref } = Vue;
+        createApp({
+            setup() {
+                return { count: ref(0) }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
