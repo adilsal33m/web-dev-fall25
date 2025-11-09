@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture 17</title>
+    <meta content="Lecture 17 - Web Based Application Development" name="description" />
+    <meta content="Muhammad Adil Saleem" name="author" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* keep similar look & sizes as reference slides */
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace
+        }
+
+        .fragment {
+            opacity: 0.0
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                <img alt="" class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" />
+                Institute of Business Administration Karachi
+            </p>
+        </div>
+        <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                CSE 308: Web Based Application Development - Fall 2025
+            </p>
+        </div>
+        <div class="slides">
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 17</h3>
+                <p class="">11th November 2025</p>
+            </section>
+
+            <section>
+                <h2 class="text-4xl font-bold mb-6">Agenda</h2>
+                <ul class="list-disc pl-8 space-y-2">
+                    <li>Request Lifecycle</li>
+                    <li>User Authentication</li>
+                </ul>
+            </section>
+
+            <!-- REQUEST LIFECYCLE -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Request Lifecycle — Big Picture</h3>
+                    <p class="fragment">A web request goes from the web server → front controller → kernel → middleware → router → controller → response → middleware (after) → final response. Understanding this helps you reason about where to register services, run code, and intercept requests.</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Entry: <code>public/index.php</code> (front controller)</li>
+                        <li class="fragment">Bootstrap: loads autoloader, environment, and creates the application instance</li>
+                        <li class="fragment">HTTP Kernel: handles the request and sends the response</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Front Controller (index.php)</h3>
+                    <p class="fragment">The single entry point for all HTTP requests. It bootstraps the framework and dispatches the request to the kernel.</p>
+                    <pre class="fragment"><code class="language-php">// public/index.php (simplified)
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$response = $kernel->handle(Illuminate\Http\Request::capture());
+$response->send();
+$kernel->terminate($request, $response);</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Bootstrap & Application Instance</h3>
+                    <p class="fragment"><code>bootstrap/app.php</code> builds the Application (service container) and registers core service providers.</p>
+                    <pre class="fragment"><code class="language-php">// bootstrap/app.php (concept)
+$app = new Illuminate\Foundation\Application(
+    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
+);
+// register some base providers
+// return $app
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">HTTP Kernel — handle() flow</h3>
+                    <p class="fragment">The Kernel receives the request and sends it through a middleware pipeline before dispatching to the router.</p>
+                    <pre class="fragment"><code class="language-php">// Kernel::handle (conceptual)
+public function handle($request)
+{
+    $request = $this->prepareRequest($request);
+    $response = (new Pipeline($this->app))
+                ->send($request)
+                ->through($this->getMiddleware())
+                ->then($this->dispatchToRouter());
+    return $response;
+}
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Routing & Controller Dispatch</h3>
+                    <p class="fragment">Router matches the incoming URI to a route and invokes the associated controller or closure. Route middleware and controller middleware both apply.</p>
+                    <p class="fragment">Implicit & explicit route model binding happens during route resolution.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">After the Controller — Response & Termination</h3>
+                    <p class="fragment">Response traverses middleware 'after' hooks. Kernel::terminate is called after response is sent, running terminable middleware.</p>
+                    <pre class="fragment"><code class="language-php">// Example of terminable middleware
+public function terminate($request, $response)
+{
+    // Post-response logging, cleanup
+}
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Service Providers </h3>
+                    <p class="fragment text-2xl">Service providers bind classes and services into the service container. They have <code>register()</code> and <code>boot()</code> methods.</p>
+                    <pre class="fragment text-2xl"><code class="language-php !text-xl">class ExampleServiceProvider extends ServiceProvider
+{
+    public function register()
+    {
+        // Bind things into the container — no heavy work here
+        $this->app->bind(Example\Foo::class, function ($app) {
+            return new Example\Foo(config('foo')); 
+        });
+    }
+
+    public function boot()
+    {
+        // Interact with other services, routes, events — after registration
+    }
+}
+</code></pre>
+                    <p class="fragment text-2xl">Tip: keep registration idempotent and lightweight — heavy I/O should happen in <code>boot()</code>.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Service Container — Overview</h3>
+                    <p class="fragment">The service container (IoC container) is the central place where class dependencies and instances are managed. Use it to resolve and inject dependencies automatically.</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Binding types: <code>bind()</code>, <code>singleton()</code>, <code>instance()</code></li>
+                        <li class="fragment">Resolving: via <code>app()->make()</code> or automatic injection</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Basic container bindings</h3>
+                    <pre class="fragment"><code class="language-php">// bind a concrete
+$this->app->bind(FooInterface::class, EloquentFoo::class);
+
+// singleton
+$this->app->singleton(Bar::class, function ($app) {
+    return new Bar($app['config']['bar']);
+});
+
+// register an existing instance
+$this->app->instance('api.connection', $connection);
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Contextual binding & tags</h3>
+                    <p class="fragment">Contextual binding allows different implementations depending on where a dependency is needed. Tags group multiple bindings to resolve arrays.</p>
+                    <pre class="fragment"><code class="language-php">// contextual binding
+$this->app->when(PaymentProcessor::class)
+    ->needs(Contract\Gateway::class)
+    ->give(PaypalGateway::class);
+
+// tags
+$this->app->bind('report.csv', CsvReport::class);
+$this->app->bind('report.pdf', PdfReport::class);
+$this->app->tag(['report.csv','report.pdf'], 'reports');
+
+$reports = $this->app->tagged('reports');</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Facades — syntactic sugar over the container</h3>
+                    <p class="fragment">Facades provide a static-like interface that proxies calls to underlying container-resolved classes. Remember they are just shortcuts to services in the container.</p>
+                    <pre class="fragment"><code class="language-php">// Behind the scenes:
+Cache::put('key', 'value'); // facade
+// resolves to
+app('cache')->put('key', 'value');
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">When to register in register() vs boot()</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><strong>register()</strong> — bind things into the container; do not rely on other services being booted.</li>
+                        <li class="fragment"><strong>boot()</strong> — execute code that depends on other services, register routes, event listeners.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- USER AUTHENTICATION -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">User Authentication — Basic workflow</h3>
+                    <p class="fragment">High-level flow: User submits credentials → server validates → server creates an authenticated session or token → subsequent requests include session cookie or token → server verifies credentials & authorizes access.</p>
+                    <ol class="list-decimal pl-8">
+                        <li class="fragment">Collect credentials (email/username + password)</li>
+                        <li class="fragment">Validate inputs</li>
+                        <li class="fragment">Verify identity (password check)</li>
+                        <li class="fragment">Create session / token & set cookie</li>
+                        <li class="fragment">Protect routes with auth middleware</li>
+                    </ol>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Simple login form (example)</h3>
+                    <pre class="fragment"><code class="language-html">&lt;form method="POST" action="/login"&gt;
+  &lt;input name="email" type="email" required /&gt;
+  &lt;input name="password" type="password" required /&gt;
+  &lt;button type="submit"&gt;Login&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Manual session-based authentication (complete)</h3>
+                    <p class="fragment">We'll implement authentication manually to see what's happening under the hood (no guard, no scaffolding). We'll:</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Validate credentials</li>
+                        <li class="fragment">Create a server-side session record</li>
+                        <li class="fragment">Set a session cookie with session id</li>
+                        <li class="fragment">Create middleware that checks session cookie and loads the authenticated user</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Step 1 — Login controller (manual)</h3>
+                    <pre class="fragment"><code class="language-php">// routes/web.php
+Route::post('/login', [App\Http\Controllers\ManualAuthController::class, 'login']);
+
+// app/Http/Controllers/ManualAuthController.php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Str;
+
+class ManualAuthController extends Controller
+{
+    public function login(Request $req)
+    {
+        $req->validate(['email' => 'required|email', 'password' => 'required']);
+
+        $user = User::where('email', $req->email)->first();
+        if (! $user) return back()->withErrors(['email' => 'No user']);
+
+        // WARNING: this example shows raw-password comparison - insecure. See next slide for hashing.
+        if ($req->password !== $user->password_raw) {
+            return back()->withErrors(['password' => 'Invalid credentials']);
+        }
+
+        // create a simple session record
+        $sessionId = (string) Str::uuid();
+        \DB::table('sessions_custom')->insert([
+            'id' => $sessionId,
+            'user_id' => $user->id,
+            'payload' => json_encode([]),
+            'last_activity' => now(),
+        ]);
+
+        // set cookie (HTTP only)
+        return redirect('/dashboard')->withCookie(cookie('session_id', $sessionId, 120));
+    }
+}
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Step 2 — Auth middleware (manual)</h3>
+                    <pre class="fragment"><code class="language-php">// app/Http/Middleware/ManualAuthenticate.php
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class ManualAuthenticate
+{
+    public function handle(Request $request, Closure $next)
+    {
+        $sessionId = $request->cookie('session_id');
+        if (! $sessionId) {
+            return redirect('/login');
+        }
+
+        $row = \DB::table('sessions_custom')->where('id', $sessionId)->first();
+        if (! $row) {
+            return redirect('/login');
+        }
+
+        // attach user to request
+        $request->setUserResolver(function () use ($row) {
+            return User::find($row->user_id);
+        });
+
+        return $next($request);
+    }
+}
+
+// register in Kernel (for example as 'manual_auth') and apply to routes
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Why storing raw text passwords is dangerous</h3>
+                    <p class="fragment">If your database is leaked, attackers get every user's password. Users commonly reuse passwords — a breach becomes catastrophic.</p>
+                    <p class="fragment">Use a slow, adaptive hashing algorithm (bcrypt, Argon2) and a per-password salt (handled by the hashing function).</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Hashing passwords (correct approach)</h3>
+                    <pre class="fragment"><code class="language-php">// when registering
+use Illuminate\Support\Facades\Hash;
+
+$user->password = Hash::make($request->password);
+$user->save();
+
+// when validating
+if (! Hash::check($request->password, $user->password)) {
+    // invalid
+}
+</code></pre>
+                    <p class="fragment">Laravel chooses a secure default (usually bcrypt or Argon2) — use Hash facade, never roll your own crypto.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Remember-me token — how it works</h3>
+                    <p class="fragment">Remember me persists login across browser restarts. Typical approach:</p>
+                    <ol class="list-decimal pl-8">
+                        <li class="fragment">On login with remember: generate a long random token and store a hash of it in DB with user id and expiry.</li>
+                        <li class="fragment">Set a long-lived cookie containing (user_id, token_plaintext) — secure and HTTP-only if possible.</li>
+                        <li class="fragment">On subsequent visits, if session absent but cookie present: look up record by user_id and verify Hash::check(token_plaintext, token_hash). If valid, create a new session and rotate the token (security best-practice).</li>
+                    </ol>
+                    
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Remember-me token (generate)</h3>
+                    <pre class="fragment"><code class="language-php">// create remember token
+$plain = Str::random(64);
+$hash = Hash::make($plain);
+\DB::table('remember_tokens')->insert([
+    'user_id' => $user->id,
+    'token' => $hash,
+    'expires_at' => now()->addWeeks(2),
+]);
+// set cookie with ($user->id, $plain)
+</code></pre>
+                </section>
+
+                <section>
+                    <p>How to use remember me token</p>
+                    <pre><code class="language-php" >
+[$userId, $tokenPlain] = explode('|', $request->cookie('remember_me'));
+
+$user = User::find($userId);
+
+if ($user && $record = DB::table('remember_tokens')
+        ->where('user_id', $user->id)
+        ->first()) {
+
+    if (Hash::check($tokenPlain, $record->token)) {
+        // Token valid — log in the user
+        Auth::login($user);
+
+        // Rotate token (important)
+        rotateRememberToken($user, $record, $tokenPlain);
+    }
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <p>Rotating remember me token</p>
+                    <pre><code class="language-php">function rotateRememberToken($user, $record, $oldTokenPlain)
+{
+    // Delete old record
+    DB::table('remember_tokens')
+        ->where('user_id', $user->id)
+        ->where('token', $record->token)
+        ->delete();
+
+    // Create new token
+    $newPlain = Str::random(64);
+    $newHash = Hash::make($newPlain);
+
+    DB::table('remember_tokens')->insert([
+        'user_id' => $user->id,
+        'token' => $newHash,
+        'expires_at' => now()->addWeeks(2),
+        'created_at' => now(),
+    ]);
+
+    // Set new cookie with user_id|tokenPlain
+    Cookie::queue(
+        Cookie::make('remember_me', "{$user->id}|{$newPlain}", 60 * 24 * 14, null, null, true, true)
+    );
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Implementing 'Forgot Password' (concept)</h3>
+                    <p class="fragment text-2xl">Flow: user requests reset → server generates one-time token (time-limited) & emails link → user opens link → token is validated and password can be reset.</p>
+                    <pre class="fragment"><code class="language-php">// generate token
+$token = Str::random(64);
+\DB::table('password_resets')->updateOrInsert(
+    ['email' => $user->email],
+    ['token' => Hash::make($token), 'created_at' => now()]
+);
+// send email with link: /password/reset?email=...&token=$token
+
+// on reset form submission
+$record = \DB::table('password_resets')->where('email', $email)->first();
+if (! $record || ! Hash::check($token, $record->token)) {
+    // invalid
+}
+// allow password reset and delete token
+</code></pre>
+                    <p class="fragment text-2xl">Important: store hash of token, not plaintext; expire tokens; rate-limit requests; log attempts.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Using Laravel's built-in authentication (guards & providers)</h3>
+                    <p class="fragment text-2xl">Laravel uses <code>guards</code> to define how users are authenticated (session, token) and <code>providers</code> to define how users are retrieved (Eloquent, database).</p>
+                    <pre class="fragment"><code class="language-php">// config/auth.php (excerpt)
+'guards' => [
+    'web' => [
+        'driver' => 'session',
+        'provider' => 'users',
+    ],
+    'api' => [
+        'driver' => 'token',
+        'provider' => 'users',
+    ],
+],
+
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => App\Models\User::class,
+    ],
+],
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Auth middleware & helper functions</h3>
+                    <p class="fragment">Use <code>auth</code> middleware to protect routes. In controllers, use <code>Auth::user()</code> or <code>$request->user()</code>.</p>
+                    <pre class="fragment"><code class="language-php">// route
+Route::get('/dashboard', fn() =&gt; view('dashboard'))->middleware('auth');
+
+// in controller
+use Illuminate\Support\Facades\Auth;
+$user = Auth::user();
+// or
+$user = $request->user();
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Breeze starter kit — quick setup</h3>
+                    <p class="fragment">Laravel Breeze provides minimal, simple authentication scaffolding (register, login, password reset, email verification) using Blade + Tailwind or Inertia + Vue/React.</p>
+                    <pre class="fragment"><code class="language-bash">composer require laravel/breeze --dev
+php artisan breeze:install blade
+npm install && npm run dev
+php artisan migrate</code></pre>
+                    <p class="fragment">Breeze wires up controllers, routes (<code>Auth::routes()</code> like), views and feature-complete flows so you don't reinvent the wheel.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Breeze — what it gives you</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Register / Login / Logout</li>
+                        <li class="fragment">Email verification</li>
+                        <li class="fragment">Forgot & reset password</li>
+                        <li class="fragment">Remember me support</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Security checklist for authentication</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Always hash passwords (Hash::make).</li>
+                        <li class="fragment">Use HTTPS; set cookies with Secure & HttpOnly flags.</li>
+                        <li class="fragment">Use rotating remember tokens and store only their hashes.</li>
+                        <li class="fragment">Rate-limit login & password reset endpoints.</li>
+                        <li class="fragment">Enable multi-factor authentication where appropriate.</li>
+                    </ul>
+                </section>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200,
+            height: 700,
+            slideNumber: 'c/t',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+        });
+    </script>
+    <script>
+        const { createApp, ref } = Vue;
+        createApp({
+            setup() {
+                return { count: ref(0) }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
