@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture 18</title>
+    <meta content="Lecture 17 - Web Based Application Development" name="description" />
+    <meta content="Muhammad Adil Saleem" name="author" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* keep similar look & sizes as reference slides */
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace
+        }
+
+        .fragment {
+            opacity: 0.0
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div style="position: absolute; right: 8px; top:-4%; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                <img alt="" class="inline h-6" src="https://www.iba.edu.pk/favicon.ico" />
+                Institute of Business Administration Karachi
+            </p>
+        </div>
+        <div style="position: absolute; left:8px; bottom:-16px; z-index: 10;">
+            <p style="text-align: center; font-size: 0.4em;">
+                CSE 308: Web Based Application Development - Fall 2025
+            </p>
+        </div>
+        <div class="slides">
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 18</h3>
+                <p class="">13th November 2025</p>
+            </section>
+
+            <section>
+                <h2 class="text-4xl font-bold mb-6">Agenda</h2>
+                <ul class="list-disc pl-8 space-y-2">
+                    <li>Role Based Access Control (RBAC)</li>
+                    <li>Roles & Permissions (concept)</li>
+                    <li>Spatie Permission Package - setup</li>
+                    <li>Using RBAC in Controllers, Views & Middleware</li>
+                    <li>Policies vs Gates</li>
+                </ul>
+            </section>
+
+            <!-- RBAC INTRO -->
+            <section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Scenario</h3>
+                    <p class="fragment">Example: A hospital management system has Doctors, Nurses, Receptionists and Admins.</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Doctors can view and write patient notes.</li>
+                        <li class="fragment">Nurses can view notes but only update vitals.</li>
+                        <li class="fragment">Receptionists can create appointments only.</li>
+                        <li class="fragment">Admins manage users and system settings.</li>
+                    </ul>
+                    <p class="fragment">Assigning permissions to roles (not to every user) simplifies changes when responsibilities change.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">What is Role Based Access Control (RBAC)?</h3>
+                    <p class="fragment">RBAC organizes authorization by assigning <em>roles</em> to users and attaching <em>permissions</em> to roles.</p>
+                    <p class="fragment">Users inherit permissions through their roles — easier to manage than assigning permissions to each user individually.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Roles & Permissions — conceptual model</h3>
+                    <p class="fragment">Key ideas:</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><strong>Role:</strong> A collection of responsibilities (e.g., <code>doctor</code>).</li>
+                        <li class="fragment"><strong>Permission:</strong> A single action (e.g., <code>edit patient</code>).</li>
+                        <li class="fragment">Users are assigned roles (and optionally direct permissions).</li>
+                        <li class="fragment">Roles are mapped to permissions — changes affect all users with that role.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- SPATIE SETUP -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Spatie Laravel Permission — Installation</h3>
+                    <p class="fragment">Add the package via Composer and publish migrations & config.</p>
+                    <pre class="fragment"><code class="language-bash">composer require spatie/laravel-permission
+
+# publish config & migrations
+php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"
+
+# run migrations
+php artisan migrate</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Model setup (User)</h3>
+                    <p class="fragment">Add the <code>HasRoles</code> trait to your User model.</p>
+                    <pre class="fragment"><code class="language-php">namespace App\Models;
+
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasRoles;
+
+    // other model code
+}
+</code></pre>
+                    <p class="fragment">This trait provides helpers like <code>hasRole</code>, <code>hasAnyRole</code>, <code>hasPermissionTo</code>, <code>givePermissionTo</code>, etc.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Config & Database</h3>
+                    <p class="fragment">Published config is <code>config/permission.php</code>. Important tables:</p>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><code>roles</code></li>
+                        <li class="fragment"><code>permissions</code></li>
+                        <li class="fragment"><code>model_has_roles</code></li>
+                        <li class="fragment"><code>model_has_permissions</code></li>
+                        <li class="fragment"><code>role_has_permissions</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Seeding roles & permissions</h3>
+                    <p class="fragment">Create a seeder to bootstrap roles and permissions.</p>
+                    <pre class="fragment"><code class="language-php">use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+
+Permission::create(['name' =&gt; 'view patients']);
+Permission::create(['name' =&gt; 'edit patients']);
+Permission::create(['name' =&gt; 'create appointments']);
+
+$doctor = Role::create(['name' =&gt; 'doctor']);
+$doctor->givePermissionTo(['view patients','edit patients']);
+
+$reception = Role::create(['name' =&gt; 'receptionist']);
+$reception->givePermissionTo(['create appointments']);</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Assigning roles & permissions (runtime)</h3>
+                    <p class="fragment">Assign to users in a controller, tinker or seeder.</p>
+                    <pre class="fragment"><code class="language-php">$user = User::find(10);
+
+// assign role
+$user->assignRole('doctor');
+
+// give a single permission directly
+$user->givePermissionTo('view patients');
+
+// check
+if ($user->hasRole('doctor')) { ... }
+if ($user->can('edit patients')) { ... }</code></pre>
+                </section>
+            </section>
+
+            <!-- RBAC IN CONTROLLERS -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Using RBAC in Controllers</h3>
+                    <p class="fragment">You can check roles/permissions inside controller actions. Prefer Gates/Policies for complex logic.</p>
+                    <pre class="fragment"><code class="language-php">public function update(Request $request, Post $post)
+{
+    $user = $request->user();
+
+    // permission check
+    if (! $user->can('edit posts')) {
+        abort(403, 'Unauthorized');
+    }
+
+    // or role-based
+    if (! $user->hasRole('editor')) {
+        abort(403);
+    }
+
+    $post->update($request->only('title','body'));
+
+    return redirect()->back();
+}</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Cleaner: authorize or Gates/Policies</h3>
+                    <p class="fragment">Use <code>$this->authorize()</code> (policies) or <code>Gate::allows()</code> for clearer intent.</p>
+                    <pre class="fragment"><code class="language-php">// inside controller
+public function update(Request $request, Post $post)
+{
+    $this->authorize('update', $post); // uses PostPolicy::update
+
+    $post->update($request->validated());
+
+    return redirect()->route('posts.show', $post);
+}</code></pre>
+                </section>
+            </section>
+
+            <!-- RBAC IN VIEWS -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Using RBAC in Blade views</h3>
+                    <p class="fragment">Blade directives provided by Spatie (and Laravel) make templates expressive.</p>
+                    <pre class="fragment"><code class="language-php">@role('admin')
+    &lt;a href="/admin"&gt;Admin Dashboard&lt;/a&gt;
+@endrole
+
+@hasrole('editor|admin')
+    &lt;button&gt;Publish&lt;/button&gt;
+@endhasrole
+
+@can('edit posts')
+    &lt;a href="{{ route('posts.edit', $post) }}"&gt;Edit&lt;/a&gt;
+@endcan</code></pre>
+                    <p class="fragment">Also available: <code>@unlessrole</code>, <code>@hasanyrole</code>, <code>@hasallroles</code>.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Passing permissions to frontend (API/SPA)</h3>
+                    <p class="fragment">When building SPAs, include the user's roles/permissions in a profile endpoint so client UI can hide/show features.</p>
+                    <pre class="fragment"><code class="language-php">// Example API resource
+return response()->json([
+    'user' =&gt; $user->only(['id','name','email']),
+    'roles' =&gt; $user->getRoleNames(),
+    'permissions' =&gt; $user->getPermissionNames()
+]);</code></pre>
+                </section>
+            </section>
+
+            <!-- MIDDLEWARE ENFORCEMENT -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Enforcing RBAC with Middleware</h3>
+                    <p class="fragment">Spatie ships with middleware aliases you can register in <code>app/Http/Kernel.php</code>:</p>
+                    <pre class="fragment"><code class="language-php">'role' =&gt; \Spatie\Permission\Middlewares\RoleMiddleware::class,
+'permission' =&gt; \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+'role_or_permission' =&gt; \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Applying middleware on routes</h3>
+                    <p class="fragment">Use middleware parameters to restrict access on routes or groups.</p>
+                    <pre class="fragment"><code class="language-php">// single route
+Route::get('/admin', fn() =&gt; 'admin')->middleware('role:admin');
+
+// parameterized (multiple roles)
+Route::get('/editor-area', fn() =&gt; 'editor')->middleware('role:editor|admin');
+
+// permission middleware
+Route::post('/posts', [PostController::class,'store'])->middleware('permission:create posts');
+
+// route group
+Route::middleware(['auth','role:admin'])->prefix('admin')->group(function () {
+    Route::resource('users', Admin\UserController::class);
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Custom middleware for advanced checks</h3>
+                    <p class="fragment">If you need composite logic, write custom middleware and use role/permission helpers inside it.</p>
+                    <pre class="fragment"><code class="language-php">public function handle(Request $request, Closure $next)
+{
+    $user = $request->user();
+
+    if (! $user || ! ($user->hasRole('manager') || $user->can('approve budgets'))) {
+        abort(403);
+    }
+
+    return $next($request);
+}</code></pre>
+                </section>
+            </section>
+
+            <!-- POLICIES -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">What is a Policy in Laravel?</h3>
+                    <p class="fragment">A Policy is a class that organizes authorization logic around a particular model (e.g., PostPolicy).</p>
+                    <p class="fragment">Policies are ideal when access depends on the specific model instance (ownership, attributes, relationships).</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">When to use a Policy?</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Authorization depends on the model instance (e.g., only the author can update their post).</li>
+                        <li class="fragment">You want centralized, testable authorization per model.</li>
+                        <li class="fragment">You need consistent use across controllers/views via <code>$this->authorize()</code> or <code>@can</code>.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Creating a Policy</h3>
+                    <p class="fragment">Generate and register a policy for <code>Post</code>.</p>
+                    <pre class="fragment"><code class="language-bash">php artisan make:policy PostPolicy --model=Post</code></pre>
+                    <pre class="fragment"><code class="language-php">// app/Policies/PostPolicy.php
+public function update(User $user, Post $post)
+{
+    // allow admins or the post owner
+    return $user->hasRole('admin') || $user->id === $post->user_id;
+}
+
+// register in AuthServiceProvider
+protected $policies = [
+    Post::class =&gt; PostPolicy::class,
+];
+</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Using Policies</h3>
+                    <p class="fragment">Use <code>$this->authorize('update',$post)</code> in controllers and <code>@can('update', $post)</code> in views.</p>
+                    <pre class="fragment"><code class="language-php">// controller
+public function edit(Post $post)
+{
+    $this->authorize('update', $post);
+
+    return view('posts.edit', compact('post'));
+}
+
+// blade
+@can('update', $post)
+    &lt;a href="{{ route('posts.edit', $post) }}"&gt;Edit&lt;/a&gt;
+@endcan</code></pre>
+                </section>
+            </section>
+
+            <!-- GATES -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">What is a Gate in Laravel?</h3>
+                    <p class="fragment">A Gate is a closure-based way to define simple authorization rules. Useful for global, non-model checks.</p>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">When to use Gates?</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Small, global rules that aren't tied to a model (e.g., "access-admin-panel").</li>
+                        <li class="fragment">Quick checks used across controllers and views without a dedicated policy class.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Defining and using Gates</h3>
+                    <p class="fragment">Define in <code>AuthServiceProvider::boot()</code>.</p>
+                    <pre class="fragment"><code class="language-php">use Illuminate\Support\Facades\Gate;
+
+public function boot()
+{
+    Gate::define('access-admin-panel', function (User $user) {
+        return $user->hasRole('admin');
+    });
+
+    Gate::define('approve-payments', fn(User $user) =&gt; $user->hasPermissionTo('approve payments'));
+}
+
+// use in controller
+if (Gate::allows('access-admin-panel')) {
+    // show admin data
+}
+
+// use Blade
+@can('approve-payments')
+    &lt;button&gt;Approve&lt;/button&gt;
+@endcan</code></pre>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">Gates vs Policies — quick comparison</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment"><strong>Policies</strong> — best for model-specific, instance-level rules.</li>
+                        <li class="fragment"><strong>Gates</strong> — best for simple/global rules not tied to a model.</li>
+                        <li class="fragment">You can use both: Gates for global checks, Policies for model authorization.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- BEST PRACTICES -->
+            <section>
+                <section>
+                    <h3 class="text-2xl font-semibold">Best practices & tips</h3>
+                    <ul class="list-disc pl-8">
+                        <li class="fragment">Prefer Roles + Permissions for broad admin dashboards and delegated responsibilities.</li>
+                        <li class="fragment">Use Policies for per-model authorization (ownership checks).</li>
+                        <li class="fragment">Keep route middleware small; delegate complex checks to Policies or Services.</li>
+                        <li class="fragment">Seed roles/permissions and avoid hardcoding permission strings in many places.</li>
+                        <li class="fragment">Cache permission lookups in high-traffic apps (Spatie supports cache via config).</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3 class="text-2xl font-semibold">References</h3>
+                    <p class="fragment">Spatie package — documentation (see vendor config after publishing).</p>
+                    <p class="fragment">Laravel — Authorization: Gates & Policies.</p>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/search/search.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200,
+            height: 700,
+            slideNumber: 'c/t',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true,
+            plugins: [RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight]
+        });
+    </script>
+    <script>
+        const { createApp, ref } = Vue;
+        createApp({
+            setup() {
+                return { count: ref(0) }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
