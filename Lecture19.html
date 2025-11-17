@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Web-Based Application Development — Lecture: Caching (Laravel 12.x)</title>
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    h2 {
+      font-size: 2.25rem;
+    }
+
+    h3 {
+      font-size: 1.625rem;
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #f8f8f2;
+      padding: 1rem;
+      border-radius: .5rem;
+      overflow: auto;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', monospace;
+    }
+
+    .fragment {
+      opacity: 0.0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>Web Based Application Development</h2>
+        <h3 class="pt-16">Lecture 19</h3>
+        <p class="">18th November 2025</p>
+      </section>
+
+      <section>
+        <h2>Agenda</h2>
+        <ul>
+          <li>Why Use Caching in Web Applications</li>
+          <li>Examples</li>
+          <li>Caching Concepts</li>
+          <li>Laravel Cache System</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Problem</h2>
+        <ul class="space-y-8">
+          <li class="fragment">Pages load slowly due to expensive DB queries or API calls.</li>
+          <li class="fragment">High traffic amplifies repeated computation.</li>
+          <li class="fragment">Infrastructure cost rises to handle load.</li>
+        </ul>
+      </section>
+
+      <section>
+        <section class="text-left">
+          <h3>Possible Solutions</h3>
+          <p class="fragment">How can we reduce latency without changing business logic?</p>
+          <ul class="space-y-8">
+            <li class="fragment">Optimize SQL?</li>
+            <li class="fragment">Scale hardware?</li>
+            <li class="fragment">Use async jobs?</li>
+            <li class="fragment font-bold">Cache?</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Why Not Just Optimize SQL?</h3>
+          <ul>
+            <li class="fragment">Optimized SQL still runs on every request</li>
+            <li class="fragment">Database load remains high for repeated reads</li>
+            <li class="fragment">Good for speed, but doesn’t eliminate the query</li>
+            <li class="fragment font-bold">Cache avoids the database entirely</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Why Not Just Scale Hardware?</h3>
+          <ul>
+            <li class="fragment">More CPU/RAM = more cost</li>
+            <li class="fragment">Scaling speeds up work, but still performs work</li>
+            <li class="fragment">Doesn’t fix heavy read pressure on DB</li>
+            <li class="fragment font-bold">Cache is cheaper & eliminates repeated work</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Why Not Just Use Async Jobs?</h3>
+          <ul>
+            <li class="fragment">Async is for background work, not real-time reads</li>
+            <li class="fragment">Users still wait for page load</li>
+            <li class="fragment">Doesn’t reduce read latency</li>
+            <li class="fragment font-bold">Cache gives instant responses</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Why Cache?</h2>
+          <ul class="space-y-8">
+            <li class="fragment">Reduced latency</li>
+            <li class="fragment">Increased throughput</li>
+            <li class="fragment">Lower DB/API load</li>
+            <li class="fragment">Resilience during partial outages</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>When NOT to Cache</h2>
+          <ul class="space-y-8">
+            <li class="fragment">Highly dynamic data</li>
+            <li class="fragment">Expensive invalidation logic</li>
+            <li class="fragment">Sensitive user-specific data</li>
+          </ul>
+        </section>
+      </section>
+
+
+      <section>
+        <section>
+          <h2>Real Examples</h2>
+          <ul>
+            <li class="fragment">Query caching</li>
+            <li class="fragment">Fragment/HTML caching</li>
+            <li class="fragment">API response caching</li>
+            <li class="fragment">Object caching</li>
+            <li class="fragment">CDN caching</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Query Caching</h2>
+          <p class="fragment">A dashboard loads “Top 10 Selling Products” every time a manager opens the page.</p>
+          <ul>
+            <li class="fragment">The query joins multiple tables</li>
+            <li class="fragment">Takes ~300ms per request</li>
+            <li class="fragment">Data only changes every few minutes</li>
+            <li class="fragment font-bold">Cache the result for 5 minutes → page loads instantly</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Fragment / HTML Caching</h2>
+          <p class="fragment">A homepage has a “Featured Articles” widget rendered from Blade.</p>
+          <ul>
+            <li class="fragment">Rendering requires multiple DB calls</li>
+            <li class="fragment">HTML output is identical for all users</li>
+            <li class="fragment">Expensive to regenerate on each page load</li>
+            <li class="fragment font-bold">Cache the HTML snippet → instantly reusable</li>
+          </ul>
+        </section>
+
+        <section>
+          <section>
+            <h2>API Response Caching</h2>
+            <p class="fragment">A page loads current currency exchange rates from an external API.</p>
+            <ul>
+              <li class="fragment">External API has a rate limit</li>
+              <li class="fragment">Response takes 1-2 seconds</li>
+              <li class="fragment">Rates update only once per hour</li>
+              <li class="fragment font-bold">Cache the API response → zero waiting, no rate-limit issues</li>
+            </ul>
+          </section>
+        </section>
+
+        <section>
+          <h2>Object Caching</h2>
+          <p class="fragment">A user's permissions are calculated through multiple role lookups.</p>
+          <ul>
+            <li class="fragment">RBAC requires several queries per request</li>
+            <li class="fragment">Permissions rarely change</li>
+            <li class="fragment">Same user is hitting the server repeatedly</li>
+            <li class="fragment font-bold">Cache the UserPermission object → instant authorization checks</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>CDN Caching</h2>
+          <p class="fragment">Your app serves product images and static assets to users worldwide.</p>
+          <ul>
+            <li class="fragment">Images are requested thousands of times per hour</li>
+            <li class="fragment">Origin server becomes overloaded</li>
+            <li class="fragment">Users far from the server experience slow loads</li>
+            <li class="fragment font-bold">CDN caches static files → faster global delivery & reduced server load</li>
+          </ul>
+        </section>
+      </section>
+
+      <section>
+        <section>
+          <h2>Case Study: From 100ms → 10ms <a class="text-sm"
+              href="https://nihardaily.com/62-laravel-performance-optimization-from-100ms-to-10ms-response-times">Source</a>
+          </h2>
+          <p class="fragment">A Laravel application struggling with rising traffic and inconsistent response times.</p>
+          <ul>
+            <li class="fragment">Initial average response time: <strong>~100ms</strong></li>
+            <li class="fragment">Goal: Reduce latency, improve scalability</li>
+            <li class="fragment">Approach: Profile → Optimize → Cache</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Identifying Bottlenecks</h2>
+          <p class="fragment">Profiling exposed multiple hidden performance issues:</p>
+          <ul>
+            <li class="fragment">N+1 queries causing 50–200 extra DB calls</li>
+            <li class="fragment">Queries selecting unnecessary columns</li>
+            <li class="fragment">Missing DB indexes → table scans</li>
+            <li class="fragment">Heavy Laravel boot time (routes, configs)</li>
+            <li class="fragment">Unnecessary service providers loading each request</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Database Optimizations</h2>
+          <p class="fragment">First wave of improvements targeted excessive DB load.</p>
+          <ul>
+            <li class="fragment">Added <strong>eager loading</strong> to remove N+1 queries</li>
+            <li class="fragment">Used <strong>select()</strong> to reduce payload size</li>
+            <li class="fragment">Added <strong>indexes</strong> to high-traffic WHERE columns</li>
+            <li class="fragment">Simplified JOINs and cleaned slow queries</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Framework-Level Optimizations</h2>
+          <p class="fragment">Significant time was wasted bootstrapping Laravel on every request.</p>
+          <ul>
+            <li class="fragment">Enabled <strong>config caching</strong></li>
+            <li class="fragment">Enabled <strong>route caching</strong></li>
+            <li class="fragment">Precompiled views with <strong>view:cache</strong></li>
+            <li class="fragment">Removed unused service providers</li>
+            <li class="fragment">Enabled <strong>OPcache</strong> for PHP bytecode</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Strategic Caching</h2>
+          <p class="fragment">Caching transformed the runtime performance completely.</p>
+          <ul>
+            <li class="fragment">Cached expensive SQL queries (Redis)</li>
+            <li class="fragment">Cached computed objects (e.g., permissions)</li>
+            <li class="fragment">Cached API responses for external services</li>
+            <li class="fragment">Reduced DB hits by 70–90%</li>
+            <li class="fragment font-bold">This step alone accounted for majority of the speed-up</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>Results</h2>
+          <ul>
+            <li class="fragment"><strong>100ms → 10ms</strong> average response time</li>
+            <li class="fragment">70–90% fewer DB queries per request</li>
+            <li class="fragment">Lower CPU + memory usage</li>
+            <li class="fragment">Able to handle more concurrent users without extra hardware</li>
+            <li class="fragment">User experience improved dramatically</li>
+          </ul>
+        </section>
+
+      </section>
+
+      <section>
+        <section>
+          <h2>Laravel Cache System</h2>
+          <p class="fragment">Unified expressive API for caching</p>
+          <p class="fragment">Supports many drivers (file, redis, memcached, database, dynamodb, array, null)</p>
+          <p class="fragment">Configured via <code>config/cache.php</code></p>
+        </section>
+
+        <section>
+          <h3>Configuration & Drivers</h3>
+          <ul>
+            <li class="fragment">
+              Default cache settings are in <code>config/cache.php</code>
+            </li>
+            <li class="fragment">
+              Supported drivers: file, redis, memcached, database, dynamodb, array, null
+            </li>
+            <li class="fragment">Driver prerequisites:
+              <ul>
+                <li class="fragment">Database: you need a `cache` table; can create via `php artisan make:cache-table`
+                </li>
+                <li class="fragment">Redis: requires PhpRedis or predis</li>
+                <li class="fragment">DynamoDB: requires AWS SDK & a table with TTL enabled</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Basic Cache Usage</h3>
+          <p class="fragment">Using the Cache facade or helper</p>
+          <pre class="fragment"><code class="language-php">// Getting a cache value
+$value = Cache::get('key', 'default');
+
+// Storing a value:
+Cache::put('key', 'value', 60); // seconds
+
+// Using DateTime:
+Cache::put('longKey', 'data', now()->addMinutes(10));</code></pre>
+          <pre class="fragment"><code>Cache::add('key', 'value', 60);</code></pre>
+          <pre class="fragment"><code>Cache::forever('permanent', 'some-value');</code></pre>
+        </section>
+
+        <section>
+          <h3>Retrieving & Removing Items</h3>
+          <ul>
+            <li class="fragment">`get` returns `null` (or default) if key not present</li>
+            <li class="fragment">`remember` method — fetch or compute + cache if missing</li>
+            <pre class="fragment"><code>$value = Cache::remember('users', 300, function () {
+    return DB::table('users')->get();
+});</code></pre>
+            <li class="fragment">`rememberForever` to cache without expiration
+            </li>
+            <pre class="fragment"><code>$perm = Cache::rememberForever('settings', function(){
+    return Setting::all();
+});</code></pre>
+            <li class="fragment">`pull` to get + delete in one go </li>
+            <pre class="fragment"><code>$value = Cache::pull('key', 'default');</code></pre>
+            <li class="fragment">`forget` or `flush` to delete items</li>
+            <pre class="fragment"><code>Cache::forget('key');
+Cache::flush();</code></pre>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Memoized Cache</h3>
+          <p class="fragment">In-memory caching during a single request or job</p>
+          <pre class="fragment"><code>$value = Cache::memo()->get('key');</code></pre>
+          <p class="fragment">Wraps another store (e.g., Redis):</p>
+          <pre class="fragment"><code>$value = Cache::memo('redis')->get('key');</code></pre>
+          <p class="fragment">Subsequent reads in the same execution don’t hit the cache store again</p>
+        </section>
+
+        <section>
+          <h3>Cache Tags</h3>
+          <p class="fragment">Group related cache entries using tags</p>
+          <pre class="fragment"><code>Cache::tags(['people', 'artists'])->put('John', $john, 3600);
+$john = Cache::tags(['people', 'artists'])->get('John');</code></pre>
+          <p class="fragment">Flush by tag:</p>
+          <pre class="fragment"><code>Cache::tags(['people', 'artists'])->flush();</code></pre>
+          <p class="fragment">⚠️ Note: Not all drivers support tags (e.g. file, database, dynamodb)</p>
+        </section>
+
+        <section>
+          <h3>Atomic Locks</h3>
+          <p class="fragment">Use distributed locking to prevent race conditions</p>
+          <pre class="fragment"><code>$lock = Cache::lock('process-name', 10);
+if ($lock->get()) {
+    // do something
+    $lock->release();
+}
+</code></pre>
+          <p class="fragment">Or with a callback and automatic release:</p>
+          <pre class="fragment"><code>Cache::lock('process-name', 10)->get(function(){
+    // critical section
+});</code></pre>
+          <p class="fragment">You can also `block()` to wait for lock acquisition</p>
+        </section>
+
+        <section>
+          <h3>Failover Cache Store</h3>
+          <p class="fragment">Automatic fallback when primary cache store fails</p>
+          <pre class="fragment"><code>'failover' => [
+    'driver' => 'failover',
+    'stores' => ['redis', 'database'],
+],</code></pre>
+          <p class="fragment">Set `CACHE_STORE=failover` so Laravel tries stores in order if one fails</p>
+        </section>
+
+        <section>
+          <h3>Custom Cache Drivers</h3>
+          <p class="fragment">You can write your own driver by implementing
+            <code>Illuminate\Contracts\Cache\Store</code>
+          </p>
+          <pre class="fragment"><code>namespace App\Extensions;
+
+use Illuminate\Contracts\Cache\Store;
+
+class MyStore implements Store {
+    public function get($key) { /* … */ }
+    public function put($key, $value, $seconds) { /* … */ }
+    public function forget($key) { /* … */ }
+    // … other methods …
+}</code></pre>
+          <p class="fragment">Then register it in a service provider:</p>
+          <pre class="fragment"><code>Cache::extend('mydriver', function($app) {
+    return Cache::repository(new MyStore);
+});</code></pre>
+        </section>
+
+        <section>
+          <h3>Cache Events</h3>
+          <p class="fragment">Laravel emits events for cache operations, which you can listen to:</p>
+          <ul class="fragment">
+            <li><code>Illuminate\Cache\Events\CacheHit</code></li>
+            <li><code>Illuminate\Cache\Events\CacheMissed</code></li>
+            <li><code>Illuminate\Cache\Events\KeyWritten</code></li>
+            <li><code>Illuminate\Cache\Events\CacheFlushed</code></li>
+          </ul>
+          <p class="fragment">You may disable events for a store by setting <code>'events' => false</code> in its
+            config.</p>
+        </section>
+      </section>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+  <script>
+    Reveal.initialize({ width: 1200, height: 700, slideNumber: 'c/t', controls: true, progress: true, center: true, hash: true });
+  </script>
+</body>
+
+</html>
