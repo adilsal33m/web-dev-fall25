@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture: Queues & Scheduling (Laravel 12.x)</title>
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .fragment {
+            opacity: 0.0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 20</h3>
+                <p class="">20th November 2025</p>
+            </section>
+
+            <section>
+                <h2>Agenda</h2>
+                <ul>
+                    <li>Queues</li>
+                    <li>Task Scheduling</li>
+                </ul>
+            </section>
+
+
+            <section class="text-3xl">
+                <section>
+                    <h2>The Problem: Slow Web Requests</h2>
+                    <p>Immediate, synchronous processing of all tasks can lead to a poor user experience and unstable
+                        service.</p>
+                    <ul class="space-y-8">
+                        <li class="fragment"><strong>High Latency for Heavy Tasks:</strong> Web requests are
+                            significantly slowed down when forced to perform intensive, long-running operations
+                            (like complex calculations or data processing) synchronously.</li>
+                        <li class="fragment"><strong>Unnecessary User Waiting:</strong> Users are blocked from
+                            receiving a response while the application performs background work that isn't required for
+                            the immediate response (e.g., sending emails, generating reports).</li>
+                        <li class="fragment"><strong>Bottlenecks and Service Instability:</strong> High concurrent
+                            traffic and long-running requests can lead to thread starvation and system
+                            bottlenecks, drastically reducing the application's overall throughput.</li>
+                    </ul>
+                </section>
+
+
+                <section>
+                    <h3>The Solution: Asynchronous Task Queues</h3>
+                    <p>Introducing a messaging queue decouples heavy work from the web request cycle, drastically
+                        improving front-end responsiveness and back-end scalability.</p>
+
+                    <ul class="space-y-8">
+                        <li class="fragment"><strong>Improve Response Time:</strong> Tasks are instantly moved to the
+                            background, allowing the web request to return a near-immediate response (e.g., "Your
+                            report is being processed").</li>
+                        <li class="fragment"><strong>Increase Throughput:</strong> Decoupling tasks from the web server
+                            prevents blocking, enabling the application to handle significantly more simultaneous
+                            requests (higher RPS/QPS).</li>
+                        <li class="fragment"><strong>Smooth Traffic Handling:</strong> Queues act as a buffer,
+                            absorbing sudden spikes in traffic (traffic bursts) without overwhelming the core
+                            application servers.</li>
+                        <li class="fragment"><strong>Reliability and Retry Logic:</strong> Tasks can be reliably
+                            processed by dedicated workers and retried automatically upon failure, improving overall
+                            system resilience.</li>
+                    </ul>
+                </section>
+
+
+                <section>
+                    <h3>Why Not Just Optimize the Code?</h3>
+                    <ul>
+                        <li class="fragment"><strong>Inherently Slow Operations:</strong> Some work is constrained by
+                            external factors or nature, making it inherently slow (e.g., network calls to third-party
+                            APIs, sending emails, generating large PDFs/CSVs). This work cannot be fully optimized
+                            to zero latency.</li>
+                        <li class="fragment"><strong>Optimization Still Blocks:</strong> Even if a task is
+                            well-optimized, if it takes hundreds of milliseconds or several seconds, performing it
+                            during the web request still blocks the user and consumes valuable web server resources.
+                            Queues address the issue of synchronous execution, not just speed.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section class="text-3xl">
+                <section>
+                    <h2>Example 1: Sending Transactional Emails</h2>
+                    <p class="fragment">Sending emails synchronously is a major source of latency due to external
+                        network interaction.</p>
+                    <ul>
+                        <li class="fragment"><strong>Timing:</strong> A typical email transmission requires an
+                            SMTP handshake and data transfer, often taking 0.5 to 2 seconds.</li>
+                        <li class="fragment"><strong>User Impact:</strong> The end user is forced to wait for
+                            the full duration of the network operation (e.g., waiting 1.5 seconds after clicking
+                            "Sign Up").</li>
+                        <li class="fragment font-bold"><strong><span style="color: green;">Solution:</span></strong>
+                            Queue the email job and return an immediate response to the user.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Implementation Detail: Laravel Email Job</h3>
+                    <p>The <code class="language-php">ShouldQueue</code> interface tells Laravel to process this
+                        task via a background worker instead of immediately.</p>
+                    <pre><code class="language-php">php artisan make:job SendWelcomeEmail</code></pre>
+
+                    <pre><code class="language-php">class SendWelcomeEmail implements ShouldQueue {
+    public function handle() {
+        // This execution now happens in the background worker
+        Mail::to($user->email)->send(new WelcomeMail($user));
+    }
+}</code></pre>
+                </section>
+
+
+                <section>
+                    <h2>Example 2: Generating Complex Reports (PDF/CSV)</h2>
+                    <p class="fragment">Generating large data exports is inherently resource-intensive and
+                        time-consuming.</p>
+                    <ul>
+                        <li class="fragment"><strong>Intensity:</strong> Generating reports with thousands of
+                            rows and formatting them into PDFs or large CSVs is CPU-heavy and
+                            Memory-heavy.</li>
+                        <li class="fragment"><strong>Duration:</strong> These tasks can easily take many seconds
+                            or even minutes to complete, severely impacting the web request timeout limits.</li>
+                        <li class="fragment font-bold"><strong><span style="color: green;">Solution:</span></strong>
+                            Queue the generation job, store the resulting file, and notify the user via
+                            email or a dashboard notification when the report is ready for download.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Implementation Detail: Report Generation Job</h3>
+                    <p>The web thread initiates the job instantly, while the worker handles the demanding processing
+                        steps.</p>
+                    <pre><code class="language-php">class GenerateReport implements ShouldQueue {
+    public function handle() {
+        // High resource consumption happens safely in the background
+        $data = ReportService::build();
+        PDF::loadView('report', compact('data'))->save('storage/reports/report_user_X.pdf');
+        // Notify user here
+    }
+}</code></pre>
+                </section>
+            </section>
+
+            <section>
+                <section>
+                    <h2>The Core: Laravel Queue System</h2>
+                    <p class="fragment">Laravel provides a unified API for various queue backends, allowing you to
+                        easily move long-running tasks to the background.</p>
+                    <p class="fragment">Reference: <a href="https://laravel.com/docs/12.x/queues"
+                            style="font-style: italic;">Laravel 12.x Documentation on Queues</a></p>
+                </section>
+
+
+                <section>
+                    <h3>Queue Connection Setup</h3>
+                    <p>The queue driver is configured in your <code class="language-plaintext">.env</code> file. Common
+                        drivers include <code class="language-plaintext">redis</code> (recommended for production),
+                        <code class="language-plaintext">sqs</code>, and <code
+                            class="language-plaintext">database</code>.
+                    </p>
+                    <ul>
+                        <li class="fragment"><strong>Configuration:</strong> Define the active connection driver.</li>
+                    </ul>
+
+                    <pre class="fragment"><code>QUEUE_CONNECTION=database</code></pre>
+
+                    <p class="fragment">If using the <code class="language-plaintext">database</code> driver, you must
+                        create and migrate the table to store pending jobs:</p>
+                    <pre class="fragment"><code>php artisan queue:table
+php artisan migrate</code></pre>
+                </section>
+
+
+                <section>
+                    <h3>Creating Queueable Jobs</h3>
+                    <p>Job classes implement the <code class="language-php">ShouldQueue</code> interface, signaling they
+                        should be run asynchronously by a worker.</p>
+                    <pre><code>php artisan make:job ProcessOrder</code></pre>
+
+                    <pre><code>class ProcessOrder implements ShouldQueue {
+
+    public function handle() {
+        // This method contains the heavy logic that is executed by the worker process.
+        // It supports automatic dependency injection via the service container.
+    }
+}</code></pre>
+                </section>
+
+
+                <section>
+                    <h3>Dispatching Jobs</h3>
+                    <p>Jobs are dispatched from controllers, services, or events, decoupling the web request from the
+                        intensive operation.</p>
+                    <div class="fragment">
+                        <p><strong>Basic Dispatch:</strong> Pushes the job onto the default
+                            connection/queue immediately.</p>
+
+                        <pre><code>ProcessOrder::dispatch($order);</code></pre>
+                    </div>
+                    <div class="fragment">
+                        <p><strong>Dispatch with Delay:</strong> Schedules the job to be processed at
+                            a future time.</p>
+                        <pre><code>ProcessOrder::dispatch($order)->delay(now()->addMinutes(5));</code></pre>
+
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Queue Segmentation and Prioritization</h3>
+                    <div class="fragment">
+                        <p><strong>Custom Queue:</strong> Send the job to a specific queue (e.g., 'emails' or
+                            'high-priority'). This is essential for segmenting tasks and allowing workers to process
+                            high-priority jobs first.</p>
+
+                        <pre><code>ProcessOrder::dispatch($order)->onQueue('high-priority');</code></pre>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Job Middleware</h3>
+                    <p class="fragment">Middleware allows you to wrap custom logic around job execution for control over
+                        concurrency and rate limiting.</p>
+
+                    <ul>
+                        <li class="fragment"><strong>Preventing Overlap:</strong> Ensures only one instance of a
+                            specific job (identified by a key) is processed at a time, preventing race conditions.</li>
+                    </ul>
+
+                    <pre class="fragment"><code>public function middleware() {
+    // Uses the order ID as a unique key. The job will not start if another job 
+    // with this same orderId is currently being processed.
+    return [new Illuminate\Queue\Middleware\WithoutOverlapping($this->orderId)];
+}</code></pre>
+                </section>
+
+                <section class="text-3xl">
+                    <h3>Running the Queue Worker</h3>
+                    <p>The worker is a long-running process that pulls jobs from the queue, executes the <code
+                            class="language-php">handle()</code> method, and monitors for failures.</p>
+                    <ul>
+                        <li class="fragment"><strong>Starting the Worker:</strong></li>
+                    </ul>
+                    <pre><code>php artisan queue:work</code></pre>
+
+                    <ul>
+                        <li class="fragment"><strong>Prioritization/Segmentation:</strong> Process specific queues in a
+                            defined order.</li>
+                    </ul>
+                    <pre><code>php artisan queue:work --queue=high,default,low</code></pre>
+
+                    <ul>
+                        <li class="fragment font-bold"><strong><span style="color: red;">Crucial:</span></strong>
+                            Workers must be monitored and restarted when deploying new code using a process monitor like
+                            Supervisor.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <section class="text-3xl">
+
+                <section>
+                    <h3>Automated Task Scheduling</h3>
+                    <p>Scheduling allows your application to execute recurring, non-user-triggered maintenance and
+                        business logic automatically at predefined intervals.</p>
+                    <ul class="space-y-8">
+                        <li class="fragment"><strong>Automation:</strong> Run specific tasks, such as Artisan commands,
+                            jobs, or shell commands, automatically on a recurring basis (e.g., daily, hourly, every
+                            minute).</li>
+                        <li class="fragment"><strong>Maintenance:</strong> Essential for routine cleanup, data
+                            synchronization, and system health checks without manual intervention.</li>
+                        <li class="fragment"><strong>Centralized Control:</strong> Define all scheduled tasks in a
+                            single <code class="language-php">app/Console/Kernel.php</code> file, simplifying management
+                            across all servers.</li>
+                    </ul>
+                </section>
+
+
+
+                <section>
+                    <h3>Key Use Cases</h3>
+                    <ul class="space-y-8">
+                        <li class="fragment">
+                            <strong><span style="color: blue;">Use Case 1: Data Pruning and Cleanup</span></strong>
+                            <p>Run weekly to optimize database performance and save storage costs by removing old,
+                                unnecessary data (e.g., failed job records, old logs, or temporary files).</p>
+                            <pre><code>$schedule->command('model:prune')->weekly();</code></pre>
+                        </li>
+                        <li class="fragment">
+                            <strong><span style="color: blue;">Use Case 2: Sending Periodic
+                                    Reminders/Reports</span></strong>
+                            <p>Dispatch emails or generate business reports to key stakeholders at the end of the day or
+                                month, ensuring timely communication and data analysis.</p>
+                            <pre><code>$schedule->job(new SendMonthlyReport)->monthlyOn(1, '01:00');</code></pre>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section class="text-3xl">
+                <section>
+                    <h2>The Laravel Scheduler</h2>
+                    <p class="fragment">Laravel's command scheduler offers a fluent, expressive way to define your
+                        application's command schedule directly within Laravel itself, replacing the need for managing
+                        multiple traditional operating system <code class="language-plaintext">cron</code> entries.</p>
+                    <p class="fragment">The scheduler brings your task schedule into source control, simplifying
+                        deployment and visibility across all environments.</p>
+                </section>
+
+                <section>
+                    <h3>The Single <code class="language-plaintext">cron</code> Entry</h3>
+                    <p>Instead of defining a separate <code class="language-plaintext">cron</code> entry for every task,
+                        Laravel requires only a single entry on your server. This entry executes the scheduler every
+                        minute, and Laravel then determines which defined tasks should run based on their frequency
+                        settings.</p>
+
+                    <p class="fragment">The necessary system <code class="language-plaintext">cron</code> entry looks
+                        like this:</p>
+                    <pre
+                        class="fragment"><code>* * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1</code></pre>
+                    <ul>
+                        <li class="fragment">The <code class="language-plaintext">* * * * *</code> ensures the command
+                            runs every minute.</li>
+                        <li class="fragment">The <code class="language-plaintext">schedule:run</code> Artisan command is
+                            the core that evaluates your schedule definitions.</li>
+                    </ul>
+                </section>
+
+
+
+                <section>
+                    <h3>Defining Tasks in <code class="language-php">Kernel.php</code></h3>
+                    <p>All scheduling logic is defined in the <code class="language-php">schedule</code> method of your
+                        application's Console Kernel (<code class="language-php">app/Console/Kernel.php</code> or
+                        <code class="language-php">routes/console.php</code>).
+                    </p>
+
+                    <p class="fragment">The Scheduler provides a fluent API to define what to run and how often.
+                    </p>
+                    <pre class="fragment"><code>// Inside app/Console/Kernel.php
+
+protected function schedule(Schedule $schedule): void
+{
+    // 1. Scheduling an Artisan Command
+    $schedule->command('emails:send-daily-summary')->dailyAt('08:00');
+
+    // 2. Scheduling a Queued Job
+    $schedule->job(new PruneOldRecords)->monthly();
+
+    // 3. Scheduling a Raw Shell Command
+    $schedule->exec('rm -rf /tmp/cache-files')->everyFifteenMinutes();
+}</code></pre>
+                </section>
+
+
+
+                <section>
+                    <h3>Advanced Frequency and Constraints</h3>
+                    <p>Tasks can be defined with simple frequencies or complex constraints for fine-grained control.</p>
+                    <ul>
+                        <li class="fragment"><strong>Time-Based Scheduling:</strong> Use methods like <code
+                                class="language-php">->hourly()</code>, <code
+                                class="language-php">->dailyAt('13:30')</code>, <code
+                                class="language-php">->twiceDaily(1, 13)</code>, or a raw <code
+                                class="language-php">->cron('0 0 * * *')</code> expression.</li>
+                        <li class="fragment"><strong>Conditional Constraints:</strong> Restrict task execution using
+                            fluent methods:
+                            <ul>
+                                <li class="fragment"><code class="language-php">->weekdays()</code>: Runs only Monday
+                                    through Friday.</li>
+                                <li class="fragment"><code class="language-php">->between('9:00', '17:00')</code>: Runs
+                                    only during business hours.</li>
+                                <li class="fragment"><code
+                                        class="language-php">->when(fn () => $this->shouldRun())</code>: Runs only if a
+                                    custom truth test passes.</li>
+                            </ul>
+                        </li>
+                        <li class="fragment"><strong>Preventing Overlap:</strong> Ensure a long-running task doesn't
+                            start again if a previous instance is still running.
+                            <pre
+                                class="fragment"><code>$schedule->command('report:generate')->daily()->withoutOverlapping();</code></pre>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+            <section class="text-3xl">
+                <section>
+                    <h3>Linux/macOS Cron Jobs (Scheduled Tasks)</h3>
+                    <p>A Cron Job is a system utility used to schedule commands or scripts to run automatically at
+                        specified intervals. It is the fundamental method for running recurring tasks on Unix-like
+                        operating systems.</p>
+
+                    <p class="fragment"><strong>How to Create a Cron Job:</strong></p>
+                    <ol>
+                        <li class="fragment">Open your personal crontab (cron table) file for editing: <code
+                                class="language-plaintext">crontab -e</code></li>
+                        <li class="fragment">Add a new line defining the schedule and the command to be executed.</li>
+                    </ol>
+
+                    <p class="fragment"><strong>The Standard Cron Entry Format:</strong></p>
+                    <pre
+                        class="fragment"><code>[Minute] [Hour] [Day of Month] [Month] [Day of Week] [Command to Execute]</code></pre>
+                </section>
+
+                <section>
+                    <div>
+                        <p class="fragment"><strong>Example: Running a Script Every Day at 2:30 AM</strong></p>
+                        <pre
+                            class="fragment"><code>30 2 * * * /usr/bin/php /var/www/my-project/cleanup.php >> /var/log/cleanup.log 2>&1</code></pre>
+
+                        <p class="fragment"><strong>Understanding the Components:</strong></p>
+                        <ul>
+                            <li class="fragment">The five fields at the beginning define the schedule. The asterisk
+                                (<code class="language-plaintext">*</code>) acts as a wildcard, meaning "all possible
+                                values."
+                                <div class="fragment">
+                                    <ul>
+                                        <li><code class="language-plaintext">30</code>: Runs at the 30th minute of
+                                            the hour.</li>
+                                        <li><code class="language-plaintext">2</code>: Runs at the 2nd hour (2 AM).
+                                        </li>
+                                        <li><code class="language-plaintext">* * *</code>: Runs on every day of the
+                                            month, every month, and every day of the week.</li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="fragment">The command executes the specified script, typically using its
+                                absolute path for reliability.</li>
+                            <li class="fragment">Output Redirection: <code
+                                    class="language-plaintext">>> /var/log/cleanup.log 2>&1</code> directs all standard
+                                output and errors into a log file, which is crucial for debugging scheduled jobs.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Windows Alternative: Task Scheduler</h3>
+                    <p>On Windows servers or local development environments (without WSL/Linux tools), the Task
+                        Scheduler utility is the standard replacement for <code class="language-plaintext">cron</code>
+                        to run commands on a recurring basis.</p>
+                    <p class="fragment">You configure a basic task to run a program (usually <code
+                            class="language-plaintext">php.exe</code>) with arguments to execute the <code
+                            class="language-plaintext">artisan schedule:run</code> command every minute.</p>
+                    <div class="fragment">
+                        <p><strong>Configuration Fields:</strong></p>
+                        <ul>
+                            <li><strong>Program/Script:</strong> <code class="language-plaintext">C:\php\php.exe</code>
+                                (Your PHP path)</li>
+                            <li><strong>Arguments:</strong> <code class="language-plaintext">artisan schedule:run</code>
+                            </li>
+                            <li><strong>Start in:</strong> <code
+                                    class="language-plaintext">C:\path\to\your\laravel\project</code> (Your project root
+                                path)</li>
+                        </ul>
+                    </div>
+                </section>
+
+
+
+                <section>
+                    <h3>Process Monitoring: Why We Need Supervisor</h3>
+                    <p>While <code class="language-plaintext">cron</code> is used to run the Scheduler once per
+                        minute, a separate tool is needed to manage the Queue Workers.</p>
+
+                    <div class="fragment">
+                        <p><strong>The Problem with Queue Workers:</strong></p>
+                        <p>The <code class="language-plaintext">php artisan queue:work</code> command is designed to be
+                            a long-running process. When you deploy new code, these workers need to be gracefully
+                            stopped and restarted to load the new application state. If they crash, they must be
+                            automatically resurrected. Cron is not designed to manage long-running processes; it's
+                            designed to run commands once and exit.</p>
+                    </div>
+
+                    <div class="fragment font-bold">
+                        <p style="color: green;"><strong>Solution: Supervisor</strong></p>
+                        <p>Supervisor is a lightweight process control system (or similar tools like Systemd, PM2) that
+                            ensures your background workers:</p>
+                        <ul>
+                            <li>Are always running (Automatic restarts upon failure).</li>
+                            <li>Are started automatically on server boot.</li>
+                            <li>Can be reliably restarted after code deployment without manual intervention.</li>
+                        </ul>
+                    </div>
+
+                    <p class="fragment"><strong>Example Supervisor Configuration Snippet:</strong></p>
+                    <pre class="fragment"><code>[program:laravel-worker]
+; Command to run the worker process
+command=php artisan queue:work --sleep=3 --tries=3
+; Number of instances to run
+numprocs=3
+autostart=true
+autorestart=true
+; Logging setup
+stderr_logfile=/var/log/worker.err.log
+stdout_logfile=/var/log/worker.out.log</code></pre>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({ width: 1200, height: 700, slideNumber: 'c/t', controls: true, progress: true, center: true, hash: true });
+    </script>
+
+</body>
+
+</html>
