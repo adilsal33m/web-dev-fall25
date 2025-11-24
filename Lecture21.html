@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture: API Design, Auth, & OpenAPI (Laravel)</title>
+    <!-- Standard Reveal.js imports -->
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <!-- Tailwind CSS for custom styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .fragment {
+            opacity: 0.0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 21</h3>
+                <p class="">25th November 2025</p>
+            </section>
+
+            <section>
+                <h2>Agenda</h2>
+                <ul>
+                    <li class="fragment">The Principles of API Design</li>
+                    <li class="fragment">Auth Tokens: Sanctum vs. JWT</li>
+                    <li class="fragment">API Documentation with OpenAPI (Swagger)</li>
+                </ul>
+            </section>
+
+            <section class="text-3xl">
+                <section>
+                    <h2>The Shift: Headless Architecture</h2>
+                    <p>Modern web development often decouples the frontend (React, Vue, Mobile) from the backend.</p>
+                    <ul class="space-y-8">
+                        <li class="fragment"><strong>The Monolith:</strong> Traditional Laravel apps return HTML views
+                            (Blade) directly to the browser.</li>
+                        <li class="fragment"><strong>The API:</strong> Returns raw data (JSON) to be consumed by any
+                            client. This requires a strict contract known as an Interface.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Core Principle: Resource-Oriented URLs</h3>
+                    <p>In REST, we manipulate <strong>Resources</strong> (Nouns), not <strong>Actions</strong> (Verbs).
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <div class="fragment">
+                            <h4 style="color: red;">❌ Bad Practice (RPC Style)</h4>
+                            <ul>
+                                <li>/getAllUsers</li>
+                                <li>/createNewProduct</li>
+                                <li>/deleteOrder?id=5</li>
+                                <li>/updateUserAddress</li>
+                            </ul>
+                        </div>
+                        <div class="fragment">
+                            <h4 style="color: green;">✅ Good Practice (RESTful)</h4>
+                            <ul>
+                                <li><span>GET</span> /users</li>
+                                <li><span>POST</span> /products</li>
+                                <li><span>DELETE</span> /orders/5</li>
+                                <li><span>PUT</span> /users/1/address</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section>
+                    <h3>Semantic HTTP Status Codes</h3>
+                    <p>Your API must communicate the <i>result</i> of the request via standard HTTP codes, not just the
+                        JSON body.</p>
+                    <ul class="text-2xl space-y-4">
+                        <li class="fragment"><strong>2xx Success:</strong>
+                            <ul>
+                                <li><code>200 OK</code>: Request succeeded.</li>
+                                <li><code>201 Created</code>: Resource successfully created (POST).</li>
+                            </ul>
+                        </li>
+                        <li class="fragment"><strong>4xx Client Error:</strong>
+                            <ul>
+                                <li><code>400 Bad Request</code>: Malformed syntax.</li>
+                                <li><code>401 Unauthorized</code>: Authentication is missing or invalid.</li>
+                                <li><code>403 Forbidden</code>: Authenticated, but lacking permissions.</li>
+                                <li><code>422 Unprocessable Entity</code>: Validation failed (Laravel default).</li>
+                            </ul>
+                        </li>
+                        <li class="fragment"><strong>5xx Server Error:</strong>
+                            <ul>
+                                <li><code>500 Internal Server Error</code>: Application crash.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Standardized JSON Responses</h3>
+                    <p class="fragment">Avoid returning raw database rows. Use <strong>API Resources</strong> to
+                        transform data into a consistent format.</p>
+                    <pre class="fragment"><code class="language-php">// php artisan make:resource UserResource
+
+public function toArray(Request $request): array
+{
+    return [
+        'id' => $this->id,
+        'full_name' => $this->first_name . ' ' . $this->last_name,
+        'email' => $this->email,
+        // Hiding sensitive attributes like 'password' or 'created_at'
+        'joined_human' => $this->created_at->diffForHumans(),
+    ];
+}</code></pre>
+                </section>
+
+                <section>
+                    <h2>API Design Process Overview</h2>
+                    <p>This diagram illustrates the structured workflow of designing an API from vague needs to a final
+                        reference kit. It also highlights the layers of design perspectives used throughout the process.
+                    </p>
+
+                </section>
+                <section>
+                    <h2>API Design Process Overview</h2>
+                    <p>Transforms vague needs into a fully documented API.</p>
+                    <img class="r-stretch !mx-auto" src="/images/api-design.png" alt="">
+                </section>
+
+                <section>
+                    <h2>DEFINE Phase</h2>
+                    <ul>
+                        <li class="fragment">Starts with vague natural-language needs.</li>
+                        <li class="fragment">Clarifies requirements and expected capabilities.</li>
+                        <li class="fragment">Goal: Understand <strong>what the API must achieve</strong>.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>DESIGN Phase (Collapsed)</h2>
+                    <ul>
+                        <li class="fragment"><strong>Identify capabilities</strong> — define high-level features.</li>
+                        <li class="fragment"><strong>Design the interface</strong> — endpoints, methods, inputs/outputs.
+                        </li>
+                        <li class="fragment"><strong>Describe the interface</strong> — using a standard format
+                            (OpenAPI).</li>
+                        <li class="fragment"><strong>Enrich artifacts</strong> — examples, rules, diagrams, constraints.
+                        </li>
+                        <li class="fragment"><strong>Output: API reference kit</strong> for
+                            development/testing/deployment.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Post-Design Lifecycle</h2>
+                    <ul>
+                        <li class="fragment">Develop</li>
+                        <li class="fragment">Test</li>
+                        <li class="fragment">Deploy</li>
+                        <li class="fragment">Provide / Consume</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>API Design Layers</h2>
+                    <p>The perspectives applied throughout the design process.</p>
+                    <ul>
+                        <li class="fragment"><strong>Effective API</strong> — does the right job.</li>
+                        <li class="fragment"><strong>Usable & interoperable</strong> — predictable and
+                            developer-friendly.</li>
+                        <li class="fragment"><strong>Constraint-aware</strong> — security, efficiency, context,
+                            backwards-compatibility, extensibility.</li>
+                        <li class="fragment"><strong>Improved design process</strong> — reusable patterns and a growing
+                            toolbox.</li>
+                    </ul>
+                </section>
+            </section>
+
+            <!-- ======================================================= -->
+            <!-- SECTION 2: AUTH TOKENS -->
+            <!-- ======================================================= -->
+            <section class="text-3xl">
+                <section>
+                    <h2>Auth Tokens: The Stateless Contract</h2>
+                    <p class="fragment">In an API context, tokens replace traditional session management, enabling
+                        stateless, scalable architecture.</p>
+                    <ul class="space-y-8 mt-10 text-left">
+                        <li class="fragment"><strong>Statelessness:</strong> The server does not need to store session
+                            data. The token itself contains all necessary information for identification.</li>
+                        <li class="fragment"><strong>Security:</strong> Tokens are digitally signed, ensuring they were
+                            not tampered with after issuance. They are often short-lived and tied to specific
+                            permissions.</li>
+                        <li class="fragment"><strong>Scalability:</strong> Any server can validate the token without
+                            requiring centralized session storage, which is crucial for load-balanced environments.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Hands-on: Laravel Sanctum for API Authentication</h3>
+                    <p>Laravel Sanctum provides a light-weight system for issuing API tokens to users, perfect for SPA
+                        authentication and simple mobile apps.</p>
+                    <h4 class="text-xl font-bold mt-8 fragment">Step 1: Installation & Setup</h4>
+                    <pre class="fragment"><code class="language-bash">composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate</code></pre>
+                </section>
+                <section>
+                    <h4 class="text-xl font-bold mt-8 fragment">Step 2: Issuing a Token (Login)</h4>
+                    <p class="fragment">The user model must use the <code class="language-php">HasApiTokens</code>
+                        trait.</p>
+                    <pre class="fragment"><code class="language-php">// In a Login Controller
+$user = User::where('email', $request->email)->first();
+
+// Check if password is valid...
+
+// Create a token with specific abilities (optional)
+$token = $user->createToken(
+    'MyAuthToken', // Name of the token
+    ['read', 'create'] // Abilities (permissions)
+);
+
+return response()->json([
+    'token' => $token->plainTextToken,
+    'type' => 'Bearer'
+]);</code></pre>
+                </section>
+
+                <section>
+                    <h3>Sanctum Implementation Detail</h3>
+                    <p class="fragment">Once the client receives the token, they must attach it to subsequent requests
+                        using the <code class="language-plaintext">Authorization</code> header.</p>
+                    <h4 class="text-xl font-bold mt-8 fragment">Example Request Header:</h4>
+                    <pre
+                        class="fragment"><code class="language-plaintext">Authorization: Bearer 1|q4O8zGv...tT9Xn2C3</code></pre>
+
+                    <h4 class="text-xl font-bold mt-8 fragment">Protecting Routes in Laravel:</h4>
+                    <p class="fragment">Use the built-in middleware in your <code
+                            class="language-plaintext">routes/api.php</code> file.</p>
+                    <pre class="fragment"><code class="language-php">Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    // Only authenticated users with a valid token can access this
+    return $request->user();
+});</code></pre>
+                </section>
+
+                <section>
+                    <h3>JSON Web Tokens (JWT)</h3>
+                    <p class="fragment">A JWT is a compact, URL-safe means of representing claims (information) to be
+                        transferred between two parties. The claims are digitally signed.</p>
+
+                    <h4 class="text-xl font-bold mt-8 fragment">Structure: Three Parts, separated by dots</h4>
+                    <pre class="fragment"><code class="language-plaintext">header.payload.signature</code></pre>
+                    <ul class="text-left space-y-2 mt-4">
+                        <li class="fragment"><strong>Header:</strong> Specifies the token type (JWT) and the signing
+                            algorithm (e.g., HS256).</li>
+                        <li class="fragment"><strong>Payload:</strong> Contains the claims (e.g., user ID, issue date,
+                            expiration date, custom data). Note: This data is readable (not encrypted)!</li>
+                        <li class="fragment"><strong>Signature:</strong> Used to verify that the sender of the JWT is
+                            who they claim to be and that the message hasn't been changed.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Sanctum vs. JWT: A Comparison</h2>
+                    <table class="w-full text-left text-2xl mt-8">
+                        <thead>
+                            <tr>
+                                <th class="w-1/3">Feature</th>
+                                <th class="w-1/3">Laravel Sanctum (Opaque Token)</th>
+                                <th class="w-1/3">Standard JWT (Signed Token)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="fragment">
+                                <td><strong>Statelessness</strong></td>
+                                <td>Requires Database Lookup (Token is stored and checked against DB).</td>
+                                <td>Fully Stateless (Token is verified cryptographically).</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td><strong>Simplicity</strong></td>
+                                <td>Extremely simple and integrated into Laravel's core.</td>
+                                <td>Requires a third-party package and more complex configuration.</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td><strong>Revocation</strong></td>
+                                <td>Instant revocation possible (delete from DB). Superior control.</td>
+                                <td>Only revokable upon expiration or using a blacklisting mechanism (complex).</td>
+                            </tr>
+                            <tr class="fragment">
+                                <td><strong>Best Use Case</strong></td>
+                                <td>SPAs, Mobile Apps (first-party clients), or simple API needs.</td>
+                                <td>Cross-domain microservices, where tokens must be validated by multiple, disparate
+                                    services.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- ======================================================= -->
+            <!-- SECTION 3: API DOCUMENTATION (OpenAPI) -->
+            <!-- ======================================================= -->
+            <section class="text-3xl">
+                <section>
+                    <h2>API Documentation: OpenAPI (Swagger)</h2>
+                    <p class="fragment">OpenAPI is a vendor-neutral, portable, and open specification for describing
+                        RESTful APIs. It is machine-readable and language-agnostic.</p>
+                    <ul class="space-y-8 mt-10 text-left">
+                        <li class="fragment"><strong>Why Use OpenAPI?</strong> It creates a single source of truth
+                            for your API contract, ensuring documentation, code, and design are always synchronized.
+                        </li>
+                        <li class="fragment"><strong>Automated Documentation:</strong> Tools like Swagger UI read the
+                            OpenAPI spec (YAML/JSON) to generate beautiful, interactive documentation.</li>
+                        <li class="fragment"><strong>Code Generation:</strong> The spec can be used to automatically
+                            generate server stubs, client SDKs, and tests in many different programming languages.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Hands-on: Integrating OpenAPI with Laravel</h2>
+                    <p>We will use the widely adopted <code class="language-plaintext">darkaonline/l5-swagger</code>
+                        package, which integrates Swagger UI into Laravel using PHP annotations.</p>
+
+                    <h4 class="text-xl font-bold mt-8 fragment">Step 1: Install the Package</h4>
+                    <pre
+                        class="fragment"><code class="language-bash">composer require darkaonline/l5-swagger</code></pre>
+
+                    <h4 class="text-xl font-bold mt-8 fragment">Step 2: Publish Configuration and Assets</h4>
+                    <p class="fragment">This command creates a configuration file <code
+                            class="language-plaintext">config/l5-swagger.php</code> and the necessary view assets.</p>
+                    <pre
+                        class="fragment"><code class="language-bash">php artisan vendor:publish --provider "L5Swagger\L5SwaggerServiceProvider"</code></pre>
+                </section>
+
+                <section>
+                    <h3>Step 3: Annotate the API Controller</h3>
+                    <p>OpenAPI uses annotations (PHPDoc style comments) to describe the routes, parameters, and response
+                        schemas directly above the relevant controller methods.</p>
+
+                    <pre class="fragment"><code class="language-php">// app/Http/Controllers/UserController.php
+
+/**
+ * @OA\Get(
+ * path="/users",
+ * tags={"Users"},
+ * summary="Get list of users",
+ * @OA\Response(
+ * response=200,
+ * description="Successful operation",
+ * @OA\JsonContent(type="array",
+ * @OA\Items(
+ * @OA\Property(property="id", type="integer", example="1"),
+ * @OA\Property(property="name", type="string", example="Alice")
+ * )
+ * )
+ * )
+ * )
+ */
+public function index()
+{
+    // ... logic to return users
+}</code></pre>
+                </section>
+
+                <section>
+                    <h3>Step 4: Generate the OpenAPI Specification</h3>
+                    <p>Run the Artisan command to crawl the project, read all the annotations, and compile the final
+                        OpenAPI JSON file in <code class="language-plaintext">storage/api-docs/api-docs.json</code>.</p>
+                    <pre class="fragment"><code class="language-bash">php artisan l5-swagger:generate</code></pre>
+
+                    <h4 class="text-xl font-bold mt-8 fragment">Step 5: Access the Documentation</h4>
+                    <p class="fragment">The documentation is now interactive and available via a route defined by the
+                        package.</p>
+                    <pre
+                        class="fragment"><code class="language-plaintext">http://your-app.test/api/documentation</code></pre>
+                    <p class="fragment font-bold mt-8" style="color: green;">The resulting Swagger UI is the final,
+                        interactive documentation your clients will use, generated directly from your code.</p>
+                </section>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        // Standard initialization for the presentation environment
+        Reveal.initialize({ width: 1200, height: 700, slideNumber: 'c/t', controls: true, progress: true, center: true, hash: true });
+    </script>
+
+</body>
+
+</html>
