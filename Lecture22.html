@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture: Notifications & Real-Time Communication (Laravel 12.x)</title>
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .fragment {
+            opacity: 0.0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ============================= -->
+            <!-- Title Slide -->
+            <!-- ============================= -->
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 22</h3>
+                <p class="">27th November 2025</p>
+            </section>
+
+            <section>
+                <h2>Agenda</h2>
+                <ul>
+                    <li>Notifications</li>
+                    <li>Challenges of Real-Time</li>
+                    <li>Real-Time Dashboard</li>
+                </ul>
+            </section>
+
+
+            <section class="text-3xl">
+
+                <section>
+                    <h2>Why Do We Need Notifications?</h2>
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            <strong>User Feedback & Responsiveness:</strong>
+                            Modern web apps must be responsive. Users expect confirmation when actions finish—
+                            such as “Order Submitted”, “Profile Updated”, or “Your Report is Ready”.
+                            Notifications reduce uncertainty and improve trust.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Automation & Workflow Progression:</strong>
+                            Many systems rely on scheduled or triggered processes.
+                            Notifications allow the system to inform users automatically when
+                            background tasks, cron jobs, or business workflows reach certain milestones
+                            (e.g., “Monthly invoice generated”, “Database backup completed”).
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Multi-Channel Communication:</strong>
+                            Laravel enables sending notifications through various channels:
+                            <span class="italic">Email, SMS, Slack, Database, Broadcast, WebSockets</span>.
+                            This helps reach users where they are and ensures important messages don't get missed.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Why Do We Need Notifications?</h2>
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            <strong>Real-Time Interactivity:</strong>
+                            Apps today often require real-time feedback:
+                            live dashboards, chat apps, delivery tracking, trading platforms,
+                            monitoring dashboards, or collaborative tools.
+                            Notifications act as the foundation for updating UIs instantly.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Improved User Engagement & Retention:</strong>
+                            Timely alerts (e.g., reminders, promotional messages, or status updates)
+                            keep users active and engaged with your system.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Error Handling & System Health:</strong>
+                            Notifications can alert admins about failures:
+                            payment issues, job failures, downtime events, or security alerts.
+                            This helps detect issues early and react quickly.
+                        </li>
+
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Use Cases</h2>
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            <strong>New Order Placed:</strong>
+                            E-commerce systems notify admins, delivery teams, or customers about new orders.
+                            Real-time alerts help manage fulfillment more efficiently.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Task or Report Completed:</strong>
+                            Long-running actions (PDF generation, backups, data imports) trigger notifications
+                            so users don’t have to wait on the screen.
+                            Example: “Your sales report is ready to download.”
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Payment Received:</strong>
+                            Systems notify both customers and admins about successful or failed transactions,
+                            ensuring financial transparency.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Use Cases</h2>
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            <strong>Stock Level or Resource Thresholds:</strong>
+                            Inventory, warehouse, or IoT-based systems notify when items run low,
+                            preventing stock-outs. In IT monitoring, notifications alert for CPU, RAM,
+                            or disk thresholds.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Security & Access Events:</strong>
+                            Examples include login alerts, suspicious activity detection, or
+                            password change confirmations.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Workflow Approvals:</strong>
+                            HR systems, ERPs, or CRMs often notify when leave requests, approvals,
+                            or document reviews are required.
+                        </li>
+
+                    </ul>
+                </section>
+
+            </section>
+
+
+            <section class="text-3xl">
+
+                <!-- ========================= -->
+                <!-- OVERVIEW OF NOTIFICATIONS -->
+                <!-- ========================= -->
+                <section>
+                    <h2>Laravel Notifications</h2>
+
+                    <p class="fragment">
+                        Laravel Notifications provide a clean, unified API for sending short, actionable messages to
+                        users
+                        across a variety of delivery channels.
+                    </p>
+
+                    <ul class="space-y-6">
+                        <li class="fragment">
+                            <strong>Mail:</strong> Send rich email messages using Markdown or simple text.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Database:</strong> Store notifications in the <code>notifications</code> table
+                            for in-app alert counters, dropdowns, and dashboards.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Broadcast:</strong> Send notifications over WebSockets for real-time updates.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>SMS / Vonage (Nexmo):</strong> Send text messages for OTPs or alerts.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Slack:</strong> Send messages to Slack channels for internal alerts or devops
+                            workflows.
+                        </li>
+
+                        <li class="fragment">
+                            <strong>Custom Channels:</strong> Create your own channels (e.g., WhatsApp, Telegram, Push
+                            Notifications,
+                            Firebase Cloud Messaging, Discord).
+                        </li>
+                    </ul>
+
+                    <p class="fragment font-semibold">
+                        All channels share a consistent structure, making notifications reusable and maintainable.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- CREATE NOTIFICATION -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Creating a Notification</h3>
+
+                    <p class="fragment">
+                        Laravel automatically generates a notification class with stub methods for each channel.
+                    </p>
+
+                    <pre class="fragment"><code>php artisan make:notification OrderShipped</code></pre>
+
+                    <p class="fragment">
+                        The generated class includes the <code>via()</code> method where you specify the channels.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- NOTIFICATION CLASS EXAMPLE -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Notification Example</h3>
+                    <p class="fragment">
+                        This example shows how one notification can send both an email and store a database entry.
+                    </p>
+
+                    <pre class="fragment"><code class="language-php">
+class OrderShipped extends Notification
+{
+    use Queueable;
+
+    // Decide which channels the notification uses
+    public function via($notifiable)
+    {
+        return ['mail', 'database'];
+    }
+
+    // Email channel
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->subject('Order Shipped')
+            ->greeting('Good news!')
+            ->line('Your order has shipped successfully.')
+            ->action('Track Order', url('/orders/' . $this->order->id))
+            ->line('Thank you for shopping with us!');
+    }
+
+    // Database channel (stored in notifications table)
+    public function toDatabase($notifiable)
+    {
+        return [
+            'order_id' => $this->order->id,
+            'message' => 'Your order has been shipped!'
+        ];
+    }
+}
+        </code></pre>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- TRIGGER NOTIFICATION -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Triggering a Notification</h3>
+
+                    <p class="fragment">
+                        Any model using the <code>Notifiable</code> trait can receive notifications (most commonly
+                        User).
+                    </p>
+
+                    <pre class="fragment"><code class="language-php">
+use App\Notifications\OrderShipped;
+
+$user->notify(new OrderShipped($order));
+        </code></pre>
+
+                    <p class="fragment">
+                        Laravel will automatically send the notification to all channels defined in <code>via()</code>.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- READING NOTIFICATIONS -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Reading Notifications</h3>
+
+                    <p class="fragment">Notifications are automatically stored in the <code>notifications</code> table.
+                    </p>
+
+                    <pre class="fragment"><code>
+// All notifications
+auth()->user()->notifications;
+
+// Only unread
+auth()->user()->unreadNotifications;
+
+// Mark a notification as read
+$notification->markAsRead();
+        </code></pre>
+
+                    <p class="fragment">
+                        Laravel also supports <strong>marking all as read</strong>:
+                    </p>
+
+                    <pre class="fragment"><code>
+auth()->user()->unreadNotifications->markAsRead();
+        </code></pre>
+
+                    <p class="fragment">
+                        These APIs make it easy to build notification dropdowns, badges, counters, and real-time
+                        indicators.
+                    </p>
+                </section>
+
+            </section>
+
+            <section class="text-3xl">
+
+                <!-- HEADER -->
+                <section>
+                    <h2>Challenges with Receiving Notifications</h2>
+                    <p class="fragment">
+                        Sending notifications is straightforward. Ensuring they are delivered
+                        <strong>instantly</strong>, <strong>efficiently</strong>, and <strong>at scale</strong>
+                        is the real problem.
+                    </p>
+                    <p class="fragment">
+                        Different architectural approaches exist, each with strengths and trade-offs.
+                    </p>
+                </section>
+
+
+                <!-- FULL PAGE REFRESH -->
+                <section>
+                    <h3>1. Full Page Refresh</h3>
+
+                    <ul class="space-y-6">
+                        <li class="fragment">
+                            The browser reloads the entire page to fetch new data.
+                        </li>
+
+                        <li class="fragment">
+                            No automatic updates—users manually refresh to see new notifications.
+                        </li>
+
+                        <li class="fragment">
+                            Highly inefficient: reloads HTML, CSS, JS, database queries every time.
+                        </li>
+
+                        <li class="fragment">
+                            Poor user experience: unsuitable for dashboards, chats, or active monitoring.
+                        </li>
+
+                        <li class="fragment">
+                            Historically common in early web apps; now considered obsolete.
+                        </li>
+                    </ul>
+                </section>
+
+
+                <!-- LONG POLLING -->
+                <section>
+                    <h3>2. Long Polling</h3>
+
+                    <ul class="space-y-6">
+
+                        <li class="fragment">
+                            The client sends repeated requests every X seconds:
+                            <em>“Do you have new notifications?”</em>
+                        </li>
+
+                        <li class="fragment">
+                            Slightly improves user experience vs. full refresh but still “pull-based”.
+                        </li>
+
+                        <li class="fragment">
+                            Causes massive unnecessary server load when scaled (every user hits endpoint repeatedly).
+                        </li>
+
+                        <li class="fragment">
+                            Polling interval determines freshness—short intervals = heavy load; long intervals = delayed
+                            updates.
+                        </li>
+
+                        <li class="fragment">
+                            Easy to implement but not efficient or modern.
+                        </li>
+                    </ul>
+                </section>
+
+
+                <!-- SERVER-SENT EVENTS (SSE) -->
+                <section>
+                    <h3>3. Server-Sent Events (SSE)</h3>
+
+                    <ul class="space-y-6">
+
+                        <li class="fragment">
+                            One-way streaming: <strong>server → client</strong>.
+                            The server can push events as they occur.
+                        </li>
+
+                        <li class="fragment">
+                            Ideal for: progress updates, logs, analytics, continuous data feeds.
+                        </li>
+
+                        <li class="fragment">
+                            Lightweight and uses simple HTTP connections—no special protocol required.
+                        </li>
+
+                        <li class="fragment">
+                            Does not support client → server streaming.
+                            For two-way communication, SSE is insufficient.
+                        </li>
+
+                        <li class="fragment">
+                            Browser support is decent but not universal in older browsers.
+                        </li>
+
+                        <li class="fragment">
+                            Cannot handle binary data (text only), unlike WebSockets.
+                        </li>
+
+                    </ul>
+                </section>
+
+
+                <!-- WEBSOCKETS -->
+                <section>
+                    <h3>4. WebSockets</h3>
+
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            WebSockets maintain a persistent connection allowing real-time
+                            <strong>two-way</strong> communication between client and server.
+                        </li>
+
+                        <li class="fragment">
+                            True real-time experience—milliseconds latency.
+                        </li>
+
+                        <li class="fragment">
+                            Works exceptionally well for:
+                            <ul class="list-disc ml-10 mt-3 space-y-3">
+                                <li class="fragment">Chats & messaging</li>
+                                <li class="fragment">Live dashboards</li>
+                                <li class="fragment">Stock & crypto tickers</li>
+                                <li class="fragment">Game state updates</li>
+                                <li class="fragment">Collaborative editors</li>
+                                <li class="fragment">IoT device monitoring</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </section>
+
+
+                <!-- WEBSOCKETS -->
+                <section>
+                    <h3>4. WebSockets</h3>
+
+                    <ul class="space-y-8">
+
+                        <li class="fragment">
+                            Efficient: sends only small messages over an open connection instead of full HTTP request
+                            cycles.
+                        </li>
+
+                        <li class="fragment">
+                            Laravel supports WebSockets using:
+                            <ul class="list-disc ml-10 mt-3 space-y-3">
+                                <li class="fragment">Pusher (Hosted, easy)</li>
+                                <li class="fragment">Ably (Hosted, Laravel native)</li>
+                                <li class="fragment">Laravel WebSockets (Self-hosted, free)</li>
+                            </ul>
+                        </li>
+
+                        <li class="fragment">
+                            Most modern and scalable approach for real-time notifications.
+                        </li>
+
+                    </ul>
+                </section>
+
+
+
+                <!-- ======================================== -->
+                <!-- COMPARISON TABLE -->
+                <!-- ======================================== -->
+                <section>
+                    <h3>Comparison of Notification Delivery Approaches</h3>
+
+                    <table class="text-xl w-full mt-8">
+                        <thead>
+                            <tr>
+                                <th class="p-4 border">Approach</th>
+                                <th class="p-4 border">Communication</th>
+                                <th class="p-4 border">Performance</th>
+                                <th class="p-4 border">Use Cases</th>
+                                <th class="p-4 border">Pros</th>
+                                <th class="p-4 border">Cons</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr class="fragment">
+                                <td class="p-4 border font-bold">Full Page Refresh</td>
+                                <td class="p-4 border">Manual pull</td>
+                                <td class="p-4 border">Very poor</td>
+                                <td class="p-4 border">Legacy apps</td>
+                                <td class="p-4 border">Simple, no JS needed</td>
+                                <td class="p-4 border">Terrible UX, inefficient, outdated</td>
+                            </tr>
+
+                            <tr class="fragment">
+                                <td class="p-4 border font-bold">Long Polling</td>
+                                <td class="p-4 border">Client pull every X seconds</td>
+                                <td class="p-4 border">Moderate</td>
+                                <td class="p-4 border">Small apps, prototypes</td>
+                                <td class="p-4 border">Easy to implement</td>
+                                <td class="p-4 border">High server load, not real-time</td>
+                            </tr>
+
+                            <tr class="fragment">
+                                <td class="p-4 border font-bold">Server-Sent Events (SSE)</td>
+                                <td class="p-4 border">Server → Client (one-way)</td>
+                                <td class="p-4 border">Good</td>
+                                <td class="p-4 border">Logs, progress updates</td>
+                                <td class="p-4 border">Lightweight, built on HTTP</td>
+                                <td class="p-4 border">No two-way communication</td>
+                            </tr>
+
+                            <tr class="fragment">
+                                <td class="p-4 border font-bold">WebSockets</td>
+                                <td class="p-4 border">Server ↔ Client (two-way)</td>
+                                <td class="p-4 border">Excellent</td>
+                                <td class="p-4 border">Real-time apps, dashboards</td>
+                                <td class="p-4 border">Fast, scalable, modern</td>
+                                <td class="p-4 border">More complex setup</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </section>
+
+            </section>
+
+            <section class="text-3xl">
+
+                <!-- ========================= -->
+                <!-- LARAVEL EVENTS OVERVIEW -->
+                <!-- ========================= -->
+                <section>
+                    <h2>Laravel Events & Real-Time Communication</h2>
+                    <p class="fragment">
+                        Laravel Events provide a clean, decoupled way to react to something that has happened in the
+                        system.
+                    </p>
+                    <p class="fragment">
+                        When combined with Broadcasting and WebSockets, events can be pushed to clients in real-time —
+                        enabling dashboards, chats, notifications, and live updates.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- CREATING EVENTS & LISTENERS -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Creating Events & Listeners</h3>
+
+                    <p class="fragment">Laravel provides artisan commands for generating event-driven architecture.</p>
+
+                    <pre class="fragment"><code>
+php artisan make:event OrderShippedEvent
+php artisan make:listener SendOrderNotification
+        </code></pre>
+
+                    <p class="fragment">
+                        Events represent what happened.
+                        Listeners handle what should happen *in response*.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- EVENT EXAMPLE -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Event Example</h3>
+                    <p class="fragment">The event simply carries data — no logic.</p>
+
+                    <pre class="fragment"><code class="language-php">
+class OrderShippedEvent
+{
+    public function __construct(public Order $order) {}
+}
+        </code></pre>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- LISTENER EXAMPLE -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Listener Example</h3>
+
+                    <p class="fragment">
+                        The listener handles the reaction — here, sending a notification.
+                    </p>
+
+                    <pre class="fragment"><code class="language-php">
+class SendOrderNotification
+{
+    public function handle(OrderShippedEvent $event)
+    {
+        $event->order->user->notify(new OrderShipped());
+    }
+}
+        </code></pre>
+
+                    <p class="fragment">
+                        Event → Listener is a powerful pattern for modular, maintainable systems.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- DISPATCH EVENT -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Dispatching an Event</h3>
+                    <p class="fragment">Any part of the app can dispatch an event:</p>
+
+                    <pre class="fragment"><code>
+event(new OrderShippedEvent($order));
+        </code></pre>
+
+                    <p class="fragment">
+                        Laravel then triggers all configured listeners — completely decoupled.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- REAL-TIME BROADCASTING -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Real-Time in Laravel</h3>
+
+                    <p class="fragment">
+                        Laravel Broadcasting extends events so they can be sent to the frontend over WebSockets.
+                    </p>
+
+                    <p class="fragment">Supported drivers include:</p>
+
+                    <ul class="space-y-4">
+                        <li class="fragment">Pusher (hosted, beginner-friendly)</li>
+                        <li class="fragment">Ably (recommended, first-party Laravel integration)</li>
+                        <li class="fragment">Laravel WebSockets (self-hosted, free)</li>
+                    </ul>
+
+                    <p class="fragment pt-4">
+                        This enables true real-time user experiences.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- BROADCAST EVENT EXAMPLE -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Broadcast Event Example</h3>
+
+                    <p class="fragment">
+                        To broadcast an event, simply implement <code>ShouldBroadcast</code>.
+                    </p>
+
+                    <pre class="fragment"><code class="language-php">
+class NewNotificationEvent implements ShouldBroadcast
+{
+    public function __construct(public string $message) {}
+
+    public function broadcastOn()
+    {
+        return new Channel('notifications');
+    }
+}
+        </code></pre>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- TRIGGER BROADCAST -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Triggering a Broadcast Event</h3>
+
+                    <pre class="fragment"><code>
+event(new NewNotificationEvent("New order received!"));
+        </code></pre>
+
+                    <p class="fragment">
+                        The message is instantly pushed to all connected WebSocket clients subscribed to the channel.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- FRONTEND LISTENER -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Frontend Listener (Laravel Echo)</h3>
+                    <p class="fragment">
+                        Laravel Echo provides a beautiful API to subscribe to WebSocket channels.
+                    </p>
+
+                    <pre class="fragment"><code>
+Echo.channel('notifications')
+    .listen('NewNotificationEvent', (e) => {
+        alert(e.message);
+    });
+        </code></pre>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- REAL-TIME DASHBOARD OVERVIEW -->
+                <!-- ========================= -->
+                <section>
+                    <h2>Real-Time Dashboard Updates</h2>
+
+                    <p class="fragment">Laravel Broadcasting + Echo make dashboards update instantly without refreshing
+                        the page.</p>
+
+                    <ul class="space-y-6">
+                        <li class="fragment">Live orders and sales numbers</li>
+                        <li class="fragment">Stock updates and alerts</li>
+                        <li class="fragment">System health & metrics</li>
+                        <li class="fragment">IoT or sensor data streams</li>
+                    </ul>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- DASHBOARD EVENT EXAMPLE -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Example: Live Order Count Event</h3>
+
+                    <pre class="fragment"><code class="language-php">
+class NewOrderEvent implements ShouldBroadcast
+{
+    public function __construct(public int $count) {}
+
+    public function broadcastOn()
+    {
+        return new Channel('dashboard');
+    }
+}
+        </code></pre>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- UPDATE DASHBOARD IN BACKEND -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Updating Dashboard from Backend</h3>
+
+                    <p class="fragment">Whenever an order is placed:</p>
+
+                    <pre class="fragment"><code class="language-php">
+$count = Order::count();
+event(new NewOrderEvent($count));
+        </code></pre>
+
+                    <p class="fragment">
+                        All connected dashboards update instantly — no reloads.
+                    </p>
+                </section>
+
+
+                <!-- ========================= -->
+                <!-- FRONTEND DASHBOARD LISTENER -->
+                <!-- ========================= -->
+                <section>
+                    <h3>Frontend Listener</h3>
+
+                    <pre class="fragment"><code>
+Echo.channel('dashboard')
+    .listen('NewOrderEvent', (e) => {
+        document.getElementById('orderCount').innerText = e.count;
+    });
+        </code></pre>
+
+                    <p class="fragment">
+                        This creates a fully synced, real-time dashboard experience.
+                    </p>
+                </section>
+
+            </section>
+
+            <section>
+                <h3>Hands-on: Notifications with Websockets</h3>
+                <a href="https://dev.to/vimuth7/building-a-simple-laravel-app-with-reverb-a-step-by-step-guide-19g5">Laravel App with Reverb</a>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200, height: 700,
+            slideNumber: 'c/t', controls: true,
+            progress: true, center: true, hash: true
+        });
+    </script>
+
+</body>
+
+</html>
