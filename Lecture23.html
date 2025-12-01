@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture: API Design, Auth, & OpenAPI (Laravel)</title>
+    <!-- Standard Reveal.js imports -->
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+    <!-- Tailwind CSS for custom styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .fragment {
+            opacity: 0.0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Title -->
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 23</h3>
+                <p>2nd December 2025</p>
+            </section>
+
+            <!-- Quiz -->
+            <section>
+                <h3>Quiz</h3>
+                <img class="!mx-auto h-64"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://forms.office.com/r/x8LMkFQKfz"
+                    alt="">
+                <p>https://forms.office.com/r/x8LMkFQKfz</p>
+            </section>
+
+            <!-- Agenda -->
+            <section>
+                <h2>Agenda</h2>
+                <ul>
+                    <li class="fragment">Deployment on Shared Server</li>
+                    <li class="fragment">Deployment on a VPS</li>
+                    <li class="fragment">CI/CD based Deployment</li>
+                </ul>
+            </section>
+
+            <!-- Shared Hosting Section -->
+            <section>
+
+                <section>
+                    <h3>Why Deploy on Shared Server?</h3>
+                    <ul>
+                        <li class="fragment">Cheapest hosting option — ideal for student or early-stage projects</li>
+                        <li class="fragment">Simple management through cPanel / Plesk (no Linux commands needed)</li>
+                        <li class="fragment">Good for small to medium websites with low–moderate traffic</li>
+                        <li class="fragment">No server administration required — security, updates, and backups often
+                            handled by host</li>
+                        <li class="fragment">Fast to set up — you can deploy a Laravel/PHP app within minutes</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Moving Files: Upload Tool / File Manager</h3>
+                    <ul>
+                        <li class="fragment">Most shared hosts provide a browser-based File Manager</li>
+                        <li class="fragment">Allows simple drag-and-drop upload of project files</li>
+                        <li class="fragment">Can upload a ZIP of your Laravel project and extract on server</li>
+                        <li class="fragment">Useful when you don’t have FTP or Git access</li>
+                        <li class="fragment">Fastest way to deploy small updates</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Moving Files: FTP / SFTP</h3>
+                    <ul>
+                        <li class="fragment">Use a client like FileZilla or WinSCP to connect to the server</li>
+                        <li class="fragment">Requires FTP/SFTP credentials from cPanel</li>
+                        <li class="fragment">Provides full access to server files (upload, delete, rename)</li>
+                        <li class="fragment">More reliable for large uploads or frequent updates</li>
+                        <li class="fragment">SFTP is preferred — encrypted connection for security</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Moving Files: GitHub Deployment</h3>
+                    <ul>
+                        <li class="fragment">Some hosting panels allow connecting a GitHub repository</li>
+                        <li class="fragment">You can set up auto-deployment: every push updates the site</li>
+                        <li class="fragment">Pulls only changed files → faster than full upload</li>
+                        <li class="fragment">Good for teams or structured development workflows</li>
+                        <li class="fragment">Requires a build step locally if you cannot run Composer/Node on the server
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Setting Up the Database</h3>
+                    <ul>
+                        <li class="fragment">
+                            Create a new MySQL database from cPanel (usually via “MySQL® Databases”)
+                            — this will hold all your application tables.
+                        </li>
+                        <li class="fragment">
+                            Create a dedicated DB user with a strong password
+                            — avoids using the default master account.
+                        </li>
+                        <li class="fragment">
+                            Assign the user to the database and grant **ALL PRIVILEGES**
+                            — allows Laravel to run migrations, insert data, and modify tables.
+                        </li>
+                        <li class="fragment">
+                            Update your <code>.env</code> file with:
+                            <br>
+                            <code>DB_DATABASE</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code>
+                            — Laravel will connect using these values.
+                        </li>
+                        <li class="fragment">
+                            Test connection by running a migration (if you have shell access) or by loading the app in
+                            the browser.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Setting Up Domain / Subdomain</h3>
+                    <ul>
+                        <li class="fragment">
+                            Add a domain or sub-domain in cPanel (e.g., <strong>app.example.com</strong>) — this creates
+                            a directory for your site on the server.
+                        </li>
+                        <li class="fragment">
+                            Point the domain’s document root to Laravel’s <code>public/</code> folder
+                            — only public files should be accessible from the web.
+                        </li>
+                        <li class="fragment">
+                            If needed, move your Laravel project so that the <code>public/</code> folder matches
+                            the domain root (or update the root path in cPanel).
+                        </li>
+                        <li class="fragment">
+                            Enable HTTPS using AutoSSL / Let’s Encrypt
+                            — ensures secure connections and avoids browser warnings.
+                        </li>
+                        <li class="fragment">
+                            Confirm the domain is resolving by opening it in the browser after DNS propagation.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Configuring the Laravel Project</h3>
+                    <pre><code>
+cp .env.example .env
+php artisan key:generate
+                    </code></pre>
+                    <ul>
+                        <li class="fragment">Update DB credentials</li>
+                        <li class="fragment">Set APP_ENV=production</li>
+                        <li class="fragment">Set APP_DEBUG=false</li>
+                        <li class="fragment">Don't forget to run <code>php artisan storage:link</code></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Applying Optimizations</h3>
+                    <pre><code>
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan optimize
+                    </code></pre>
+                    <p class="fragment">Reduces response time by caching configuration, routes, and views.</p>
+                </section>
+
+                <section>
+                    <h3>No Shell Access?</h3>
+                    <ul>
+                        <li class="fragment">Install dependencies locally → upload <code>vendor/</code> folder</li>
+                        <li class="fragment">Upload <code>node_modules/</code> build output (<code>public/build</code>)
+                        </li>
+                        <li class="fragment">Trigger artisan commands via temporary web routes</li>
+                    </ul>
+
+                    <pre class="fragment"><code>
+// routes/web.php
+Route::get('/optimize', function () {
+    Artisan::call('optimize');
+});
+                    </code></pre>
+
+                    <p class="fragment text-red-600 font-bold">⚠️ Delete these routes after running them!</p>
+                </section>
+
+            </section>
+
+            <!-- VPS Deployment -->
+            <section>
+
+                <section>
+                    <h3>Deployment on VPS</h3>
+                    <p class="fragment">Full control over server environment (root access).</p>
+                </section>
+
+                <section>
+                    <h3>How Is It Different From Shared Hosting?</h3>
+                    <ul>
+                        <li class="fragment">You configure everything yourself</li>
+                        <li class="fragment">Can install multiple apps</li>
+                        <li class="fragment">More secure and scalable</li>
+                        <li class="fragment">Higher performance</li>
+                        <li class="fragment">Requires Linux command-line knowledge</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Deploying Using Containers</h3>
+                    <ul>
+                        <li class="fragment">Encapsulates application + dependencies</li>
+                        <li class="fragment">Avoids “works on my machine” issues</li>
+                        <li class="fragment">Examples: Docker, Podman</li>
+                        <li class="fragment">Easier to ship / version apps</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Challenges of Using Containers</h3>
+                    <ul>
+                        <li class="fragment">Requires knowledge of Docker & Linux</li>
+                        <li class="fragment">Needs resource monitoring</li>
+                        <li class="fragment">Security hardening (images, network)</li>
+                        <li class="fragment">Backup & persistent storage management</li>
+                    </ul>
+                </section>
+
+                <section data-background-iframe="https://www.youtube.com/embed/uYhowDSkwyk" data-background-interactive>
+                </section>
+
+            </section>
+
+            <!-- CI/CD Section -->
+            <section>
+
+                <section>
+                    <h3>Continuous Integration / Continuous Deployment</h3>
+                    <p class="fragment">Automate → Test → Deploy without manual steps.</p>
+                </section>
+
+                <section>
+                    <h3>How Does CI/CD Work?</h3>
+                    <ul>
+                        <li class="fragment">Developer pushes code to Git</li>
+                        <li class="fragment">CI pipeline runs:</li>
+                        <li class="fragment ml-8">installs dependencies</li>
+                        <li class="fragment ml-8">runs tests</li>
+                        <li class="fragment ml-8">builds optimized assets</li>
+                        <li class="fragment">CD pipeline deploys the build to server</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>Hands-On: CI with Github Actions</h3>
+                    <a href="https://dev.to/rafi021/step-by-step-guide-laravel-cicd-with-github-actions-i89">CI/CD with Github Actions</a>
+                </section>
+
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200,
+            height: 700,
+            slideNumber: 'c/t',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true
+        });
+    </script>
+</body>
+
+
+</html>
