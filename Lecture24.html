@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web-Based Application Development — Lecture: Testing & Web Security (Laravel)</title>
+
+    <!-- Reveal.js -->
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/simple.min.css" id="theme" rel="stylesheet" />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        h2 {
+            font-size: 2.25rem;
+        }
+
+        h3 {
+            font-size: 1.625rem;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 1rem;
+            border-radius: .5rem;
+            overflow: auto;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+        }
+
+        .fragment {
+            opacity: 0.0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- TITLE -->
+            <section>
+                <h2>Web Based Application Development</h2>
+                <h3 class="pt-16">Lecture 24</h3>
+                <p>4th December 2025</p>
+            </section>
+
+            <!-- AGENDA -->
+            <section>
+                <h2>Agenda</h2>
+                <ul>
+                    <li class="fragment">Software Testing (Why & How)</li>
+                    <li class="fragment">Laravel Testing with Pest</li>
+                    <li class="fragment">Web Security Fundamentals</li>
+                    <li class="fragment">OWASP Top Vulnerabilities</li>
+                    <li class="fragment">Real Examples of Attacks</li>
+                </ul>
+            </section>
+
+            <!-- TESTING SECTION -->
+            <section>
+
+                <section>
+                    <h3>Why Testing?</h3>
+                    <ul class="text-3xl space-y-8">
+                        <li class="fragment">
+                            Catch bugs before users do - Automated tests simulate real usage and help identify issues
+                            early in development.
+                        </li>
+
+                        <li class="fragment">
+                            Prevent regressions when adding new features - Changes in one part of the system can break
+                            another—tests act as a safety net.
+                        </li>
+
+                        <li class="fragment">
+                            Document expected behavior - Tests serve as living documentation, showing how functions and
+                            endpoints should behave.
+                        </li>
+
+                        <li class="fragment">
+                            Gain confidence before deployment - A passing test suite means the system works as intended,
+                            reducing deployment stress.
+                        </li>
+
+                        <li class="fragment">
+                            Enables CI/CD pipelines - Automated testing is essential for continuous integration—code is
+                            only deployed if all
+                            tests pass.
+                        </li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h3>What Should We Test?</h3>
+                    <ul class="text-3xl space-y-8">
+                        <li class="fragment">
+                            Models & business logic – Ensure that core functionality (calculations, transformations,
+                            rules)
+                            works consistently and handles edge cases.
+                        </li>
+
+                        <li class="fragment">
+                            Controllers & API routes – Verify that endpoints return correct responses, statuses,
+                            and handle request/response flow properly.
+                        </li>
+
+                        <li class="fragment">
+                            Database operations – Test that data is stored, retrieved, updated, and deleted correctly,
+                            including relations and constraints.
+                        </li>
+
+                        <li class="fragment">
+                            Authentication / Authorization – Confirm that only legitimate users can log in and that
+                            permissions and role-based access control work as intended.
+                        </li>
+
+                        <li class="fragment">
+                            Validation rules – Make sure invalid data is rejected and meaningful error messages are
+                            returned,
+                            preventing corrupted or incomplete data from entering the system.
+                        </li>
+
+                        <li class="fragment">
+                            Critical user flows – Test high-value, high-impact actions such as checkout, booking,
+                            payment, registration, or form submissions to ensure reliability.
+                        </li>
+                    </ul>
+                </section>
+
+                <section data-background-iframe="https://www.youtube.com/embed/R3UydV_lYhs" data-background-interactive>
+                </section>
+
+            </section>
+
+            <!-- WEB SECURITY SECTION -->
+            <section>
+
+                <section>
+                    <h3>Why Web Security?</h3>
+                    <ul class="text-3xl space-y-8">
+                        <li class="fragment">
+                            Your application is exposed to the public internet – Anyone can attempt to access,
+                            manipulate,
+                            or attack your system, including automated bots and malicious actors.
+                        </li>
+
+                        <li class="fragment">
+                            User data is always at risk (PII, passwords, payments) – Applications often handle sensitive
+                            information
+                            that must be protected to maintain user trust and comply with privacy regulations.
+                        </li>
+
+                        <li class="fragment">
+                            Security breaches → reputation loss & legal issues – Successful attacks can lead to
+                            financial penalties,
+                            damaged brand credibility, and loss of customers due to lack of trust.
+                        </li>
+
+                        <li class="fragment">
+                            Developers must think in terms of threats – Secure coding requires awareness of common
+                            vulnerabilities
+                            and an understanding of how attackers exploit poorly designed systems.
+                        </li>
+                    </ul>
+                </section>
+
+
+                <section>
+                    <h2>OWASP</h2>
+                    <p class="fragment">
+                        OWASP = Open Web Application Security Project – A global, non-profit organization focused on
+                        improving
+                        the security of software through community-driven research, tools, and best practices.
+                    </p>
+
+                    <p class="fragment">
+                        OWASP maintains the <strong>Top 10 Web Application Vulnerabilities</strong> – a regularly
+                        updated list
+                        highlighting the most critical and commonly exploited security risks faced by modern web
+                        applications.
+                    </p>
+
+                    <p class="fragment">
+                        Following OWASP guidelines helps developers, teams, and organizations build more secure systems
+                        and
+                        defend against real-world attack techniques.
+                    </p>
+                </section>
+            </section>
+
+            <!-- Vulnerabilities -->
+            <section>
+
+                <!-- Injection -->
+                <section>
+                    <h2>Injection Attacks</h2>
+
+                    <p class="fragment text-3xl">
+                        Injection attacks occur when untrusted user input is interpreted as part of a command or query.
+                        This allows attackers to manipulate databases, execute system commands, or inject malicious
+                        scripts.
+                    </p>
+
+                    <p class="fragment text-3xl">
+                        Most common types:
+                        SQL Injection, XSS (Cross-Site Scripting), and Command Injection – each targeting a different
+                        layer
+                        of the application but sharing the same root cause: improper handling of user input.
+                    </p>
+
+                    <p class="fragment text-3xl">
+                        These vulnerabilities often arise when applications fail to sanitize, validate, or escape input
+                        before using it
+                        in critical operations such as database queries, HTML rendering, or shell commands.
+                    </p>
+                </section>
+
+                <section data-background-iframe="https://www.youtube.com/embed/17L4RPszBO8" data-background-interactive>
+                </section>
+
+                <!-- XSS -->
+                <section>
+                    <h3>Cross-Site Scripting (XSS)</h3>
+
+                    <p class="fragment text-3xl">
+                        XSS occurs when an application displays user-provided input directly on a webpage without
+                        sanitization or escaping.
+                        Attackers can inject malicious JavaScript that runs in the victim’s browser.
+                    </p>
+
+                    <p class="fragment text-3xl">
+                        Consequences include stealing session cookies, redirecting users to malicious sites, defacing
+                        pages,
+                        or performing actions on behalf of the user.
+                    </p>
+
+                    <pre class="fragment"><code>
+// ❌ Vulnerable Blade template (renders unescaped HTML)
+{!! $comment->text !!}
+// Attacker can submit: <scrip>alert('Hacked!')</scrip>
+    </code></pre>
+
+                    <pre class="fragment"><code>
+// ✔️ Safe version (auto-escapes dangerous characters)
+{{ $comment->text }}
+    </code></pre>
+                </section>
+
+
+                <!-- Command Injection -->
+                <section>
+                    <h3>Command Injection</h3>
+
+                    <p class="fragment text-3xl">Occurs when untrusted input is passed directly into system commands.
+                    </p>
+
+                    <pre class="fragment"><code>
+// ❌ Vulnerable:
+$filename = $_GET['file'];
+shell_exec("rm $filename");   // attacker: ?file="; rm -rf /"
+    </code></pre>
+
+                    <pre class="fragment"><code>
+// ✔️ Safe version:
+$filename = escapeshellarg($_GET['file']);
+shell_exec("rm {$filename}");
+    </code></pre>
+
+                    <p class="fragment text-3xl"><strong>Best practice:</strong> Avoid shell commands entirely.
+                        Use native PHP/Laravel functions (e.g., <code>Storage::delete()</code>) instead.</p>
+                </section>
+
+            </section>
+
+            <!-- CSRF -->
+            <section>
+                <h2>CSRF — Cross-Site Request Forgery</h2>
+
+                <p class="fragment  text-3xl">
+                    An attack that tricks a logged-in user into performing unwanted actions without their consent.
+                </p>
+
+                <pre class="fragment"><code>
+// ❌ Vulnerable (no CSRF token)
+<form method="POST" action="/update-profile">
+    <input type="text" name="name">
+    <button type="submit">Update</button>
+</form>
+
+// ✔️ Safe (Laravel automatically includes CSRF token)
+<form method="POST" action="/update-profile">
+    @csrf
+    <input type="text" name="name">
+    <button type="submit">Update</button>
+</form>
+    </code></pre>
+
+                <p class="fragment text-3xl">
+                    <strong>Best practice:</strong> Always use @csrf in Laravel forms and validate tokens on
+                    server-side.
+                </p>
+            </section>
+
+            <!-- BROKEN AUTH -->
+            <section>
+                <h3>Broken Authentication</h3>
+
+                <p class="fragment">Failures in handling identity and sessions that let attackers impersonate users.</p>
+
+                <ul class="text-3xl space-y-8">
+                    <li class="fragment">Weak or reused passwords</li>
+                    <li class="fragment">No rate limiting on login attempts</li>
+                    <li class="fragment">Session hijacking / session fixation</li>
+                    <li class="fragment">Leaking or misusing access tokens</li>
+                </ul>
+
+                <p class="fragment"><strong>Impact:</strong> Full account takeover.</p>
+            </section>
+
+
+            <!-- Sensitive Data Exposure -->
+            <section>
+                <h3>Sensitive Data Exposure</h3>
+
+                <p class="fragment text-3xl">
+                    Protect sensitive information from being stolen or leaked.
+                </p>
+
+                <ul class="space-y-8 text-3xl">
+                    <li class="fragment">Encrypt data at rest (e.g., database encryption)</li>
+                    <li class="fragment">Encrypt data in transit using HTTPS/TLS</li>
+                    <li class="fragment">Use strong hashing for passwords (bcrypt, Argon2)</li>
+                </ul>
+
+                <p class="fragment text-3xl">
+                    <strong>Best practice:</strong> Never store sensitive data in plaintext and always follow modern
+                    encryption standards.
+                </p>
+            </section>
+
+
+            <!-- Access Control -->
+            <section>
+                <h2>Broken Access Control</h2>
+
+                <p class="fragment">
+                    Improper restrictions on what users can do—leading to unauthorized data access.
+                    <strong>Top cause of data breaches.</strong>
+                </p>
+
+                <pre class="fragment"><code>
+// ❌ Vulnerable:
+$order = Order::find($request->id);
+// No check → any user can access any order
+    </code></pre>
+
+
+                <pre class="fragment"><code>
+// ✔️ Safe:
+$order = Order::where('user_id', auth()->id())
+              ->findOrFail($request->id);
+// Ensures user only accesses their own orders
+    </code></pre>
+            </section>
+
+            <!-- Security Misconfiguration -->
+            <section>
+                <h3>Security Misconfiguration</h3>
+
+                <p class="fragment text-3xl">
+                    Insecure default settings or misconfigured systems can expose your application to attacks.
+                </p>
+
+                <ul class="text-3xl space-y-8">
+                    <li class="fragment">Leaving <code>APP_DEBUG=true</code> in production</li>
+                    <li class="fragment">Exposing sensitive files (e.g., <code>.env</code>)</li>
+                    <li class="fragment">Incorrect file or directory permissions</li>
+                    <li class="fragment">Misconfigured public storage or server paths</li>
+                </ul>
+
+                <p class="fragment text-3xl">
+                    <strong>Best practice:</strong> Harden server and application configs, remove debug info, and secure
+                    sensitive files.
+                </p>
+            </section>
+
+
+            <!-- Known Vulnerabilities -->
+            <section>
+                <section>
+                    <h3>Using Components With Known Vulnerabilities</h3>
+                    <p class="fragment">Old composer packages, npm libraries, outdated PHP versions.</p>
+                    <pre class="fragment"><code>
+composer outdated
+npm audit
+        </code></pre>
+                </section>
+            </section>
+
+            <!-- SSRF -->
+            <!-- SSRF -->
+            <section>
+                <h3>Server-Side Request Forgery (SSRF)</h3>
+
+                <p class="fragment text-3xl">
+                    An attacker tricks the server into making requests to internal or sensitive endpoints.
+                    (e.g., <code>http://localhost</code>, cloud metadata URLs)
+                </p>
+
+                <pre class="fragment"><code>// ❌ Vulnerable:
+$url = $_GET['url'];
+file_get_contents($url);   
+
+// ✔️ Safe approach:
+$allowedHosts = ['example.com'];
+$host = parse_url($_GET['url'], PHP_URL_HOST);
+
+if (! in_array($host, $allowedHosts)) {
+    abort(403);
+}
+
+file_get_contents($_GET['url']);
+    </code></pre>
+
+                <p class="fragment text-3xl">
+                    <strong>Best practice:</strong> Use allow‑lists, block internal IP ranges,
+                    or proxy outbound requests through a safe gateway.
+                </p>
+            </section>
+
+
+            <!-- DOS -->
+            <!-- Denial-of-Service / DDoS -->
+            <section>
+                <h2>Denial‑of‑Service (DoS) / DDoS</h2>
+
+                <p class="fragment">
+                    Attackers overload your server with excessive requests, making it slow or unreachable.
+                </p>
+
+                <ul>
+                    <li class="fragment">Implement rate limiting (e.g., Laravel Throttle middleware)</li>
+                    <li class="fragment">Use caching to reduce server load</li>
+                    <li class="fragment">Protect with Cloudflare / WAF (Web Application Firewall)</li>
+                </ul>
+
+                <p class="fragment">
+                    <strong>Goal:</strong> Keep your app responsive even during high traffic or attack attempts.
+                </p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            width: 1200,
+            height: 700,
+            slideNumber: 'c/t',
+            controls: true,
+            progress: true,
+            center: true,
+            hash: true
+        });
+    </script>
+
+</body>
+
+</html>
